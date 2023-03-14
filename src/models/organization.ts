@@ -1,25 +1,30 @@
 import {
-    Schema, model, Model, Document
+    Schema, model, Model
 } from "mongoose";
 import { autoIncrement } from "../plugin/autoincrement";
 
-interface Organization {
-    organizationID: String,
-    organizationName: String,
+export interface Organization {
+    _id: Schema.Types.ObjectId,
+    ID: String,
+    name: String,
     contactNo: String,
     address: String,
-    asd: String,
+    passcode: String,
+    creationDate: String
 
 }
 
 const organizationSchema = new Schema<Organization>({
-    organizationID: { type: String, unique: true },
-    organizationName: { type: String, required: true },
+    ID: { type: String, unique: true },
+    name: { type: String, required: true },
     contactNo: { type: String, required: true },
     address: { type: String, required: true },
+    passcode: { type: String, required: true },
+    creationDate: { type: Schema.Types.Date },
 })
 
-organizationSchema.plugin(autoIncrement, { fieldName: "organizationID", ModelName: "organization", prefix: "OR_" })
+organizationSchema.plugin(autoIncrement, { fieldName: "ID" as keyof Organization, ModelName: "organization", prefix: "OR_" })
+
 
 const OrganizationModel: Model<Organization> = model<Organization>('Organization', organizationSchema);
 export default OrganizationModel;

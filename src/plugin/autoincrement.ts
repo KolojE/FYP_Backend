@@ -1,5 +1,4 @@
-import { Document, model, Schema } from "mongoose";
-import { resolve } from "path";
+import { model, Schema } from "mongoose";
 
 interface Object {
     ModelName: string,
@@ -7,28 +6,29 @@ interface Object {
     prefix: string
 }
 
-interface counter extends Document {
-    _id: String,
+interface counter {
+    collectionID: String,
     seq: number,
 }
 const counterSchema = new Schema<counter>({
-    _id: { type: Schema.Types.ObjectId, required: true },
+    collectionID: { type: String, required: true, unique: true },
     seq: { type: Number, required: true }
-}, { _id: false })
+})
 
 const counterModel = model<counter>("counter", counterSchema);
+
 
 
 export function autoIncrement(schema: Schema, options: Object) {
 
     schema.pre('save', function (next) {
+
         const doc = this;
-        const counterID: string = options.ModelName;
-        console.log(counterID)
+        const collectionID: string = options.ModelName;
         try {
-            counterModel.findByIdAndUpdate(counterID, { $inc: { seq: 1 } }, { new: true }).then(async (counterDoc) => {
+            counterModel.findOneAndUpdate({ collectionID: collectionID }, { $inc: { seq: 1 } }, { new: true }).then(async (counterDoc) => {
                 if (counterDoc == null) {
-                    const newCounter = new counterModel({ _id: options.ModelName, seq: 0 });
+                    const newCounter = new counterModel({ collectionID: options.ModelName, seq: 0 });
                     await newCounter.save();
                 }
                 doc[options.fieldName] = getID(counterDoc?.seq ?? 0, options.prefix);

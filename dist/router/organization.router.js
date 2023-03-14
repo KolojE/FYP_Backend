@@ -7,8 +7,8 @@ const express_1 = __importDefault(require("express"));
 const organization_controller_1 = require("../controller/organization.controller");
 const organizationRouter = express_1.default.Router();
 organizationRouter.use(express_1.default.json());
-organizationRouter.get('/getAllOrganization', organization_controller_1.get_All_Organization);
-organizationRouter.post('/addOrganization', organization_controller_1.insert_Organization);
+organizationRouter.get('/getAllOrganization', organization_controller_1.get_All_Organizations);
+organizationRouter.post('/addOrganization', organization_controller_1.register_Organization);
 organizationRouter.post('/createCollection', organization_controller_1.create_Collection);
 exports.default = organizationRouter;
 //# sourceMappingURL=organization.router.js.map

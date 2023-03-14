@@ -1,17 +1,21 @@
 import { Model, model, Schema } from "mongoose";
+import { autoIncrement } from "../plugin/autoincrement";
 
 
 
 interface Administrator {
-    admin_ID: Schema.Types.ObjectId,
-    admin_Password: string,
+    adminID: String,
+    adminPassword: string,
     organization: Schema.Types.ObjectId,
 }
 
+
 const administratorSchema = new Schema<Administrator>({
-    admin_ID: { type: Schema.Types.ObjectId, required: true },
-    admin_Password: { type: String, required: true },
+    adminID: { type: String, unique: true },
+    adminPassword: { type: String, required: true },
     organization: { type: Schema.Types.ObjectId }
 });
+
+administratorSchema.plugin(autoIncrement, { ModelName: "administrtor", fieldName: "adminID" as keyof Administrator, prefix: "AM_" })
 
 const administratorModel: Model<Administrator> = model<Administrator>('Administrator', administratorSchema);

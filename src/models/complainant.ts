@@ -1,24 +1,42 @@
-import { Schema, ObjectId, model, Model } from "mongoose"
-interface Complainant {
-    complainant_ID: Schema.Types.ObjectId,
-    complainant_Email: string,
-    complainant_Password: string,
-    complainant_Profile: string,
+import { Schema, model, Model } from "mongoose"
+import { autoIncrement } from "../plugin/autoincrement";
+
+export interface Complainant {
+    ID?: string,
+    email: string,
+    password: string,
+    profile: {
+        username: String,
+        contact?: string,
+    },
     organization: {
-        type: Schema.Types.ObjectId, ref: 'Organization'
+        _id: Schema.Types.ObjectId,
+        ID: String,
     }
+    passwordSalt: String,
+
 }
 
 const complainantSchema = new Schema<Complainant>({
-    complainant_ID: { type: Schema.Types.ObjectId, required: true },
-    complainant_Email: { type: String, required: true },
-    complainant_Password: { type: String, required: true },
-    complainant_Profile: { type: String, required: true },
+    ID: { type: String, unique: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    profile: {
+        username: {
+            type: String, required: true
+        },
+        contact: {
+            type: String
+        }
+    },
     organization: {
-        type: Schema.Types.ObjectId, ref: 'Organization'
-    }
+        _id: { type: Schema.Types.ObjectId, require: true },
+        ID: { type: String, required: true }
+    },
+    passwordSalt: { type: String, required: true }
 });
 
+complainantSchema.plugin(autoIncrement, { fieldName: "ID", ModelName: "complainant", prefix: "CP_" })
 
 const complainantModel: Model<Complainant> = model<Complainant>('Complainant', complainantSchema)
 

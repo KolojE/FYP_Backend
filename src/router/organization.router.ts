@@ -1,5 +1,5 @@
 import express, { Router } from "express";
-import { create_Collection, get_All_Organization, insert_Organization } from "../controller/organization.controller";
+import { create_Collection, get_All_Organizations, register_Organization } from "../controller/organization.controller";
 
 
 const organizationRouter: Router = express.Router();
@@ -7,9 +7,9 @@ const organizationRouter: Router = express.Router();
 organizationRouter.use(express.json())
 
 //get request
-organizationRouter.get('/getAllOrganization', get_All_Organization);
+organizationRouter.get('/getAllOrganization', get_All_Organizations);
 //post request
-organizationRouter.post('/addOrganization', insert_Organization);
+organizationRouter.post('/addOrganization', register_Organization);
 
 //post request
 organizationRouter.post('/createCollection', create_Collection);

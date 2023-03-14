@@ -1,7 +1,8 @@
 import { ConnectDatabase } from "./config/db";
-import express, { Express, Request, Response } from "express";
+import express, { Express } from "express";
 import { config } from "dotenv";
 import organizationRouter from "./router/organization.router";
+import complainantRouter from "./router/complainants.router";
 
 config();
 
@@ -11,6 +12,7 @@ const app: Express = express();
 
 app.use(express.json())
 app.use("/Organization", organizationRouter)
+app.use("/Complainant", complainantRouter)
 
 app.listen(8080, () => {
     console.log("Listening on port:8080")
