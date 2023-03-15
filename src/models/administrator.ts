@@ -3,19 +3,36 @@ import { autoIncrement } from "../plugin/autoincrement";
 
 
 
-interface Administrator {
-    adminID: String,
-    adminPassword: string,
-    organization: Schema.Types.ObjectId,
+export interface Administrator {
+    ID: string,
+    email: string,
+    password: {
+        hashed: string,
+        salt: string,
+    },
+    organization: {
+        _id: Schema.Types.ObjectId,
+        ID: string,
+    },
 }
 
 
 const administratorSchema = new Schema<Administrator>({
-    adminID: { type: String, unique: true },
-    adminPassword: { type: String, required: true },
-    organization: { type: Schema.Types.ObjectId }
+    ID: { type: String, unique: true },
+    email: { type: String, required: true, unique: true },
+    password: {
+        hashed: { type: String, required: true },
+        salt: { type: String, required: true },
+    },
+    organization: {
+        _id: {
+            type: Schema.Types.ObjectId, required: true
+        },
+        ID: {
+            type: String, required: true
+        }
+    }
 });
 
-administratorSchema.plugin(autoIncrement, { ModelName: "administrtor", fieldName: "adminID" as keyof Administrator, prefix: "AM_" })
-
-const administratorModel: Model<Administrator> = model<Administrator>('Administrator', administratorSchema);
+administratorSchema.plugin(autoIncrement, { ModelName: "administrator", fieldName: "ID", prefix: "AM_" })
+export const administratorModel: Model<Administrator> = model<Administrator>('Administrator', administratorSchema);

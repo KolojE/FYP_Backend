@@ -3,48 +3,36 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.create_Collection = exports.get_All_Organizations = exports.register_Organization = void 0;
+exports.create_Collection = exports.register_Organization = void 0;
 const organization_1 = __importDefault(require("../models/organization"));
 const organization_service_1 = require("../services/organization.service");
-async function register_Organization(req, res) {
+async function register_Organization(req, res, next) {
     console.log(req.body);
     try {
-        const result = await organization_service_1.OrganizationService.create_New_Organization(req.body);
-        console.log("New Organization is inserted in the database");
+        console.log("Creating new organization");
+        const newOrganization = await organization_service_1.OrganizationService.create_New_Organization(req.body);
+        console.log("Creating Root Admin");
+        const newRootAdmin = await organization_service_1.OrganizationService.create_Root_Admin(newOrganization, req.body);
         res.status(200).json({
-            message: "successfully inserted organization",
+            message: "successfully inserted organization and root admin is created",
             isCompleted: true,
-            resolved: result,
+            resolve: {
+                organization: {
+                    ID: newOrganization.ID,
+                    Name: newOrganization.name,
+                },
+                rootAdmin: {
+                    ID: newRootAdmin.ID,
+                    email: newRootAdmin.email,
+                }
+            },
         }).send();
     }
-    catch (error) {
-        res.status(500).json({
-            message: "failed to insert organization",
-            isCompleted: false,
-            error: error,
-        });
+    catch (err) {
+        next(err);
     }
 }
 exports.register_Organization = register_Organization;
-async function get_All_Organizations(req, res) {
-    console.log("get all organization");
-    try {
-        const result = organization_service_1.OrganizationService.get_All_Organizations();
-        res.status(200).json({
-            message: "Sucessfully returned all organization",
-            isCompleted: true,
-            resolved: result
-        }).send();
-    }
-    catch (error) {
-        res.status(500).json({
-            message: "Sucessfully returned all organization",
-            isCompleted: true,
-            errir: error
-        }).send();
-    }
-}
-exports.get_All_Organizations = get_All_Organizations;
 function create_Collection(req, res) {
     organization_1.default.createCollection().then((resolved) => {
         res.status(200).json({

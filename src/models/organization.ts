@@ -5,12 +5,12 @@ import { autoIncrement } from "../plugin/autoincrement";
 
 export interface Organization {
     _id: Schema.Types.ObjectId,
-    ID: String,
-    name: String,
-    contactNo: String,
-    address: String,
-    passcode: String,
-    creationDate: String
+    ID: string,
+    name: string,
+    contactNo: string,
+    address: string,
+    passcode: string,
+    creationDate: Schema.Types.Date
 
 }
 
