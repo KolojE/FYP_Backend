@@ -1,8 +1,7 @@
-import { Administrator, administratorModel } from "../models/administrator";
 import OrganizationModel, { Organization } from "../models/organization";
 import { hashPassword } from "../utils/hash";
 import { validationService } from "./validation.service";
-
+import userModel, { role, User } from "../models/user";
 type newOrganization = {
     name: string,
     address: string,
@@ -19,6 +18,7 @@ export namespace OrganizationService {
 
         const newOrganization = data;
 
+        await validationService.check_Email_Availability(newOrganization.rootAdmin.email);
 
         const newOrganization_ = new OrganizationModel({
             name: newOrganization.name,
@@ -36,12 +36,12 @@ export namespace OrganizationService {
 
     }
 
-    export async function create_Root_Admin(newOrganization: Organization, data: newOrganization): Promise<Administrator> {
+    export async function create_Root_Admin(newOrganization: Organization, data: newOrganization): Promise<User> {
         const newRootAdmin = data.rootAdmin;
         const hashedPassword = await hashPassword(newRootAdmin.password);
         validationService.is_Email(newRootAdmin.email);
         //create a default administrator
-        const newRootAdmin_ = new administratorModel({
+        const newAdminUser = new userModel({
             email: newRootAdmin.email,
             organization: {
                 _id: newOrganization._id,
@@ -50,9 +50,10 @@ export namespace OrganizationService {
             password: {
                 hashed: hashedPassword.hashValue,
                 salt: hashedPassword.salt,
-            }
+            },
+            role: role.admin,
         });
-        return await newRootAdmin_.save();
+        return await newAdminUser.save();
     }
 
 

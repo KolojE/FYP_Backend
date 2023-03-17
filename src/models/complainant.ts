@@ -1,47 +1,24 @@
-import { Schema, model, Model } from "mongoose"
+
+import { Document, model, Schema } from "mongoose";
 import { autoIncrement } from "../plugin/autoincrement";
 
-export interface Complainant {
+interface Complainant extends Document {
     ID: string,
-    email: string,
-    password: {
-        hashed: string,
-        salt: string,
-    },
-    profile: {
-        username: string,
-        contact?: string,
-    },
-    organization: {
+    User: {
         _id: Schema.Types.ObjectId,
-        ID: String,
-    }
-
+        ID: string,
+    },
 }
+
 
 const complainantSchema = new Schema<Complainant>({
     ID: { type: String, unique: true },
-    email: { type: String, required: true, unique: true },
-    password: {
-        hash: { type: String, required: true },
-        passwordSalt: { type: String, required: true }
-    },
-    profile: {
-        username: {
-            type: String, required: true
-        },
-        contact: {
-            type: String
-        }
-    },
-    organization: {
-        _id: { type: Schema.Types.ObjectId, require: true },
-        ID: { type: String, required: true }
-    },
-});
+    User: {
+        _id: { type: String, unique: true, ref: "User" },
+        ID: { type: String, unique: true, ref: "User" }
+    }
+})
+complainantSchema.plugin(autoIncrement, { fieldName: "ID", ModelName: "Complainant", prefix: "Comp_" });
+const complaiantModel = model<Complainant>("Complainant", complainantSchema);
 
-complainantSchema.plugin(autoIncrement, { fieldName: "ID", ModelName: "complainant", prefix: "CP_" })
-
-const complainantModel: Model<Complainant> = model<Complainant>('Complainant', complainantSchema)
-
-export default complainantModel;
+export default complaiantModel;

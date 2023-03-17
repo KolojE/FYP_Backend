@@ -1,5 +1,4 @@
 import { clientError, statusCode } from "../exception/errorHandler";
-import complainantModel from "../models/complainant";
 
 
 export namespace validationService {
@@ -15,7 +14,7 @@ export namespace validationService {
         //TODO
 
         //check if it exists in conplainants 
-        if (await complainantModel.exists({ email: email }) !== null) {
+        if (await userModel.exists({ email: email }) !== null) {
             throw {
                 data: email,
                 message: "Email already exits",

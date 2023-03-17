@@ -36,15 +36,14 @@ export async function register_Organization(req: Request, res: Response, next: F
 export function create_Collection(req: Request, res: Response) {
     OrganizationModel.createCollection().then((resolved) => {
         res.status(200).json({
-            message: "Organization Collection Is Created, This doesnt have to be done manually since moongose will handle the creation.",
+            message: "Organization Collection is created, This doesnt have to be done manually since moongose will handle the creation.",
             resolved: resolved
         }).send();
     }, (rejected) => {
         res.status(500).json({
             message: "Creation failed, Please see the error for details",
             erro: rejected
-        }).send(
-        );
+        }).send();
 
     })
 }

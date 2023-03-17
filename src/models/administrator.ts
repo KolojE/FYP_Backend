@@ -1,38 +1,23 @@
-import { Model, model, Schema } from "mongoose";
+import { Document, model, Schema } from "mongoose";
 import { autoIncrement } from "../plugin/autoincrement";
 
-
-
-export interface Administrator {
+interface Administrator extends Document {
     ID: string,
-    email: string,
-    password: {
-        hashed: string,
-        salt: string,
-    },
-    organization: {
+    User: {
         _id: Schema.Types.ObjectId,
         ID: string,
     },
 }
 
 
-const administratorSchema = new Schema<Administrator>({
+const adminSchema = new Schema<Administrator>({
     ID: { type: String, unique: true },
-    email: { type: String, required: true, unique: true },
-    password: {
-        hashed: { type: String, required: true },
-        salt: { type: String, required: true },
-    },
-    organization: {
-        _id: {
-            type: Schema.Types.ObjectId, required: true
-        },
-        ID: {
-            type: String, required: true
-        }
+    User: {
+        _id: { type: String, unique: true, ref: "User" },
+        ID: { type: String, unique: true, ref: "User" }
     }
-});
+})
+adminSchema.plugin(autoIncrement, { fieldName: "ID", ModelName: "administrator", prefix: "Admin_" });
+const adminModel = model<Administrator>("Administrator", adminSchema);
 
-administratorSchema.plugin(autoIncrement, { ModelName: "administrator", fieldName: "ID", prefix: "AM_" })
-export const administratorModel: Model<Administrator> = model<Administrator>('Administrator', administratorSchema);
+export default adminModel;

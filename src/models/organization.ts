@@ -1,9 +1,10 @@
+import { Document } from "mongoose";
 import {
     Schema, model, Model
 } from "mongoose";
 import { autoIncrement } from "../plugin/autoincrement";
 
-export interface Organization {
+export interface Organization extends Document {
     _id: Schema.Types.ObjectId,
     ID: string,
     name: string,
@@ -23,7 +24,7 @@ const organizationSchema = new Schema<Organization>({
     creationDate: { type: Schema.Types.Date },
 })
 
-organizationSchema.plugin(autoIncrement, { fieldName: "ID" as keyof Organization, ModelName: "organization", prefix: "OR_" })
+organizationSchema.plugin(autoIncrement, { fieldName: "ID", ModelName: "organization", prefix: "OR_" })
 
 
 const OrganizationModel: Model<Organization> = model<Organization>('Organization', organizationSchema);
