@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.validationService = void 0;
 const errorHandler_1 = require("../exception/errorHandler");
-const complainant_1 = __importDefault(require("../models/complainant"));
+const user_1 = __importDefault(require("../models/user"));
 var validationService;
 (function (validationService) {
     function is_Email(email) {
@@ -14,7 +14,7 @@ var validationService;
     }
     validationService.is_Email = is_Email;
     async function check_Email_Availability(email) {
-        if (await complainant_1.default.exists({ email: email }) !== null) {
+        if (await user_1.default.exists({ email: email }) !== null) {
             throw {
                 data: email,
                 message: "Email already exits",

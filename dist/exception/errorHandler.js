@@ -6,6 +6,7 @@ var statusCode;
     statusCode[statusCode["badRequest"] = 400] = "badRequest";
     statusCode[statusCode["notfound"] = 404] = "notfound";
     statusCode[statusCode["conflict"] = 409] = "conflict";
+    statusCode[statusCode["unauthorize"] = 401] = "unauthorize";
 })(statusCode = exports.statusCode || (exports.statusCode = {}));
 function clientErrorHandler(err, req, res, next) {
     res.status(err.status ? err.status : 500).json({

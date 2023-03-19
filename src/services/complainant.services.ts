@@ -1,6 +1,7 @@
 import { clientError, statusCode } from "../exception/errorHandler";
-import complainantModel, { Complainant } from "../models/complainant";
+import complainantModel from "../models/complainant";
 import OrganizationModel, { Organization } from "../models/organization";
+import userModel, { role, User } from "../models/user";
 import { hashPassword } from "../utils/hash";
 import { validationService } from "./validation.service";
 
@@ -20,9 +21,10 @@ interface newComplainant {
 }
 
 export namespace complainantService {
-    export async function register_Complainant(complainantData: newComplainant): Promise<Complainant> {
+    export async function register_Complainant(complainantData: newComplainant): Promise<User> {
 
         const newComplainant: newComplainant = complainantData;
+        console.log(newComplainant)
 
         //Get organization from submitted ID
         const Organization = await OrganizationModel.findOne({ ID: newComplainant.organization.ID })
@@ -49,7 +51,7 @@ export namespace complainantService {
         //hash password and store salt and hashed password
         const hashedPassword = await hashPassword(newComplainant.password);
 
-        const newComplainant_ = new complainantModel({
+        const newComplainant_ = new userModel({
             email: newComplainant.email,
             password: {
                 hashed: hashedPassword.hashValue,
@@ -59,8 +61,11 @@ export namespace complainantService {
             profile: {
                 username: newComplainant.profile.username,
                 contact: newComplainant.profile.contactNo,
-            }
+            },
+            role: role.complainant,
         })
+
+
 
         return newComplainant_.save();
 

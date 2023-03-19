@@ -36,7 +36,7 @@ exports.register_Organization = register_Organization;
 function create_Collection(req, res) {
     organization_1.default.createCollection().then((resolved) => {
         res.status(200).json({
-            message: "Organization Collection Is Created, This doesnt have to be done manually since moongose will handle the creation.",
+            message: "Organization Collection is created, This doesnt have to be done manually since moongose will handle the creation.",
             resolved: resolved
         }).send();
     }, (rejected) => {

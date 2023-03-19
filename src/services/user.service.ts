@@ -3,6 +3,7 @@ import AdminModel from "../models/administrator";
 import complaiantModel from "../models/complainant";
 
 export namespace userService {
+
     export async function create_role(doc: User, next: Function) {
         if (doc.role === role.admin) {
             const newAdmin = new AdminModel({

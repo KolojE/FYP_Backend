@@ -18,12 +18,10 @@ export async function hashPassword(password: string): Promise<hash_salt> {
 
 }
 
-export async function verify(password: string, salt: string, hashedPassword: string): Promise<boolean> {
+export async function verify(password: string, hashedPassword: string): Promise<boolean> {
 
-    const hashValue = await hash(password, salt);
-
-    const result = compare(hashValue, hashedPassword);
-
+    const result = await compare(password, hashedPassword);
+    console.log(result)
 
     return result;
 

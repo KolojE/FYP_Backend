@@ -12,9 +12,9 @@ async function hashPassword(password) {
     return result;
 }
 exports.hashPassword = hashPassword;
-async function verify(password, salt, hashedPassword) {
-    const hashValue = await (0, bcrypt_1.hash)(password, salt);
-    const result = (0, bcrypt_1.compare)(hashValue, hashedPassword);
+async function verify(password, hashedPassword) {
+    const result = await (0, bcrypt_1.compare)(password, hashedPassword);
+    console.log(result);
     return result;
 }
 exports.verify = verify;

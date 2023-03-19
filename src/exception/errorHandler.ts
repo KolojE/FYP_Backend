@@ -4,7 +4,8 @@ import { Request, Response } from "express";
 export enum statusCode {
     badRequest = 400,
     notfound = 404,
-    conflict = 409
+    conflict = 409,
+    unauthorize = 401
 
 }
 export type clientError = {
