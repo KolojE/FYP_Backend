@@ -1,1 +1,1 @@
-{"version":3,"file":"authentication.middleware.js","sourceRoot":"","sources":["../../src/middleware/authentication.middleware.ts"],"names":[],"mappings":";;;AAGA,SAAgB,wBAAwB,CAAC,GAAY,EAAE,GAAa,EAAE,IAAc;IAChF,MAAM,KAAK,GAAG,GAAG,CAAC,OAAO,CAAC,eAAe,CAAC,CAAC;AAG/C,CAAC;AAJD,4DAIC"}
+{"version":3,"file":"authentication.middleware.js","sourceRoot":"","sources":["../../src/middleware/authentication.middleware.ts"],"names":[],"mappings":";;;AAGA,SAAgB,wBAAwB,CAAC,GAAY,EAAE,GAAa,EAAE,IAAc;IAChF,MAAM,KAAK,GAAG,GAAG,CAAC,OAAO,CAAC,eAAe,CAAC,CAAC;AAE/C,CAAC;AAHD,4DAGC"}

@@ -20,7 +20,7 @@ interface newComplainant {
 
 }
 
-export namespace complainantService {
+export namespace registrationService {
     export async function register_Complainant(complainantData: newComplainant): Promise<User> {
 
         const newComplainant: newComplainant = complainantData;

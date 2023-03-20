@@ -10,7 +10,7 @@ export async function authentication(req: Request, res: Response, next: Function
         console.log(user)
         if (user === null)
             throw {
-                message: "Failed to authenticate user, no user found",
+                message: "Failed to authenticate user, no user found.",
                 status: statusCode.notfound,
             } as clientError
 

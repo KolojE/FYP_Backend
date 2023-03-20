@@ -26,7 +26,7 @@ var authenticationService;
             else {
                 throw {
                     message: "password incorrect !",
-                    statusCode: errorHandler_1.statusCode.unauthorize
+                    status: errorHandler_1.statusCode.unauthorize
                 };
             }
         }

@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.register_Complainant = void 0;
-const complainant_services_1 = require("../services/complainant.services");
+const registration_service_1 = require("../services/registration.service");
 async function register_Complainant(req, res, next) {
     try {
-        const result = await complainant_services_1.regisrationService.register_Complainant(req.body);
+        const result = await registration_service_1.registrationService.register_Complainant(req.body);
         res.status(200).json({
             message: "Registration Successful !",
             resolved: result,
@@ -15,4 +15,4 @@ async function register_Complainant(req, res, next) {
     }
 }
 exports.register_Complainant = register_Complainant;
-//# sourceMappingURL=complainant.controller.js.map
+//# sourceMappingURL=registration.controller.js.map

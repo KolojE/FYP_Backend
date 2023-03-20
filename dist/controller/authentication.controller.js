@@ -9,7 +9,7 @@ async function authentication(req, res, next) {
         console.log(user);
         if (user === null)
             throw {
-                message: "Failed to authenticate user, no user found",
+                message: "Failed to authenticate user, no user found.",
                 status: errorHandler_1.statusCode.notfound,
             };
         const token = await authentication_services_1.authenticationService.generateJWT(user);

@@ -35,8 +35,8 @@ export namespace authenticationService {
             else {
                 throw {
                     message: "password incorrect !",
-                    statusCode: statusCode.unauthorize
-                }
+                    status: statusCode.unauthorize
+                } as clientError
             }
         }
 

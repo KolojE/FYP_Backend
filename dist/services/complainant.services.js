@@ -26,14 +26,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.complainantService = void 0;
+exports.regisrationService = void 0;
 const errorHandler_1 = require("../exception/errorHandler");
 const organization_1 = __importDefault(require("../models/organization"));
 const user_1 = __importStar(require("../models/user"));
 const hash_1 = require("../utils/hash");
 const validation_service_1 = require("./validation.service");
-var complainantService;
-(function (complainantService) {
+var regisrationService;
+(function (regisrationService) {
     async function register_Complainant(complainantData) {
         const newComplainant = complainantData;
         console.log(newComplainant);
@@ -67,6 +67,6 @@ var complainantService;
         });
         return newComplainant_.save();
     }
-    complainantService.register_Complainant = register_Complainant;
-})(complainantService = exports.complainantService || (exports.complainantService = {}));
+    regisrationService.register_Complainant = register_Complainant;
+})(regisrationService = exports.regisrationService || (exports.regisrationService = {}));
 //# sourceMappingURL=complainant.services.js.map
