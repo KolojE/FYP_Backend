@@ -7,6 +7,7 @@ const authentication_middleware_1 = require("../middleware/authentication.middle
 const administratorRouter = (0, express_1.Router)();
 administratorRouter.use(authentication_middleware_1.authenticationMiddleware);
 administratorRouter.post("/addForm", administrator_controller_1.addFormController);
+administratorRouter.post("/updateForm", administrator_controller_1.updateFormController);
 administratorRouter.use(errorHandler_1.clientErrorHandler);
 administratorRouter.use(errorHandler_1.errorHandler);
 exports.default = administratorRouter;

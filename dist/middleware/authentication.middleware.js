@@ -13,7 +13,6 @@ async function authenticationMiddleware(req, res, next) {
                 status: errorHandler_1.statusCode.unauthorize,
             };
         }
-        console.log(token);
         const user = await authentication_services_1.authenticationService.verifyToken(token);
         if (!user) {
             throw {

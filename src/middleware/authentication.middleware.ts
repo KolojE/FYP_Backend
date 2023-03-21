@@ -15,7 +15,6 @@ export async function authenticationMiddleware(req: Request, res: Response, next
             } as clientError
         }
 
-        console.log(token)
         const user = await authenticationService.verifyToken(token);
         if (!user) {
             throw {

@@ -1,7 +1,7 @@
 import { model, Model, Schema, Document } from "mongoose";
 
 
-export interface form extends Document {
+export interface Form extends Document {
     name: Schema.Types.String,
     fields: Schema.Types.Array,
     organization: {
@@ -12,7 +12,7 @@ export interface form extends Document {
     creationDate: Schema.Types.Date,
 }
 
-const formSchema = new Schema<form>(
+const formSchema = new Schema<Form>(
     {
         name: { type: Schema.Types.String, required: true },
         fields: { type: Schema.Types.Array, required: true },
@@ -25,5 +25,5 @@ const formSchema = new Schema<form>(
 
     })
 
-export const formModel: Model<form> = model<form>("Form", formSchema)
+export const formModel: Model<Form> = model<Form>("Form", formSchema)
 
