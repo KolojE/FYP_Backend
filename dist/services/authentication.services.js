@@ -18,11 +18,11 @@ var authenticationService;
                 status: errorHandler_1.statusCode.unauthorize
             };
         }
-        const user = await user_1.default.findOne({ email: login.identifier }).exec();
-        if (user) {
+        const loginUser = await user_1.default.findOne({ email: login.identifier }).exec();
+        if (loginUser) {
             console.log(login.password);
-            if (await (0, hash_1.verify)(login.password, user.password.hashed))
-                return user;
+            if (await (0, hash_1.verify)(login.password, loginUser.password.hashed))
+                return loginUser;
             else {
                 throw {
                     message: "password incorrect !",

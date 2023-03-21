@@ -8,8 +8,6 @@ interface Administrator extends Document {
         ID: string,
     },
 }
-
-
 const adminSchema = new Schema<Administrator>({
     ID: { type: String, unique: true },
     User: {

@@ -4,7 +4,6 @@ import { OrganizationService } from "../services/organization.service";
 
 
 export async function register_Organization(req: Request, res: Response, next: Function) {
-    console.log(req.body)
     try {
         console.log("Creating new organization");
         const newOrganization = await OrganizationService.create_New_Organization(req.body)

@@ -7,7 +7,6 @@ exports.create_Collection = exports.register_Organization = void 0;
 const organization_1 = __importDefault(require("../models/organization"));
 const organization_service_1 = require("../services/organization.service");
 async function register_Organization(req, res, next) {
-    console.log(req.body);
     try {
         console.log("Creating new organization");
         const newOrganization = await organization_service_1.OrganizationService.create_New_Organization(req.body);

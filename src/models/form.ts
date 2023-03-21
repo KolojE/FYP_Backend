@@ -1,19 +1,29 @@
-import { model, Model, Schema } from "mongoose";
+import { model, Model, Schema, Document } from "mongoose";
 
-interface form {
-    form_ID: Schema.Types.ObjectId,
-    form_Name: Schema.Types.String,
-    form_Details: [Object],
-    organization: Schema.Types.ObjectId,
-    Activation_Status: boolean,
+
+export interface form extends Document {
+    name: Schema.Types.String,
+    fields: Schema.Types.Array,
+    organization: {
+        _id: Schema.Types.ObjectId,
+        ID: String,
+    },
+    activation_Status: boolean,
+    creationDate: Schema.Types.Date,
 }
 
 const formSchema = new Schema<form>(
     {
-        form_ID: { type: Schema.Types.ObjectId, required: true },
-        form_Name: { type: Schema.Types.ObjectId, required: true },
-        form_Details: { type: [Object], required: true },
+        name: { type: Schema.Types.String, required: true },
+        fields: { type: Schema.Types.Array, required: true },
+        organization: {
+            _id: { type: Schema.Types.ObjectId, required: true, ref: "organizations" },
+            ID: { type: String, required: true, ref: "organizations" },
+        },
+        creationDate: { type: Schema.Types.Date },
+        activation_Status: { type: Schema.Types.Boolean, required: true },
 
     })
-export const formSchemaModel: Model<form> = model<form>("Form", formSchema)
+
+export const formModel: Model<form> = model<form>("Form", formSchema)
 

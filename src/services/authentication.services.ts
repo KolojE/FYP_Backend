@@ -2,7 +2,7 @@ import { validationService } from "./validation.service";
 import { verify } from "../utils/hash";
 import { clientError, statusCode } from "../exception/errorHandler";
 import jwt from "jsonwebtoken";
-import { Document, Schema } from "mongoose";
+import { Schema } from "mongoose";
 import userModel, { User } from "../models/user";
 
 type login = {
@@ -17,6 +17,11 @@ type token = {
 
 export namespace authenticationService {
 
+    /**
+    Authenticating User Base On Identifier and Password Provided
+    @authenticateUser
+    @param {login} login - login contain identifier(email) and password  
+    **/
     export async function authenticateUser(login: login): Promise<User | null> {
         if (!validationService.is_Email(login.identifier)) {
             throw {
@@ -27,11 +32,11 @@ export namespace authenticationService {
 
 
         //find the identifier owner and verify password
-        const user = await userModel.findOne({ email: login.identifier }).exec()
-        if (user) {
+        const loginUser = await userModel.findOne({ email: login.identifier }).exec()
+        if (loginUser) {
             console.log(login.password)
-            if (await verify(login.password, user.password.hashed))
-                return user;
+            if (await verify(login.password, loginUser.password.hashed))
+                return loginUser;
             else {
                 throw {
                     message: "password incorrect !",
@@ -44,6 +49,8 @@ export namespace authenticationService {
 
     }
 
+
+    //Generate Jason Web Token
     export function generateJWT(user: User): String {
 
         if (!process.env.JWT_SECRET) {
@@ -57,6 +64,8 @@ export namespace authenticationService {
 
         return token
     }
+
+
 
     export async function verifyToken(token: string): Promise<User> {
 
