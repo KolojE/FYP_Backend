@@ -6,7 +6,16 @@ export enum role {
     admin = "admin",
     complainant = "complainant"
 }
+export interface organization {
 
+    _id: Schema.Types.ObjectId,
+    ID: string,
+}
+export interface contact {
+
+    phoneNo: String,
+    address: String
+}
 export interface User extends Document {
     ID: string,
     email: string,
@@ -14,17 +23,15 @@ export interface User extends Document {
         hashed: string,
         salt: string,
     },
-    organization: {
-        _id: Schema.Types.ObjectId,
-        ID: string,
-    },
+    organization: organization,
+    contact: contact,
     role: role,
 
 }
 
 const userSchema = new Schema<User>({
     ID: { type: String },
-    email: { type: String, required: true },
+    email: { type: Schema.Types.String, required: true },
     password: {
         hashed: { type: String, required: true },
         salt: { type: String, required: true },
@@ -33,7 +40,12 @@ const userSchema = new Schema<User>({
         _id: { type: Schema.Types.ObjectId, required: true, ref: "organization" },
         ID: { type: String, required: true, ref: "organization" },
     },
-    role: { type: String, enum: ["complainant", "admin"], required: true }
+    contact: {
+        phoneNo: { type: String, required: false },
+        address: { type: String },
+    },
+    role: { type: String, enum: ["complainant", "admin"], required: true },
+
 
 })
 

@@ -14,7 +14,7 @@ interface Complainant extends Document {
 const complainantSchema = new Schema<Complainant>({
     ID: { type: String, unique: true },
     User: {
-        _id: { type: String, unique: true, ref: "User" },
+        _id: { type: Schema.Types.ObjectId, unique: true, ref: "User" },
         ID: { type: String, unique: true, ref: "User" }
     }
 })

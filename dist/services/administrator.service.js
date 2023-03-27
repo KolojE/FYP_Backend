@@ -1,8 +1,13 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.administratorService = void 0;
 const errorHandler_1 = require("../exception/errorHandler");
 const form_1 = require("../models/form");
+const user_1 = __importDefault(require("../models/user"));
+const validation_service_1 = require("./validation.service");
 var administratorService;
 (function (administratorService) {
     async function addNewForm(form, user) {
@@ -40,5 +45,28 @@ var administratorService;
         return updatedForm;
     }
     administratorService.updateForm = updateForm;
+    async function updateMember(member) {
+        if (!member._id) {
+            throw {
+                message: "User ID is not provided",
+                status: errorHandler_1.statusCode.badRequest,
+            };
+        }
+        if (validation_service_1.validationService.is_Email(member.email)) {
+        }
+        const updatedMember = await user_1.default.findByIdAndUpdate(member._id, {
+            $set: {
+                contact: member.contact,
+            }
+        }, { returnDocument: "after" });
+        if (!updatedMember) {
+            throw {
+                message: "Member not found!",
+                status: errorHandler_1.statusCode.notfound
+            };
+        }
+        return updatedMember;
+    }
+    administratorService.updateMember = updateMember;
 })(administratorService = exports.administratorService || (exports.administratorService = {}));
 //# sourceMappingURL=administrator.service.js.map

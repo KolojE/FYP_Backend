@@ -1,6 +1,7 @@
 import { role, User } from "../models/user";
 import AdminModel from "../models/administrator";
 import complaiantModel from "../models/complainant";
+import { ObjectId } from "mongodb";
 
 export namespace userService {
 
@@ -8,7 +9,7 @@ export namespace userService {
         if (doc.role === role.admin) {
             const newAdmin = new AdminModel({
                 User: {
-                    _id: doc._id,
+                    _id: new ObjectId(doc._id),
                     ID: doc.ID
                 }
             });
@@ -19,7 +20,7 @@ export namespace userService {
         if (doc.role === role.complainant) {
             const newComplainant = new complaiantModel({
                 User: {
-                    _id: doc._id,
+                    _id: new ObjectId(doc._id),
                     ID: doc.ID
                 }
             });

@@ -7,13 +7,14 @@ exports.userService = void 0;
 const user_1 = require("../models/user");
 const administrator_1 = __importDefault(require("../models/administrator"));
 const complainant_1 = __importDefault(require("../models/complainant"));
+const mongodb_1 = require("mongodb");
 var userService;
 (function (userService) {
     async function create_role(doc, next) {
         if (doc.role === user_1.role.admin) {
             const newAdmin = new administrator_1.default({
                 User: {
-                    _id: doc._id,
+                    _id: new mongodb_1.ObjectId(doc._id),
                     ID: doc.ID
                 }
             });
@@ -23,7 +24,7 @@ var userService;
         if (doc.role === user_1.role.complainant) {
             const newComplainant = new complainant_1.default({
                 User: {
-                    _id: doc._id,
+                    _id: new mongodb_1.ObjectId(doc._id),
                     ID: doc.ID
                 }
             });

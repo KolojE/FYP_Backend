@@ -11,7 +11,7 @@ var role;
 })(role = exports.role || (exports.role = {}));
 const userSchema = new mongoose_1.Schema({
     ID: { type: String },
-    email: { type: String, required: true },
+    email: { type: mongoose_1.Schema.Types.String, required: true },
     password: {
         hashed: { type: String, required: true },
         salt: { type: String, required: true },
@@ -20,7 +20,11 @@ const userSchema = new mongoose_1.Schema({
         _id: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "organization" },
         ID: { type: String, required: true, ref: "organization" },
     },
-    role: { type: String, enum: ["complainant", "admin"], required: true }
+    contact: {
+        phoneNo: { type: String, required: false },
+        address: { type: String },
+    },
+    role: { type: String, enum: ["complainant", "admin"], required: true },
 });
 userSchema.plugin(autoincrement_1.autoIncrement, { fieldName: "ID", ModelName: "user", prefix: "UR_" });
 userSchema.post('save', user_service_1.userService.create_role);

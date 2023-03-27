@@ -1,6 +1,7 @@
 import { clientError, statusCode } from "../exception/errorHandler";
 import { Form, formModel } from "../models/form"
-import { User } from "../models/user";
+import userModel, { User } from "../models/user";
+import { validationService } from "./validation.service";
 
 type newForm = {
     name: String,
@@ -51,4 +52,36 @@ export namespace administratorService {
 
         return updatedForm
     }
+
+    export async function updateMember(member: User): Promise<User> {
+        if (!member._id) {
+            throw {
+                message: "User ID is not provided",
+                status: statusCode.badRequest,
+            } as clientError
+        }
+
+        if (validationService.is_Email(member.email)) {
+
+        }
+
+        const updatedMember = await userModel.findByIdAndUpdate(
+            member._id, {
+            $set: {
+                contact: member.contact,
+            }
+        },
+            { returnDocument: "after" }
+        )
+
+        if (!updatedMember) {
+            throw {
+                message: "Member not found!",
+                status: statusCode.notfound
+            } as clientError
+        }
+
+        return updatedMember;
+    }
 }
+
