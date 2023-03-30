@@ -11,7 +11,7 @@ const validation_service_1 = require("./validation.service");
 var administratorService;
 (function (administratorService) {
     async function addNewForm(form, user) {
-        console.log(form);
+        validation_service_1.validationService.form_validation(form);
         const newForm = new form_1.formModel({
             name: form.name,
             fields: form.fields,
@@ -25,6 +25,7 @@ var administratorService;
     }
     administratorService.addNewForm = addNewForm;
     async function updateForm(formToUpdate) {
+        validation_service_1.validationService.form_validation(formToUpdate);
         if (!formToUpdate._id) {
             throw {
                 message: "ID is not provided !",

@@ -17,6 +17,7 @@ async function authentication(req, res, next) {
             "Authorization": `Baerer ${token}`
         });
         res.status(200).json({
+            UserRole: user.role,
             message: "Sucessfully authenticatd token returned in the header",
         });
     }

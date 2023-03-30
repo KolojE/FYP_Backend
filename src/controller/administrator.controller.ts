@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import complaiantModel from "../models/complainant";
-import userModel from "../models/user";
 import { administratorService } from "../services/administrator.service";
 
 

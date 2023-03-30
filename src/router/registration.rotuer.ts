@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { register_Complainant } from "../controller/registration.controller";
-import { clientErrorHandler, errorHandler } from "../exception/errorHandler";
 
 const registrationRouter = Router();
 

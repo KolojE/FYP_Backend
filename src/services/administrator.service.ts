@@ -1,18 +1,19 @@
 import { clientError, statusCode } from "../exception/errorHandler";
-import { Form, formModel } from "../models/form"
+import { field, Form, formModel, inputType } from "../models/form"
 import userModel, { User } from "../models/user";
 import { validationService } from "./validation.service";
 
-type newForm = {
+export type newForm = {
     name: String,
-    fields: Array<Object>,
+    fields: Array<field>,
     activation: boolean,
 }
 
 export namespace administratorService {
     export async function addNewForm(form: newForm, user: User): Promise<Form> {
 
-        console.log(form)
+        validationService.form_validation(form);
+
         const newForm = new formModel({
             name: form.name,
             fields: form.fields,
@@ -27,6 +28,8 @@ export namespace administratorService {
     }
 
     export async function updateForm(formToUpdate: Form): Promise<Form> {
+
+        validationService.form_validation(formToUpdate);
 
         if (!formToUpdate._id) {
             throw {

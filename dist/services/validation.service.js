@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.validationService = void 0;
 const errorHandler_1 = require("../exception/errorHandler");
+const form_1 = require("../models/form");
 const user_1 = __importDefault(require("../models/user"));
 var validationService;
 (function (validationService) {
@@ -23,5 +24,17 @@ var validationService;
         }
     }
     validationService.check_Email_Availability = check_Email_Availability;
+    function form_validation(form) {
+        form.fields.forEach((field) => {
+            if (!Object.values(form_1.inputType).includes(field.inputType)) {
+                throw {
+                    message: `Input type ${field.inputType} is not valid !`,
+                    data: `valid types are ${Object.values(form_1.inputType)}`,
+                    status: errorHandler_1.statusCode.badRequest,
+                };
+            }
+        });
+    }
+    validationService.form_validation = form_validation;
 })(validationService = exports.validationService || (exports.validationService = {}));
 //# sourceMappingURL=validation.service.js.map

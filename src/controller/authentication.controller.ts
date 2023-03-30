@@ -20,6 +20,7 @@ export async function authentication(req: Request, res: Response, next: Function
         })
 
         res.status(200).json({
+            UserRole: user.role,
             message: "Sucessfully authenticatd token returned in the header",
         })
 

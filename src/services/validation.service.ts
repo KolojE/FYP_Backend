@@ -1,5 +1,7 @@
 import { clientError, statusCode } from "../exception/errorHandler";
+import { Form, inputType } from "../models/form";
 import userModel from "../models/user";
+import { newForm } from "./administrator.service";
 
 
 export namespace validationService {
@@ -19,6 +21,19 @@ export namespace validationService {
             } as clientError
 
         }
+    }
+
+
+    export function form_validation(form: newForm | Form) {
+        form.fields.forEach((field) => {
+            if (!Object.values(inputType).includes(field.inputType)) {
+                throw {
+                    message: `Input type ${field.inputType} is not valid !`,
+                    data: `valid types are ${Object.values(inputType)}`,
+                    status: statusCode.badRequest,
+                } as clientError
+            }
+        })
     }
 
 }
