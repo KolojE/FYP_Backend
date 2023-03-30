@@ -1,7 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.authenticationMiddleware = void 0;
+exports.complainantVerificationMiddleware = exports.adminVerificationMiddleware = exports.authenticationMiddleware = void 0;
 const errorHandler_1 = require("../exception/errorHandler");
+const user_1 = require("../models/user");
 const authentication_services_1 = require("../services/authentication.services");
 async function authenticationMiddleware(req, res, next) {
     var _a;
@@ -28,4 +29,36 @@ async function authenticationMiddleware(req, res, next) {
     }
 }
 exports.authenticationMiddleware = authenticationMiddleware;
+async function adminVerificationMiddleware(req, res, next) {
+    try {
+        if (req.user.role === user_1.role.admin) {
+            next();
+            return;
+        }
+        throw {
+            message: "You do not have sufficient permission to make the request",
+            status: errorHandler_1.statusCode.unauthorize,
+        };
+    }
+    catch (err) {
+        next(err);
+    }
+}
+exports.adminVerificationMiddleware = adminVerificationMiddleware;
+async function complainantVerificationMiddleware(req, res, next) {
+    try {
+        if (req.user.role === user_1.role.complainant) {
+            next();
+            return;
+        }
+        throw {
+            message: "You do not have sufficient permission to make the request",
+            status: errorHandler_1.statusCode.unauthorize,
+        };
+    }
+    catch (err) {
+        next(err);
+    }
+}
+exports.complainantVerificationMiddleware = complainantVerificationMiddleware;
 //# sourceMappingURL=authentication.middleware.js.map

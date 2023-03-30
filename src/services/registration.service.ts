@@ -39,6 +39,7 @@ export namespace registrationService {
                 status: statusCode.conflict
             } as clientError
         }
+
         //TODO - validate passcode
 
         if (!validationService.is_Email(newComplainant.email)) {

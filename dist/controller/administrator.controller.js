@@ -6,10 +6,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateMembersController = exports.viewMembersController = exports.updateFormController = exports.addFormController = void 0;
 const complainant_1 = __importDefault(require("../models/complainant"));
 const administrator_service_1 = require("../services/administrator.service");
+const validation_service_1 = require("../services/validation.service");
 async function addFormController(req, res, next) {
     try {
         const newForm = req.body;
         const user = req.user;
+        validation_service_1.validationService.form_validation(newForm);
         const form = await administrator_service_1.administratorService.addNewForm(newForm, user);
         res.status(200).json({
             message: "successfully added new form",
@@ -24,6 +26,7 @@ exports.addFormController = addFormController;
 async function updateFormController(req, res, next) {
     try {
         const updateForm = req.body;
+        validation_service_1.validationService.form_validation(updateForm);
         const updatedForm = await administrator_service_1.administratorService.updateForm(updateForm);
         res.status(200).json({
             message: "successfully updated form",

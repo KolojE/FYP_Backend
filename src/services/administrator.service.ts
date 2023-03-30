@@ -12,7 +12,6 @@ export type newForm = {
 export namespace administratorService {
     export async function addNewForm(form: newForm, user: User): Promise<Form> {
 
-        validationService.form_validation(form);
 
         const newForm = new formModel({
             name: form.name,
@@ -29,7 +28,6 @@ export namespace administratorService {
 
     export async function updateForm(formToUpdate: Form): Promise<Form> {
 
-        validationService.form_validation(formToUpdate);
 
         if (!formToUpdate._id) {
             throw {

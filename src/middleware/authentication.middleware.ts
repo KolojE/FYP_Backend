@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { clientError, statusCode } from "../exception/errorHandler";
+import { role } from "../models/user";
 import { authenticationService } from "../services/authentication.services";
 
 
@@ -30,5 +31,39 @@ export async function authenticationMiddleware(req: Request, res: Response, next
         next(err)
     }
 
+}
+
+export async function adminVerificationMiddleware(req: Request, res: Response, next: Function) {
+    try {
+        if (req.user.role === role.admin) {
+            next()
+            return;
+        }
+        throw {
+            message: "You do not have sufficient permission to make the request",
+            status: statusCode.unauthorize,
+        } as clientError
+
+    } catch (err) {
+        next(err);
+    }
+
 
 }
+
+export async function complainantVerificationMiddleware(req: Request, res: Response, next: Function) {
+    try {
+        if (req.user.role === role.complainant) {
+            next()
+            return;
+        }
+        throw {
+            message: "You do not have sufficient permission to make the request",
+            status: statusCode.unauthorize,
+        } as clientError
+
+    } catch (err) {
+        next(err);
+    }
+}
+

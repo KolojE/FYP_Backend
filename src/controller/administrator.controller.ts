@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import complaiantModel from "../models/complainant";
 import { administratorService } from "../services/administrator.service";
+import { validationService } from "../services/validation.service";
 
 
 
@@ -8,6 +9,9 @@ export async function addFormController(req: Request, res: Response, next: Funct
     try {
         const newForm = req.body;
         const user = req.user;
+
+        validationService.form_validation(newForm);
+
         const form = await administratorService.addNewForm(newForm, user);
         res.status(200).json({
             message: "successfully added new form",
@@ -24,6 +28,9 @@ export async function addFormController(req: Request, res: Response, next: Funct
 export async function updateFormController(req: Request, res: Response, next: Function) {
     try {
         const updateForm = req.body;
+
+        validationService.form_validation(updateForm);
+
         const updatedForm = await administratorService.updateForm(updateForm)
         res.status(200).json({
             message: "successfully updated form",
