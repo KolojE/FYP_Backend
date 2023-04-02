@@ -1,4 +1,4 @@
-import { model, Model, Schema, Document } from "mongoose";
+import { model, Model, Schema, Document, Types } from "mongoose";
 
 export enum inputType {
     Text = "Text",
@@ -9,28 +9,37 @@ export enum inputType {
     Photo = "Photo",
 }
 
-export interface field {
-    label: String,
+export interface field extends Document {
+    label: string,
     inputType: inputType,
     options?: Array<any>,
     required: boolean
 }
 
+const fieldSchema = new Schema<field>(
+    {
+        label: { type: String, required: true },
+        inputType: { type: String, required: true },
+        options: { type: Array },
+        required: { type: Boolean, required: true },
+    }
+)
+
 export interface Form extends Document {
-    name: Schema.Types.String,
+    name: string,
     fields: Array<field>,
     organization: {
-        _id: Schema.Types.ObjectId,
+        _id: Types.ObjectId,
         ID: String,
     },
     activation_Status: boolean,
-    creationDate: Schema.Types.Date,
+    creationDate: Date,
 }
 
 const formSchema = new Schema<Form>({
     name: { type: Schema.Types.String, required: true },
     fields: [
-        { label: String, inputType: String, options: Schema.Types.Array, required: Boolean, type: Object }
+        { label: String, inputType: String, options: Schema.Types.Array, required: Boolean, type: fieldSchema }
     ]
     ,
     organization: {
@@ -41,5 +50,5 @@ const formSchema = new Schema<Form>({
     activation_Status: { type: Schema.Types.Boolean, required: true },
 })
 
-export const formModel: Model<Form> = model<Form>("Form", formSchema)
+export const FormModel: Model<Form> = model<Form>("Form", formSchema)
 

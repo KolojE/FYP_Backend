@@ -1,11 +1,11 @@
 
-import { Document, model, Schema } from "mongoose";
+import { Document, model, Schema, Types } from "mongoose";
 import { autoIncrement } from "../plugin/autoincrement";
 
 interface Complainant extends Document {
     ID: string,
     User: {
-        _id: Schema.Types.ObjectId,
+        _id: Types.ObjectId,
         ID: string,
     },
 }

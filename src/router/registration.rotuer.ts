@@ -5,5 +5,5 @@ const registrationRouter = Router();
 
 //use authentication middleware
 
-registrationRouter.post("/registerComplainant", register_Complainant);
+registrationRouter.post("/register", register_Complainant);
 export default registrationRouter;

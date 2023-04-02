@@ -50,6 +50,7 @@ export namespace authenticationService {
     }
 
 
+
     //Generate Jason Web Token
     export function generateJWT(user: User): String {
 

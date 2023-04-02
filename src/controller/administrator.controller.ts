@@ -10,7 +10,7 @@ export async function addFormController(req: Request, res: Response, next: Funct
         const newForm = req.body;
         const user = req.user;
 
-        validationService.form_validation(newForm);
+        validationService.form_Validation(newForm);
 
         const form = await administratorService.addNewForm(newForm, user);
         res.status(200).json({
@@ -29,7 +29,7 @@ export async function updateFormController(req: Request, res: Response, next: Fu
     try {
         const updateForm = req.body;
 
-        validationService.form_validation(updateForm);
+        validationService.form_Validation(updateForm);
 
         const updatedForm = await administratorService.updateForm(updateForm)
         res.status(200).json({

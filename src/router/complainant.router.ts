@@ -1,4 +1,3 @@
-import { verify } from "crypto";
 import { Router } from "express"
 import { reportIncidentController } from "../controller/complainant.controller";
 import { authenticationMiddleware, complainantVerificationMiddleware } from "../middleware/authentication.middleware";
@@ -11,3 +10,5 @@ complainantRouter.use(authenticationMiddleware);
 complainantRouter.use(complainantVerificationMiddleware);
 
 complainantRouter.post("/reportIncident", reportIncidentController);
+
+export default complainantRouter;

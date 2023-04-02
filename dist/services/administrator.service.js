@@ -11,7 +11,7 @@ const validation_service_1 = require("./validation.service");
 var administratorService;
 (function (administratorService) {
     async function addNewForm(form, user) {
-        const newForm = new form_1.formModel({
+        const newForm = new form_1.FormModel({
             name: form.name,
             fields: form.fields,
             activation_Status: form.activation,
@@ -30,7 +30,7 @@ var administratorService;
                 status: errorHandler_1.statusCode.badRequest,
             };
         }
-        const updatedForm = await form_1.formModel.findByIdAndUpdate(formToUpdate._id, {
+        const updatedForm = await form_1.FormModel.findByIdAndUpdate(formToUpdate._id, {
             name: formToUpdate.name,
             fields: formToUpdate.fields,
             activation_Status: formToUpdate.activation_Status,

@@ -1,17 +1,18 @@
-import { Document, model, Schema } from "mongoose";
+import { Document, model, Schema, Types } from "mongoose";
 import { autoIncrement } from "../plugin/autoincrement";
+import { ObjectId } from "mongodb";
 
 interface Administrator extends Document {
     ID: string,
     User: {
-        _id: Schema.Types.ObjectId,
+        _id: Types.ObjectId,
         ID: string,
     },
 }
 const adminSchema = new Schema<Administrator>({
     ID: { type: String, unique: true },
     User: {
-        _id: { type: String, unique: true, ref: "User" },
+        _id: { type: Schema.Types.ObjectId, unique: true, ref: "User" },
         ID: { type: String, unique: true, ref: "User" }
     }
 })

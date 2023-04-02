@@ -11,7 +11,7 @@ async function addFormController(req, res, next) {
     try {
         const newForm = req.body;
         const user = req.user;
-        validation_service_1.validationService.form_validation(newForm);
+        validation_service_1.validationService.form_Validation(newForm);
         const form = await administrator_service_1.administratorService.addNewForm(newForm, user);
         res.status(200).json({
             message: "successfully added new form",
@@ -26,7 +26,7 @@ exports.addFormController = addFormController;
 async function updateFormController(req, res, next) {
     try {
         const updateForm = req.body;
-        validation_service_1.validationService.form_validation(updateForm);
+        validation_service_1.validationService.form_Validation(updateForm);
         const updatedForm = await administrator_service_1.administratorService.updateForm(updateForm);
         res.status(200).json({
             message: "successfully updated form",

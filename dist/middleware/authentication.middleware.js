@@ -17,7 +17,7 @@ async function authenticationMiddleware(req, res, next) {
         const user = await authentication_services_1.authenticationService.verifyToken(token);
         if (!user) {
             throw {
-                message: "Token is not provided !",
+                message: "The token is not belong to any user!",
                 status: errorHandler_1.statusCode.unauthorize,
             };
         }
@@ -35,6 +35,7 @@ async function adminVerificationMiddleware(req, res, next) {
             next();
             return;
         }
+        console.log("authenticating admin");
         throw {
             message: "You do not have sufficient permission to make the request",
             status: errorHandler_1.statusCode.unauthorize,
@@ -51,6 +52,7 @@ async function complainantVerificationMiddleware(req, res, next) {
             next();
             return;
         }
+        console.log("asd");
         throw {
             message: "You do not have sufficient permission to make the request",
             status: errorHandler_1.statusCode.unauthorize,

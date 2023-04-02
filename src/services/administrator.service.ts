@@ -1,5 +1,5 @@
 import { clientError, statusCode } from "../exception/errorHandler";
-import { field, Form, formModel, inputType } from "../models/form"
+import { field, Form, FormModel, inputType } from "../models/form"
 import userModel, { User } from "../models/user";
 import { validationService } from "./validation.service";
 
@@ -13,7 +13,7 @@ export namespace administratorService {
     export async function addNewForm(form: newForm, user: User): Promise<Form> {
 
 
-        const newForm = new formModel({
+        const newForm = new FormModel({
             name: form.name,
             fields: form.fields,
             activation_Status: form.activation,
@@ -36,7 +36,7 @@ export namespace administratorService {
             } as clientError
 
         }
-        const updatedForm = await formModel.findByIdAndUpdate(
+        const updatedForm = await FormModel.findByIdAndUpdate(
             formToUpdate._id, {
             name: formToUpdate.name,
             fields: formToUpdate.fields,

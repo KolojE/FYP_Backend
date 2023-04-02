@@ -7,6 +7,7 @@ exports.validationService = void 0;
 const errorHandler_1 = require("../exception/errorHandler");
 const form_1 = require("../models/form");
 const user_1 = __importDefault(require("../models/user"));
+const joi_1 = require("../utils/joi");
 var validationService;
 (function (validationService) {
     function is_Email(email) {
@@ -24,7 +25,7 @@ var validationService;
         }
     }
     validationService.check_Email_Availability = check_Email_Availability;
-    function form_validation(form) {
+    function form_Validation(form) {
         form.fields.forEach((field) => {
             if (!Object.values(form_1.inputType).includes(field.inputType)) {
                 throw {
@@ -35,6 +36,32 @@ var validationService;
             }
         });
     }
-    validationService.form_validation = form_validation;
+    validationService.form_Validation = form_Validation;
+    function validate_User_Belong_To_Organziation(user, organizationID) {
+        if (!user.organization._id.equals(organizationID)) {
+            throw {
+                message: "You are not authorized to process !",
+                status: errorHandler_1.statusCode.unauthorize,
+                data: "Invlid action",
+            };
+        }
+    }
+    validationService.validate_User_Belong_To_Organziation = validate_User_Belong_To_Organziation;
+    async function fields_Validation(field, form) {
+        console.log(field);
+        const Schema = (0, joi_1.generateSchema)(form);
+        console.log(Schema);
+        try {
+            await Schema.validateAsync(field);
+        }
+        catch (err) {
+            throw {
+                message: "Failed to validate the form's fields",
+                status: errorHandler_1.statusCode.badRequest,
+                data: err,
+            };
+        }
+    }
+    validationService.fields_Validation = fields_Validation;
 })(validationService = exports.validationService || (exports.validationService = {}));
 //# sourceMappingURL=validation.service.js.map

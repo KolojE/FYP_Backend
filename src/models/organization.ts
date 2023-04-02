@@ -1,17 +1,17 @@
-import { Document } from "mongoose";
+import { Document, Types } from "mongoose";
 import {
     Schema, model, Model
 } from "mongoose";
 import { autoIncrement } from "../plugin/autoincrement";
 
 export interface Organization extends Document {
-    _id: Schema.Types.ObjectId,
+    _id: Types.ObjectId,
     ID: string,
     name: string,
     contactNo: string,
     address: string,
     passcode: string,
-    creationDate: Schema.Types.Date
+    creationDate: Date
 
 }
 

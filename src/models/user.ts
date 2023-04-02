@@ -1,4 +1,4 @@
-import { Document, model, Schema } from "mongoose";
+import { Document, model, Schema, Types } from "mongoose";
 import { autoIncrement } from "../plugin/autoincrement";
 import { userService } from "../services/user.service";
 
@@ -8,7 +8,7 @@ export enum role {
 }
 export interface organization {
 
-    _id: Schema.Types.ObjectId,
+    _id: Types.ObjectId,
     ID: string,
 }
 export interface contact {

@@ -1,7 +1,9 @@
 import { clientError, statusCode } from "../exception/errorHandler";
 import { Form, inputType } from "../models/form";
-import userModel from "../models/user";
+import userModel, { User } from "../models/user";
 import { newForm } from "./administrator.service";
+import { generateSchema } from "../utils/joi";
+import { Types } from "mongoose";
 
 
 export namespace validationService {
@@ -24,7 +26,7 @@ export namespace validationService {
     }
 
 
-    export function form_validation(form: newForm | Form) {
+    export function form_Validation(form: newForm | Form) {
         form.fields.forEach((field) => {
             if (!Object.values(inputType).includes(field.inputType)) {
                 throw {
@@ -36,4 +38,31 @@ export namespace validationService {
         })
     }
 
+    export function validate_User_Belong_To_Organziation(user: User, organizationID: Types.ObjectId) {
+
+        if (!user.organization._id.equals(organizationID)) {
+            throw {
+                message: "You are not authorized to process !",
+                status: statusCode.unauthorize,
+                data: "Invlid action",
+
+            } as clientError
+        }
+    }
+
+    export async function fields_Validation(field: Object, form: Form) {
+
+        console.log(field)
+        const Schema = generateSchema(form);
+        console.log(Schema)
+        try {
+            await Schema.validateAsync(field);
+        } catch (err) {
+            throw {
+                message: "Failed to validate the form's fields",
+                status: statusCode.badRequest,
+                data: err,
+            } as clientError
+        }
+    }
 }

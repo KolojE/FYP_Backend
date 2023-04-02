@@ -1,22 +1,35 @@
-import { Model, model, Schema } from "mongoose";
+import { Model, model, Schema, Types } from "mongoose";
 
 interface Report {
-    report_ID: Schema.Types.ObjectId,
-    report_Date: Schema.Types.Date,
-    report_Status: Schema.Types.ObjectId,
-    complainant: Schema.Types.ObjectId,
-    organization: Schema.Types.ObjectId,
-    form: Schema.Types.ObjectId,
+    date: Date;
+    status: boolean;
+    details: object[];
+    form: Types.ObjectId;
+    organization: {
+        _id: Types.ObjectId;
+        ID: string;
+    };
+    complainant: {
+        _id: Types.ObjectId;
+        ID: string;
+    };
 }
 
 const reportSchema = new Schema<Report>({
-    report_ID: { type: Schema.Types.ObjectId, required: true },
-    report_Date: { type: Schema.Types.Date, required: true },
-    report_Status: { type: Schema.Types.ObjectId, required: true },
-    complainant: { type: Schema.Types.ObjectId, required: true },
-    organization: { type: Schema.Types.ObjectId, required: true },
-    form: { type: Schema.Types.ObjectId, required: true }
-})
+    date: { type: Date, required: true },
+    status: { type: Boolean, required: true },
+    details: { type: [Object], default: [] },
+    form: { type: Schema.Types.ObjectId, required: true, ref: "Form" },
+    organization: {
+        _id: { type: Schema.Types.ObjectId, required: true, ref: "Organization" },
+        ID: { type: String, required: true }
+    },
+    complainant: {
+        _id: { type: Schema.Types.ObjectId, required: true, ref: "User" },
+        ID: { type: String, required: true }
+    }
+});
 
+const ReportModel: Model<Report> = model<Report>('Report', reportSchema);
 
-const reportModel: Model<Report> = model<Report>('Report', reportSchema);
+export { Report, ReportModel };

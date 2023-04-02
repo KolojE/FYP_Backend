@@ -1,16 +1,20 @@
 import { Router } from "express";
 import { clientErrorHandler, errorHandler } from "../exception/errorHandler";
 import authenticationRouter from "./authentication.router";
-import complainantRouter from "./registration.rotuer";
+import registrationRouter from "./registration.rotuer";
 import organizationRouter from "./organization.router";
 import administratorRouter from "./administrator.router";
+import complainantRouter from "./complainant.router";
 
 const mainRouter = Router();
 
-mainRouter.use("/Organization", organizationRouter)
-mainRouter.use("/Complainant", complainantRouter)
 mainRouter.use(authenticationRouter);
-mainRouter.use(administratorRouter);
+mainRouter.use(registrationRouter);
+
+mainRouter.use("/Organization", organizationRouter)
+mainRouter.use("/report", complainantRouter)
+mainRouter.use("/admin", administratorRouter);
+
 mainRouter.use(clientErrorHandler);
 mainRouter.use(errorHandler);
 

@@ -9,11 +9,13 @@ const authentication_router_1 = __importDefault(require("./authentication.router
 const registration_rotuer_1 = __importDefault(require("./registration.rotuer"));
 const organization_router_1 = __importDefault(require("./organization.router"));
 const administrator_router_1 = __importDefault(require("./administrator.router"));
+const complainant_router_1 = __importDefault(require("./complainant.router"));
 const mainRouter = (0, express_1.Router)();
-mainRouter.use("/Organization", organization_router_1.default);
-mainRouter.use("/Complainant", registration_rotuer_1.default);
 mainRouter.use(authentication_router_1.default);
-mainRouter.use(administrator_router_1.default);
+mainRouter.use(registration_rotuer_1.default);
+mainRouter.use("/Organization", organization_router_1.default);
+mainRouter.use("/report", complainant_router_1.default);
+mainRouter.use("/admin", administrator_router_1.default);
 mainRouter.use(errorHandler_1.clientErrorHandler);
 mainRouter.use(errorHandler_1.errorHandler);
 exports.default = mainRouter;
