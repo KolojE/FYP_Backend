@@ -6,26 +6,26 @@ export enum role {
     admin = "admin",
     complainant = "complainant"
 }
-export interface organization {
+interface organization {
 
-    _id: Types.ObjectId,
-    ID: string,
+    _id: Types.ObjectId;
+    ID: string;
 }
-export interface contact {
+interface contact {
 
-    phoneNo: String,
-    address: String
+    phoneNo: String;
+    address: String;
 }
 export interface User extends Document {
-    ID: string,
-    email: string,
+    ID: string;
+    email: string;
     password: {
-        hashed: string,
-        salt: string,
+        hashed: string;
+        salt: string;
     },
-    organization: organization,
-    contact: contact,
-    role: role,
+    organization: organization;
+    contact: contact;
+    role: role;
 
 }
 

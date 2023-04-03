@@ -31,6 +31,7 @@ const organization_1 = __importDefault(require("../models/organization"));
 const hash_1 = require("../utils/hash");
 const validation_service_1 = require("./validation.service");
 const user_1 = __importStar(require("../models/user"));
+const status_1 = __importDefault(require("../models/status"));
 var OrganizationService;
 (function (OrganizationService) {
     async function create_New_Organization(data) {
@@ -65,5 +66,27 @@ var OrganizationService;
         return await newAdminUser.save();
     }
     OrganizationService.create_Root_Admin = create_Root_Admin;
+    async function create_default_status(next) {
+        const doc = this;
+        const pendingStatus = new status_1.default({
+            desc: "Pending",
+            organization: {
+                _id: doc._id,
+                ID: doc.ID,
+            },
+        });
+        const resolvedStatus = new status_1.default({
+            desc: "Resolved",
+            organization: {
+                _id: doc._id,
+                ID: doc.ID,
+            }
+        });
+        const systemDefaultStatus = await pendingStatus.save();
+        await resolvedStatus.save();
+        doc.defaultStatus = pendingStatus._id;
+        next();
+    }
+    OrganizationService.create_default_status = create_default_status;
 })(OrganizationService = exports.OrganizationService || (exports.OrganizationService = {}));
 //# sourceMappingURL=organization.service.js.map

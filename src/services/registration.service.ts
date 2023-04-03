@@ -36,7 +36,7 @@ export namespace registrationService {
         if (!Organization) {
             throw {
                 message: "ID " + newComplainant.organization.ID + " Organization Not Found! ",
-                status: statusCode.conflict
+                status: statusCode.notfound
             } as clientError
         }
 

@@ -2,6 +2,7 @@ import OrganizationModel, { Organization } from "../models/organization";
 import { hashPassword } from "../utils/hash";
 import { validationService } from "./validation.service";
 import userModel, { role, User } from "../models/user";
+import statusModel, { Status } from "../models/status";
 type newOrganization = {
     name: string,
     address: string,
@@ -56,5 +57,42 @@ export namespace OrganizationService {
         return await newAdminUser.save();
     }
 
+    export async function create_default_status(this: Organization, next: Function) {
+        const doc = this;
 
+        const pendingStatus = new statusModel({
+            desc: "Pending",
+            organization: {
+                _id: doc._id,
+                ID: doc.ID,
+            },
+
+        })
+        const resolvedStatus = new statusModel({
+            desc: "Resolved",
+            organization: {
+                _id: doc._id,
+                ID: doc.ID,
+            }
+
+        })
+
+        const systemDefaultStatus = await pendingStatus.save();
+        await resolvedStatus.save();
+
+        doc.defaultStatus = pendingStatus._id;
+        next();
+
+
+
+
+
+
+
+
+
+
+    }
 }
+
+

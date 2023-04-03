@@ -3,14 +3,14 @@ import { autoIncrement } from "../plugin/autoincrement";
 import { ObjectId } from "mongodb";
 
 interface Administrator extends Document {
-    ID: string,
+    ID: string;
     User: {
-        _id: Types.ObjectId,
-        ID: string,
+        _id: Types.ObjectId;
+        ID: string;
     },
 }
 const adminSchema = new Schema<Administrator>({
-    ID: { type: String, unique: true },
+    ID: { type: String, unique: true, required: true },
     User: {
         _id: { type: Schema.Types.ObjectId, unique: true, ref: "User" },
         ID: { type: String, unique: true, ref: "User" }

@@ -42,7 +42,7 @@ var registrationService;
         if (!Organization) {
             throw {
                 message: "ID " + newComplainant.organization.ID + " Organization Not Found! ",
-                status: errorHandler_1.statusCode.conflict
+                status: errorHandler_1.statusCode.notfound
             };
         }
         if (!validation_service_1.validationService.is_Email(newComplainant.email)) {

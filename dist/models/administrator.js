@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const autoincrement_1 = require("../plugin/autoincrement");
 const adminSchema = new mongoose_1.Schema({
-    ID: { type: String, unique: true },
+    ID: { type: String, unique: true, required: true },
     User: {
         _id: { type: mongoose_1.Schema.Types.ObjectId, unique: true, ref: "User" },
         ID: { type: String, unique: true, ref: "User" }

@@ -1,5 +1,6 @@
 import { clientError, statusCode } from "../exception/errorHandler";
 import { FormModel } from "../models/form";
+import ReportModel from "../models/report";
 import { User } from "../models/user";
 import { validationService } from "./validation.service";
 
@@ -25,6 +26,17 @@ export namespace reportIncidentService {
         await validationService.validate_User_Belong_To_Organziation(user, form.organization._id);
 
         await validationService.fields_Validation(submission.field, form);
+
+        const newReport = new ReportModel({
+            date: new Date(),
+            complainant: { _id: user._id, ID: user.ID },
+            organization: { _id: user._id, ID: user.ID },
+            form: { _id: form._id },
+            status: false,
+            details: submission.field
+        })
+
+        await newReport.save()
 
 
 

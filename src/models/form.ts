@@ -26,14 +26,14 @@ const fieldSchema = new Schema<field>(
 )
 
 export interface Form extends Document {
-    name: string,
-    fields: Array<field>,
+    name: string;
+    fields: Array<field>;
     organization: {
-        _id: Types.ObjectId,
-        ID: String,
+        _id: Types.ObjectId;
+        ID: String;
     },
-    activation_Status: boolean,
-    creationDate: Date,
+    activation_Status: boolean;
+    creationDate: Date;
 }
 
 const formSchema = new Schema<Form>({

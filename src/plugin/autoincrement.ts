@@ -21,7 +21,7 @@ const counterModel = model<counter>("counter", counterSchema);
 
 export function autoIncrement(schema: Schema, options: Object) {
 
-    schema.pre('save', function (next) {
+    schema.pre('validate', function (next) {
 
         const doc = this;
         const collectionID: string = options.ModelName;

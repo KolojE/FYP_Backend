@@ -8,7 +8,7 @@ const counterSchema = new mongoose_1.Schema({
 });
 const counterModel = (0, mongoose_1.model)("counter", counterSchema);
 function autoIncrement(schema, options) {
-    schema.pre('save', function (next) {
+    schema.pre('validate', function (next) {
         const doc = this;
         const collectionID = options.ModelName;
         try {
