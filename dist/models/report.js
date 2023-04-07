@@ -14,8 +14,9 @@ const reportSchema = new mongoose_1.Schema({
         ID: { type: String, required: true }
     },
     status: {
+        _id: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "status" },
         admin: {
-            _id: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "User" },
+            _id: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "administrator" },
             ID: { type: String, required: true }
         }
     }

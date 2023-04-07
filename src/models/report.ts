@@ -44,8 +44,9 @@ const reportSchema = new Schema<Report>({
         ID: { type: String, required: true }
     },
     status: {
+        _id: { type: Schema.Types.ObjectId, required: true, ref: "status" },
         admin: {
-            _id: { type: Schema.Types.ObjectId, required: true, ref: "User" },
+            _id: { type: Schema.Types.ObjectId, required: true, ref: "administrator" },
             ID: { type: String, required: true }
         }
     }

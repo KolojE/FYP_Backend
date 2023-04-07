@@ -16,8 +16,8 @@ const statusSchema = new Schema<Status>(
         desc: { type: String, required: true },
         organization:
         {
-            _id: { type: Schema.Types.ObjectId, required: true },
-            ID: { type: Schema.Types.String, required: true },
+            _id: { type: Schema.Types.ObjectId, required: true, ref: "organization" },
+            ID: { type: Schema.Types.String, required: true, ref: "organization" },
         }
     }
 )

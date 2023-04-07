@@ -1,5 +1,6 @@
 import { clientError, statusCode } from "../exception/errorHandler";
 import { FormModel } from "../models/form";
+import OrganizationModel, { Organization } from "../models/organization";
 import ReportModel from "../models/report";
 import { User } from "../models/user";
 import { validationService } from "./validation.service";
@@ -23,16 +24,22 @@ export namespace reportIncidentService {
             } as clientError
         }
 
-        await validationService.validate_User_Belong_To_Organziation(user, form.organization._id);
+        const organization: Organization | null = await OrganizationModel.findById(form.organization._id).exec();
+
+        if (!organization) {
+            throw new Error(`there is not organization ${form.organization._id} found`);
+        }
+
+        await validationService.validate_User_Belong_To_Organziation(user, organization._id);
 
         await validationService.fields_Validation(submission.field, form);
 
         const newReport = new ReportModel({
             date: new Date(),
             complainant: { _id: user._id, ID: user.ID },
-            organization: { _id: user._id, ID: user.ID },
+            organization: { _id: organization._id, ID: organization.ID },
             form: { _id: form._id },
-            status: false,
+            status: { _id: organization.defaultStatus._id },
             details: submission.field
         })
 
