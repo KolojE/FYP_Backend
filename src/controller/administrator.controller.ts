@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import complaiantModel from "../models/complainant";
 import { administratorService } from "../services/administrator.service";
 import { validationService } from "../services/validation.service";
+import { FormModel } from "../models/form";
 
 
 
@@ -38,6 +39,25 @@ export async function updateFormController(req: Request, res: Response, next: Fu
         }).send()
     } catch (err) {
         next(err);
+    }
+}
+
+export async function viewFormsController(req:Request,res:Response,next:Function){
+    const admin = req.user;
+    try{
+
+        const forms  = await FormModel.find({organization:admin.organization});
+        
+        res.status(200).json(
+            {
+                data : forms,
+            }
+        )
+    }
+    catch(err)
+    {
+        next(err);
+
     }
 }
 

@@ -1,11 +1,11 @@
-import { role, User } from "../models/user";
+import { role, IUser } from "../models/user";
 import AdminModel from "../models/administrator";
 import complaiantModel from "../models/complainant";
 import { ObjectId } from "mongodb";
 
 export namespace userService {
 
-    export async function create_role(doc: User, next: Function) {
+    export async function create_role(doc: IUser, next: Function) {
         if (doc.role === role.admin) {
             const newAdmin = new AdminModel({
                 User: {

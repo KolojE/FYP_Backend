@@ -3,7 +3,7 @@ import { verify } from "../utils/hash";
 import { clientError, statusCode } from "../exception/errorHandler";
 import jwt from "jsonwebtoken";
 import { Schema } from "mongoose";
-import userModel, { User } from "../models/user";
+import userModel, { IUser } from "../models/user";
 
 type login = {
     identifier: string,
@@ -22,7 +22,7 @@ export namespace authenticationService {
     @authenticateUser
     @param {login} login - login contain identifier(email) and password  
     **/
-    export async function authenticateUser(login: login): Promise<User | null> {
+    export async function authenticateUser(login: login): Promise<IUser | null> {
         if (!validationService.is_Email(login.identifier)) {
             throw {
                 message: "Identifier is not an email!",
@@ -52,7 +52,7 @@ export namespace authenticationService {
 
 
     //Generate Jason Web Token
-    export function generateJWT(user: User): String {
+    export function generateJWT(user: IUser): String {
 
         if (!process.env.JWT_SECRET) {
             throw new Error("JWT secret key is not set !")
@@ -61,14 +61,14 @@ export namespace authenticationService {
         const token = jwt.sign({
             _id: user._id,
             ID: user.ID,
-        }, process.env.JWT_SECRET);
+        }, process.env.JWT_SECRET,{algorithm:"HS256"});
 
         return token
     }
 
 
 
-    export async function verifyToken(token: string): Promise<User> {
+    export async function verifyToken(token: string): Promise<IUser> {
 
         if (!process.env.JWT_SECRET) {
             throw new Error("JWT secret key is not set !")

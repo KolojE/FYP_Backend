@@ -1,18 +1,18 @@
 import { Document, Model, model, Schema, Types } from "mongoose";
 
 
-interface organization {
+interface IOrganization {
     _id: Types.ObjectId;
     ID: string;
 }
 
-interface complainant {
+interface IComplainant {
 
     _id: Types.ObjectId;
     ID: string;
 }
 
-interface status {
+interface IStatus {
     _id: Types.ObjectId;
     admin?: {
         _id: Types.ObjectId;
@@ -24,10 +24,10 @@ export interface Report extends Document {
     date: Date;
     details: object[];
     form: Types.ObjectId;
-    ReportStatus: status;
-    organization: organization;
-    complainant: complainant;
-    status: status;
+    ReportStatus: IStatus;
+    organization: IOrganization;
+    complainant: IComplainant;
+    status: IStatus;
 
 }
 

@@ -1,6 +1,6 @@
 import { clientError, statusCode } from "../exception/errorHandler";
 import { Form, inputType } from "../models/form";
-import userModel, { User } from "../models/user";
+import userModel, { IUser } from "../models/user";
 import { newForm } from "./administrator.service";
 import { generateSchema } from "../utils/joi";
 import { Types } from "mongoose";
@@ -38,7 +38,7 @@ export namespace validationService {
         })
     }
 
-    export function validate_User_Belong_To_Organziation(user: User, organizationID: Types.ObjectId) {
+    export function validate_User_Belong_To_Organziation(user: IUser, organizationID: Types.ObjectId) {
 
         if (!user.organization._id.equals(organizationID)) {
             throw {

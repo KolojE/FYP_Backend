@@ -1,16 +1,16 @@
 import { clientError, statusCode } from "../exception/errorHandler";
-import { field, Form, FormModel, inputType } from "../models/form"
-import userModel, { User } from "../models/user";
+import { IField, Form, FormModel, inputType } from "../models/form"
+import userModel, { IUser } from "../models/user";
 import { validationService } from "./validation.service";
 
 export type newForm = {
     name: String,
-    fields: Array<field>,
+    fields: Array<IField>,
     activation: boolean,
 }
 
 export namespace administratorService {
-    export async function addNewForm(form: newForm, user: User): Promise<Form> {
+    export async function addNewForm(form: newForm, user: IUser): Promise<Form> {
 
 
         const newForm = new FormModel({
@@ -55,7 +55,7 @@ export namespace administratorService {
         return updatedForm
     }
 
-    export async function updateMember(member: User): Promise<User> {
+    export async function updateMember(member: IUser): Promise<IUser> {
         if (!member._id) {
             throw {
                 message: "User ID is not provided",

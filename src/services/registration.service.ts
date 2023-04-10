@@ -1,6 +1,6 @@
 import { clientError, statusCode } from "../exception/errorHandler";
-import OrganizationModel, { Organization } from "../models/organization";
-import userModel, { role, User } from "../models/user";
+import OrganizationModel, { IOrganization } from "../models/organization";
+import userModel, { role, IUser } from "../models/user";
 import { hashPassword } from "../utils/hash";
 import { validationService } from "./validation.service";
 
@@ -20,7 +20,7 @@ interface newComplainant {
 }
 
 export namespace registrationService {
-    export async function register_Complainant(complainantData: newComplainant): Promise<User> {
+    export async function register_Complainant(complainantData: newComplainant): Promise<IUser> {
 
         const newComplainant: newComplainant = complainantData;
         console.log(newComplainant)

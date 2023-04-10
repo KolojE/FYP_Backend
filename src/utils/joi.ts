@@ -1,4 +1,4 @@
-import { field, Form, inputType } from "../models/form";
+import { IField, Form, inputType } from "../models/form";
 import Joi, { string } from "joi";
 type schema = {
     [key: string]: Joi.Schema

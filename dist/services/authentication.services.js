@@ -40,7 +40,7 @@ var authenticationService;
         const token = jsonwebtoken_1.default.sign({
             _id: user._id,
             ID: user.ID,
-        }, process.env.JWT_SECRET);
+        }, process.env.JWT_SECRET, { algorithm: "HS256" });
         return token;
     }
     authenticationService.generateJWT = generateJWT;

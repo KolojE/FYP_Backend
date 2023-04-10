@@ -3,10 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateMembersController = exports.viewMembersController = exports.updateFormController = exports.addFormController = void 0;
+exports.updateMembersController = exports.viewMembersController = exports.viewFormsController = exports.updateFormController = exports.addFormController = void 0;
 const complainant_1 = __importDefault(require("../models/complainant"));
 const administrator_service_1 = require("../services/administrator.service");
 const validation_service_1 = require("../services/validation.service");
+const form_1 = require("../models/form");
 async function addFormController(req, res, next) {
     try {
         const newForm = req.body;
@@ -38,6 +39,19 @@ async function updateFormController(req, res, next) {
     }
 }
 exports.updateFormController = updateFormController;
+async function viewFormsController(req, res, next) {
+    const admin = req.user;
+    try {
+        const forms = await form_1.FormModel.find({ organization: admin.organization });
+        res.status(200).json({
+            data: forms,
+        });
+    }
+    catch (err) {
+        next(err);
+    }
+}
+exports.viewFormsController = viewFormsController;
 async function viewMembersController(req, res, next) {
     try {
         const members = await complainant_1.default.aggregate([{

@@ -7,7 +7,7 @@ import { OrganizationService } from "../services/organization.service";
 
 
 
-export interface Organization extends Document {
+export interface IOrganization extends Document {
     _id: Types.ObjectId;
     ID: string;
     name: string;
@@ -19,7 +19,7 @@ export interface Organization extends Document {
 
 }
 
-const organizationSchema = new Schema<Organization>({
+const organizationSchema = new Schema<IOrganization>({
     ID: { type: String, unique: true, required: true },
     name: { type: String, required: true },
     contactNo: { type: String, required: true },
@@ -34,7 +34,7 @@ organizationSchema.plugin(autoIncrement, { fieldName: "ID", ModelName: "organiza
 organizationSchema.pre("validate", OrganizationService.create_default_status);
 
 
-const OrganizationModel: Model<Organization> = model<Organization>('Organization', organizationSchema);
+const OrganizationModel: Model<IOrganization> = model<IOrganization>('Organization', organizationSchema);
 export default OrganizationModel;
 
 

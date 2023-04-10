@@ -6,30 +6,30 @@ export enum role {
     admin = "admin",
     complainant = "complainant"
 }
-interface organization {
+interface IOrganization {
 
     _id: Types.ObjectId;
     ID: string;
 }
-interface contact {
+interface IContact {
 
     phoneNo: String;
     address: String;
 }
-export interface User extends Document {
+export interface IUser extends Document {
     ID: string;
     email: string;
     password: {
         hashed: string;
         salt: string;
     },
-    organization: organization;
-    contact: contact;
+    organization: IOrganization;
+    contact: IContact;
     role: role;
 
 }
 
-const userSchema = new Schema<User>({
+const userSchema = new Schema<IUser>({
     ID: { type: String },
     email: { type: Schema.Types.String, required: true },
     password: {
@@ -50,8 +50,8 @@ const userSchema = new Schema<User>({
 })
 
 userSchema.plugin(autoIncrement, { fieldName: "ID", ModelName: "user", prefix: "UR_" })
-userSchema.post<User>('save', userService.create_role);
-const userModel = model<User>("User", userSchema);
+userSchema.post<IUser>('save', userService.create_role);
+const userModel = model<IUser>("User", userSchema);
 
 export default userModel;
 

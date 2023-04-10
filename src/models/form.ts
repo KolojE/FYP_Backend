@@ -9,14 +9,14 @@ export enum inputType {
     Photo = "Photo",
 }
 
-export interface field extends Document {
+export interface IField extends Document {
     label: string,
     inputType: inputType,
     options?: Array<any>,
     required: boolean
 }
 
-const fieldSchema = new Schema<field>(
+const fieldSchema = new Schema<IField>(
     {
         label: { type: String, required: true },
         inputType: { type: String, required: true },
@@ -27,7 +27,7 @@ const fieldSchema = new Schema<field>(
 
 export interface Form extends Document {
     name: string;
-    fields: Array<field>;
+    fields: Array<IField>;
     organization: {
         _id: Types.ObjectId;
         ID: String;

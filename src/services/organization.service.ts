@@ -1,7 +1,7 @@
-import OrganizationModel, { Organization } from "../models/organization";
+import OrganizationModel, { IOrganization } from "../models/organization";
 import { hashPassword } from "../utils/hash";
 import { validationService } from "./validation.service";
-import userModel, { role, User } from "../models/user";
+import userModel, { role, IUser } from "../models/user";
 import statusModel, { Status } from "../models/status";
 type newOrganization = {
     name: string,
@@ -15,7 +15,7 @@ type newOrganization = {
 
 }
 export namespace OrganizationService {
-    export async function create_New_Organization(data: newOrganization): Promise<Organization> {
+    export async function create_New_Organization(data: newOrganization): Promise<IOrganization> {
 
         const newOrganization = data;
 
@@ -37,7 +37,7 @@ export namespace OrganizationService {
 
     }
 
-    export async function create_Root_Admin(newOrganization: Organization, data: newOrganization): Promise<User> {
+    export async function create_Root_Admin(newOrganization: IOrganization, data: newOrganization): Promise<IUser> {
         const newRootAdmin = data.rootAdmin;
         const hashedPassword = await hashPassword(newRootAdmin.password);
         validationService.is_Email(newRootAdmin.email);
@@ -57,7 +57,7 @@ export namespace OrganizationService {
         return await newAdminUser.save();
     }
 
-    export async function create_default_status(this: Organization, next: Function) {
+    export async function create_default_status(this: IOrganization, next: Function) {
         const doc = this;
 
         const pendingStatus = new statusModel({

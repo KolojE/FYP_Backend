@@ -8,6 +8,7 @@ async function authenticationMiddleware(req, res, next) {
     var _a;
     try {
         const token = (_a = req.headers["authorization"]) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
+        console.log(token);
         if (!token) {
             throw {
                 message: "Token is not provided !",
@@ -52,7 +53,6 @@ async function complainantVerificationMiddleware(req, res, next) {
             next();
             return;
         }
-        console.log("asd");
         throw {
             message: "You do not have sufficient permission to make the request",
             status: errorHandler_1.statusCode.unauthorize,
