@@ -30,11 +30,12 @@ var administratorService;
                 status: errorHandler_1.statusCode.badRequest,
             };
         }
-        const updatedForm = await form_1.FormModel.findByIdAndUpdate(formToUpdate._id, {
-            name: formToUpdate.name,
-            fields: formToUpdate.fields,
-            activation_Status: formToUpdate.activation_Status,
-        }, { returnDocument: "after" });
+        const updatedForm = await form_1.FormModel.findByIdAndUpdate(formToUpdate._id, { $set: {
+                name: formToUpdate.name,
+                fields: formToUpdate.fields,
+                activation_Status: formToUpdate.activation_Status,
+            }
+        }, { returnDocument: "after", runValidators: true });
         if (!updatedForm) {
             throw {
                 message: "Form not found !",

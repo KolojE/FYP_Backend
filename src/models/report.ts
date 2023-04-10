@@ -14,7 +14,7 @@ interface complainant {
 
 interface status {
     _id: Types.ObjectId;
-    admin: {
+    admin?: {
         _id: Types.ObjectId;
         ID: string;
     }
@@ -46,8 +46,8 @@ const reportSchema = new Schema<Report>({
     status: {
         _id: { type: Schema.Types.ObjectId, required: true, ref: "status" },
         admin: {
-            _id: { type: Schema.Types.ObjectId, required: true, ref: "administrator" },
-            ID: { type: String, required: true }
+            _id: { type: Schema.Types.ObjectId,  ref: "administrator" },
+            ID: { type: String }
         }
     }
 });

@@ -1,5 +1,4 @@
 import { clientError, statusCode } from "../exception/errorHandler";
-import complainantModel from "../models/complainant";
 import OrganizationModel, { Organization } from "../models/organization";
 import userModel, { role, User } from "../models/user";
 import { hashPassword } from "../utils/hash";

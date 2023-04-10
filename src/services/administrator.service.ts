@@ -37,11 +37,12 @@ export namespace administratorService {
 
         }
         const updatedForm = await FormModel.findByIdAndUpdate(
-            formToUpdate._id, {
+            formToUpdate._id, {$set: {
             name: formToUpdate.name,
             fields: formToUpdate.fields,
             activation_Status: formToUpdate.activation_Status,
-        }, { returnDocument: "after" }
+            }
+        }, { returnDocument: "after",runValidators:true }
         );
 
         if (!updatedForm) {

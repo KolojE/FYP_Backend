@@ -7,7 +7,7 @@ import { validationService } from "./validation.service";
 
 type submission = {
     formID: string,
-    field: [Object],
+    field: Object,
 }
 
 export namespace reportIncidentService {
