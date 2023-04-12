@@ -3,8 +3,7 @@ import express, { Express } from "express";
 import { config } from "dotenv";
 import mainRouter from "./router/main.router";
 import  HttpServer  from "http";
-import { Server } from "socket.io";
-import { socketIORouter } from "./router/socketIO.router";
+import socketIO from "./socketIO/socket.io";
 
 
 config();
@@ -14,11 +13,8 @@ console.log("Starting Server...")
 const app: Express = express();
 const httpServer:HttpServer.Server = HttpServer.createServer(app);
 
-const io = new Server(httpServer,{cors:{
-    origin:"*",
-}})
+const socketio = socketIO(httpServer);
 
-socketIORouter(io);
 app.use(express.json())
 app.use(mainRouter);
 

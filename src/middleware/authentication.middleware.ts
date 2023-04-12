@@ -8,7 +8,6 @@ export async function authenticationMiddleware(req: Request, res: Response, next
     try {
 
         const token = req.headers["authorization"]?.split(' ')[1]; // get token, e.g. Bearer "token"
-        console.log(token)
         if (!token) {
             throw {
                 message: "Token is not provided !",

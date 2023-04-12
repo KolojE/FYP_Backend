@@ -8,16 +8,12 @@ const express_1 = __importDefault(require("express"));
 const dotenv_1 = require("dotenv");
 const main_router_1 = __importDefault(require("./router/main.router"));
 const http_1 = __importDefault(require("http"));
-const socket_io_1 = require("socket.io");
-const socketIO_router_1 = require("./router/socketIO.router");
+const socket_io_1 = __importDefault(require("./socketIO/socket.io"));
 (0, dotenv_1.config)();
 console.log("Starting Server...");
 const app = (0, express_1.default)();
 const httpServer = http_1.default.createServer(app);
-const io = new socket_io_1.Server(httpServer, { cors: {
-        origin: "*",
-    } });
-(0, socketIO_router_1.socketIORouter)(io);
+const socketio = (0, socket_io_1.default)(httpServer);
 app.use(express_1.default.json());
 app.use(main_router_1.default);
 httpServer.listen(8080, () => {
