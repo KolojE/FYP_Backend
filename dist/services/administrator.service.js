@@ -25,10 +25,10 @@ var administratorService;
     administratorService.addNewForm = addNewForm;
     async function updateForm(formToUpdate) {
         if (!formToUpdate._id) {
-            throw {
+            throw new errorHandler_1.clientError({
                 message: "ID is not provided !",
                 status: errorHandler_1.statusCode.badRequest,
-            };
+            });
         }
         const updatedForm = await form_1.FormModel.findByIdAndUpdate(formToUpdate._id, { $set: {
                 name: formToUpdate.name,
@@ -37,20 +37,17 @@ var administratorService;
             }
         }, { returnDocument: "after", runValidators: true });
         if (!updatedForm) {
-            throw {
-                message: "Form not found !",
-                status: errorHandler_1.statusCode.notfound
-            };
+            throw new errorHandler_1.clientError({ message: "Form not found !", status: errorHandler_1.statusCode.notfound });
         }
         return updatedForm;
     }
     administratorService.updateForm = updateForm;
     async function updateMember(member) {
         if (!member._id) {
-            throw {
+            throw new errorHandler_1.clientError({
                 message: "User ID is not provided",
                 status: errorHandler_1.statusCode.badRequest,
-            };
+            });
         }
         if (validation_service_1.validationService.is_Email(member.email)) {
         }
@@ -60,10 +57,10 @@ var administratorService;
             }
         }, { returnDocument: "after" });
         if (!updatedMember) {
-            throw {
+            throw new errorHandler_1.clientError({
                 message: "Member not found!",
                 status: errorHandler_1.statusCode.notfound
-            };
+            });
         }
         return updatedMember;
     }

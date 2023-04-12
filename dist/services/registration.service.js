@@ -40,16 +40,16 @@ var registrationService;
         const Organization = await organization_1.default.findOne({ ID: newComplainant.organization.ID });
         await validation_service_1.validationService.check_Email_Availability(newComplainant.email);
         if (!Organization) {
-            throw {
+            throw new errorHandler_1.clientError({
                 message: "ID " + newComplainant.organization.ID + " Organization Not Found! ",
                 status: errorHandler_1.statusCode.notfound
-            };
+            });
         }
         if (!validation_service_1.validationService.is_Email(newComplainant.email)) {
-            throw {
+            throw new errorHandler_1.clientError({
                 message: "Identifier is not an email !",
                 status: errorHandler_1.statusCode.badRequest
-            };
+            });
         }
         const hashedPassword = await (0, hash_1.hashPassword)(newComplainant.password);
         const newComplainant_ = new user_1.default({

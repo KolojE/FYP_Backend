@@ -9,17 +9,17 @@ async function authenticationMiddleware(req, res, next) {
     try {
         const token = (_a = req.headers["authorization"]) === null || _a === void 0 ? void 0 : _a.split(' ')[1];
         if (!token) {
-            throw {
+            throw new errorHandler_1.clientError({
                 message: "Token is not provided !",
                 status: errorHandler_1.statusCode.unauthorize,
-            };
+            });
         }
         const user = await authentication_services_1.authenticationService.verifyToken(token);
         if (!user) {
-            throw {
+            throw new errorHandler_1.clientError({
                 message: "The token is not belong to any user!",
                 status: errorHandler_1.statusCode.unauthorize,
-            };
+            });
         }
         req.user = user;
         next();
@@ -36,10 +36,10 @@ async function adminVerificationMiddleware(req, res, next) {
             return;
         }
         console.log("authenticating admin");
-        throw {
+        throw new errorHandler_1.clientError({
             message: "You do not have sufficient permission to make the request",
             status: errorHandler_1.statusCode.unauthorize,
-        };
+        });
     }
     catch (err) {
         next(err);
@@ -52,10 +52,10 @@ async function complainantVerificationMiddleware(req, res, next) {
             next();
             return;
         }
-        throw {
+        throw new errorHandler_1.clientError({
             message: "You do not have sufficient permission to make the request",
             status: errorHandler_1.statusCode.unauthorize,
-        };
+        });
     }
     catch (err) {
         next(err);

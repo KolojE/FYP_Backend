@@ -33,19 +33,19 @@ export namespace registrationService {
 
         //if Organization is null throw error
         if (!Organization) {
-            throw {
+            throw new clientError ({
                 message: "ID " + newComplainant.organization.ID + " Organization Not Found! ",
                 status: statusCode.notfound
-            } as clientError
+            }) 
         }
 
         //TODO - validate passcode
 
         if (!validationService.is_Email(newComplainant.email)) {
-            throw {
+            throw new clientError({
                 message: "Identifier is not an email !",
                 status: statusCode.badRequest
-            } as clientError
+            }) 
         }
 
         //hash password and store salt and hashed password

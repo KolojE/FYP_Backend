@@ -17,11 +17,11 @@ export namespace reportIncidentService {
         const form = await FormModel.findById(submission.formID).exec();
 
         if (!form) {
-            throw {
+            throw new clientError({
                 message: "form not found",
                 status: statusCode.notfound,
                 data: "Form Id provided is not exists in the database",
-            } as clientError
+            }) 
         }
 
         const organization: IOrganization | null = await OrganizationModel.findById(form.organization._id).exec();

@@ -9,10 +9,10 @@ export async function authentication(req: Request, res: Response, next: Function
         const user = await authenticationService.authenticateUser(req.body);
         console.log(user)
         if (user === null)
-            throw {
+            throw new clientError({
                 message: "Failed to authenticate user, no user found.",
                 status: statusCode.notfound,
-            } as clientError
+            }) 
 
         const token = await authenticationService.generateJWT(user);
         res.set({

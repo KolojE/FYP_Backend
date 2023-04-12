@@ -17,33 +17,33 @@ var validationService;
     validationService.is_Email = is_Email;
     async function check_Email_Availability(email) {
         if (await user_1.default.exists({ email: email }) !== null) {
-            throw {
+            throw new errorHandler_1.clientError({
                 data: email,
                 message: "Email already exits",
                 status: errorHandler_1.statusCode.conflict,
-            };
+            });
         }
     }
     validationService.check_Email_Availability = check_Email_Availability;
     function form_Validation(form) {
         form.fields.forEach((field) => {
             if (!Object.values(form_1.inputType).includes(field.inputType)) {
-                throw {
+                throw new errorHandler_1.clientError({
                     message: `Input type ${field.inputType} is not valid !`,
                     data: `valid types are ${Object.values(form_1.inputType)}`,
                     status: errorHandler_1.statusCode.badRequest,
-                };
+                });
             }
         });
     }
     validationService.form_Validation = form_Validation;
     function validate_User_Belong_To_Organziation(user, organizationID) {
         if (!user.organization._id.equals(organizationID)) {
-            throw {
+            throw new errorHandler_1.clientError({
                 message: "You are not authorized to process !",
                 status: errorHandler_1.statusCode.unauthorize,
                 data: "Invlid action",
-            };
+            });
         }
     }
     validationService.validate_User_Belong_To_Organziation = validate_User_Belong_To_Organziation;
@@ -55,11 +55,11 @@ var validationService;
             await Schema.validateAsync(field);
         }
         catch (err) {
-            throw {
+            throw new errorHandler_1.clientError({
                 message: "Failed to validate the form's fields",
                 status: errorHandler_1.statusCode.badRequest,
                 data: err,
-            };
+            });
         }
     }
     validationService.fields_Validation = fields_Validation;

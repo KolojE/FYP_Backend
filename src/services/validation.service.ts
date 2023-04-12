@@ -16,11 +16,11 @@ export namespace validationService {
 
         //check if it exists in conplainants 
         if (await userModel.exists({ email: email }) !== null) {
-            throw {
+            throw new clientError({
                 data: email,
                 message: "Email already exits",
                 status: statusCode.conflict,
-            } as clientError
+            })
 
         }
     }
@@ -29,11 +29,11 @@ export namespace validationService {
     export function form_Validation(form: newForm | Form) {
         form.fields.forEach((field) => {
             if (!Object.values(inputType).includes(field.inputType)) {
-                throw {
+                throw new clientError({
                     message: `Input type ${field.inputType} is not valid !`,
                     data: `valid types are ${Object.values(inputType)}`,
                     status: statusCode.badRequest,
-                } as clientError
+                }) 
             }
         })
     }
@@ -41,12 +41,12 @@ export namespace validationService {
     export function validate_User_Belong_To_Organziation(user: IUser, organizationID: Types.ObjectId) {
 
         if (!user.organization._id.equals(organizationID)) {
-            throw {
+            throw new clientError({
                 message: "You are not authorized to process !",
                 status: statusCode.unauthorize,
                 data: "Invlid action",
 
-            } as clientError
+            }) 
         }
     }
 
@@ -58,11 +58,11 @@ export namespace validationService {
         try {
             await Schema.validateAsync(field);
         } catch (err) {
-            throw {
+            throw new clientError({
                 message: "Failed to validate the form's fields",
                 status: statusCode.badRequest,
                 data: err,
-            } as clientError
+            })
         }
     }
 }

@@ -13,10 +13,10 @@ var authenticationService;
 (function (authenticationService) {
     async function authenticateUser(login) {
         if (!validation_service_1.validationService.is_Email(login.identifier)) {
-            throw {
+            throw new errorHandler_1.clientError({
                 message: "Identifier is not an email!",
                 status: errorHandler_1.statusCode.unauthorize
-            };
+            });
         }
         const loginUser = await user_1.default.findOne({ email: login.identifier }).exec();
         if (loginUser) {
@@ -24,10 +24,10 @@ var authenticationService;
             if (await (0, hash_1.verify)(login.password, loginUser.password.hashed))
                 return loginUser;
             else {
-                throw {
+                throw new errorHandler_1.clientError({
                     message: "password incorrect !",
                     status: errorHandler_1.statusCode.unauthorize
-                };
+                });
             }
         }
         return null;
@@ -52,17 +52,18 @@ var authenticationService;
             const data = await jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
             const User = await user_1.default.findById(data._id).exec();
             if (!User)
-                throw {
+                throw new errorHandler_1.clientError({
                     message: "Token invalid!",
                     status: errorHandler_1.statusCode.unauthorize
-                };
+                });
             return User;
         }
         catch (err) {
-            throw {
-                message: err,
+            throw new errorHandler_1.clientError({
+                data: err,
+                message: "token veification error",
                 status: errorHandler_1.statusCode.unauthorize
-            };
+            });
         }
     }
     authenticationService.verifyToken = verifyToken;

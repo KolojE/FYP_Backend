@@ -30,10 +30,10 @@ export namespace administratorService {
 
 
         if (!formToUpdate._id) {
-            throw {
+            throw new clientError( {
                 message: "ID is not provided !",
                 status: statusCode.badRequest,
-            } as clientError
+            } )
 
         }
         const updatedForm = await FormModel.findByIdAndUpdate(
@@ -46,10 +46,7 @@ export namespace administratorService {
         );
 
         if (!updatedForm) {
-            throw {
-                message: "Form not found !",
-                status: statusCode.notfound
-            } as clientError
+            throw new clientError({message:"Form not found !",status:statusCode.notfound})
         }
 
         return updatedForm
@@ -57,10 +54,10 @@ export namespace administratorService {
 
     export async function updateMember(member: IUser): Promise<IUser> {
         if (!member._id) {
-            throw {
+            throw new clientError({
                 message: "User ID is not provided",
                 status: statusCode.badRequest,
-            } as clientError
+            }) 
         }
 
         if (validationService.is_Email(member.email)) {
@@ -77,10 +74,10 @@ export namespace administratorService {
         )
 
         if (!updatedMember) {
-            throw {
+            throw new clientError({
                 message: "Member not found!",
                 status: statusCode.notfound
-            } as clientError
+            })
         }
 
         return updatedMember;

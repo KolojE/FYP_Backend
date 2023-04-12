@@ -24,10 +24,10 @@ export namespace authenticationService {
     **/
     export async function authenticateUser(login: login): Promise<IUser | null> {
         if (!validationService.is_Email(login.identifier)) {
-            throw {
+            throw new clientError({
                 message: "Identifier is not an email!",
                 status: statusCode.unauthorize
-            } as clientError
+            }) 
         }
 
 
@@ -38,10 +38,10 @@ export namespace authenticationService {
             if (await verify(login.password, loginUser.password.hashed))
                 return loginUser;
             else {
-                throw {
+                throw new clientError( {
                     message: "password incorrect !",
                     status: statusCode.unauthorize
-                } as clientError
+                })
             }
         }
 
@@ -77,18 +77,19 @@ export namespace authenticationService {
             const data = await jwt.verify(token, process.env.JWT_SECRET) as token;
             const User = await userModel.findById(data._id).exec();
             if (!User)
-                throw {
+                throw new clientError ({
                     message: "Token invalid!",
                     status: statusCode.unauthorize
-                } as clientError
+                }) 
 
             return User;
 
         } catch (err) {
-            throw {
-                message: err,
+            throw new clientError ({
+                data:err,
+                message: "token veification error",
                 status: statusCode.unauthorize
-            } as clientError
+            } )
         }
 
 

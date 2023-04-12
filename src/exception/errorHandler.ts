@@ -8,13 +8,33 @@ export enum statusCode {
     unauthorize = 401
 
 }
-export type clientError = {
-    data: string,
-    message: string,
-    status: number
-} & Error
+
+interface IClientError {
+
+    data?: any;
+    status: statusCode;
+    message: string;
+
+}
+
+export class clientError extends Error implements IClientError {
+
+    public data: any;
+    public status: statusCode;
+
+    constructor({ message, status, data }: IClientError) {
+        super(message)
+        this.data = data;
+        this.status = status;
+    }
+}
 
 export function clientErrorHandler(err: clientError, req: Request, res: Response, next: Function) {
+    if (!(err instanceof clientError)) {
+        next(err)
+        return
+    }
+
     res.status(err.status ? err.status : 500).json({
         data: err.data,
         message: err.message
@@ -22,7 +42,6 @@ export function clientErrorHandler(err: clientError, req: Request, res: Response
 }
 
 export function errorHandler(err: Error, req: Request, res: Response, next: Function) {
-    console.error(err);
     res.status(500).json({
         message: "Server error!",
         err: err

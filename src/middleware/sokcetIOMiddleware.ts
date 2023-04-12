@@ -8,20 +8,20 @@ export async function socketIOAuthenticationMiddleware(socket: Socket, next: Fun
 
         const token = socket.handshake.headers["authorization"]?.split(' ')[1]; // get token, e.g. Bearer "token"
         if (!token) {
-            throw {
+            throw new clientError({
                 message: "Token is not provided !",
                 status: statusCode.unauthorize,
-            } as clientError
+            })
         }
 
         const user = await authenticationService.verifyToken(token);
 
 
         if (!user) {
-            throw {
+            throw new clientError({
                 message: "The token is not belong to any user!",
                 status: statusCode.unauthorize,
-            } as clientError
+            })
         }
         console.log(user._id + 'joined room')
         socket.join(user._id.toString())
