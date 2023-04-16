@@ -17,8 +17,8 @@ function socketIO(httpServer: httpServer.Server) {
 
     const clientIO = io.of("/chat");
 
-    clientIO.use(socketIOAuthenticationMiddleware);
     clientIO.on("connection", socketRouter)
+    clientIO.use(socketIOAuthenticationMiddleware);
 
 }
 

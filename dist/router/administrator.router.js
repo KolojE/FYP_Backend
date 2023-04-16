@@ -10,7 +10,7 @@ administratorRouter.use(authentication_middleware_1.adminVerificationMiddleware)
 administratorRouter.post("/addForm", administrator_controller_1.addFormController);
 administratorRouter.post("/updateForm", administrator_controller_1.updateFormController);
 administratorRouter.post("/updateMember", administrator_controller_1.updateMembersController);
-administratorRouter.get("/viewMember", administrator_controller_1.viewMembersController);
+administratorRouter.get("/viewMembers", administrator_controller_1.viewMembersController);
 administratorRouter.get("/viewForms", administrator_controller_1.viewFormsController);
 administratorRouter.use(errorHandler_1.clientErrorHandler);
 administratorRouter.use(errorHandler_1.errorHandler);

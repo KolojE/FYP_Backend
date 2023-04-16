@@ -16,13 +16,17 @@ interface IContact {
     phoneNo: String;
     address: String;
 }
+
+interface IPassword {
+
+        hashed: string;
+        salt: string;
+}
+
 export interface IUser extends Document {
     ID: string;
     email: string;
-    password: {
-        hashed: string;
-        salt: string;
-    },
+    password: IPassword;
     organization: IOrganization;
     contact: IContact;
     role: role;

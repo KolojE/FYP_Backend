@@ -1,11 +1,12 @@
 import { Request, Response } from "express";
 import { clientError, statusCode } from "../exception/errorHandler";
 import { authenticationService } from "../services/authentication.services";
-
+import { IUser } from "../models/user";
 
 export async function authentication(req: Request, res: Response, next: Function) {
 
     try {
+    
         const user = await authenticationService.authenticateUser(req.body);
         console.log(user)
         if (user === null)
@@ -19,8 +20,13 @@ export async function authentication(req: Request, res: Response, next: Function
             "Authorization": `Baerer ${token}`
         })
 
+        const userOmitPassword={...user.toObject(),password:undefined}
+         
+
+        console.log("user ommited password"+userOmitPassword)
+
         res.status(200).json({
-            UserRole: user.role,
+            loginUser:userOmitPassword,
             message: "Sucessfully authenticatd token returned in the header",
         })
 

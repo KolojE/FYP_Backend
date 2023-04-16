@@ -20,3 +20,4 @@ adminSchema.plugin(autoIncrement, { fieldName: "ID", ModelName: "administrator",
 const adminModel = model<IAdministrator>("Administrator", adminSchema);
 
 export default adminModel;
+

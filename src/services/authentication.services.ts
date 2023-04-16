@@ -22,7 +22,7 @@ export namespace authenticationService {
     @authenticateUser
     @param {login} login - login contain identifier(email) and password  
     **/
-    export async function authenticateUser(login: login): Promise<IUser | null> {
+    export async function authenticateUser(login: login): Promise<IUser | null > {
         if (!validationService.is_Email(login.identifier)) {
             throw new clientError({
                 message: "Identifier is not an email!",

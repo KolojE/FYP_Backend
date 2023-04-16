@@ -30,9 +30,8 @@ export async function socketIOAuthenticationMiddleware(socket: Socket, next: Fun
         next();
 
     } catch (err) {
-        next(err)
+    next(err)
     }
-
 
 }
 
@@ -47,7 +46,7 @@ export async function sendMessageEventValidationMiddleware(user: IUser, event: E
         const receipientUser = await userModel.findById(receipientID)
         console.log(user)
         if (!receipientUser) {
-            return;
+            return
         }
         //Validate if sender have the right to interact with receipient
         if (!receipientUser.organization._id.equals(user.organization._id)) {

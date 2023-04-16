@@ -13,7 +13,7 @@ administratorRouter.post("/addForm", addFormController);
 administratorRouter.post("/updateForm", updateFormController);
 administratorRouter.post("/updateMember", updateMembersController);
 
-administratorRouter.get("/viewMember", viewMembersController);
+administratorRouter.get("/viewMembers", viewMembersController);
 administratorRouter.get("/viewForms",viewFormsController);
 administratorRouter.use(clientErrorHandler);
 administratorRouter.use(errorHandler);

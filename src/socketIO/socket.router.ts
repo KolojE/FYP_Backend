@@ -17,6 +17,10 @@ export function socketRouter(socket: Socket) {
         onSendMessage(IO, socket, args)
     });
 
+    socket.on("error",()=>{
+console.log("error")
+    })
+
 
 
 }

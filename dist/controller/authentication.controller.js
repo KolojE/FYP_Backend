@@ -16,8 +16,10 @@ async function authentication(req, res, next) {
         res.set({
             "Authorization": `Baerer ${token}`
         });
+        const userOmitPassword = Object.assign(Object.assign({}, user.toObject()), { password: undefined });
+        console.log("user ommited password" + userOmitPassword);
         res.status(200).json({
-            UserRole: user.role,
+            loginUser: userOmitPassword,
             message: "Sucessfully authenticatd token returned in the header",
         });
     }
