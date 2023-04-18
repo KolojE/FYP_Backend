@@ -36,23 +36,22 @@ var OrganizationService;
 (function (OrganizationService) {
     async function create_New_Organization(data) {
         const newOrganization = data;
-        await validation_service_1.validationService.check_Email_Availability(newOrganization.rootAdmin.email);
         const newOrganization_ = new organization_1.default({
             name: newOrganization.name,
             address: newOrganization.address,
             contactNo: newOrganization.contactNo,
-            passcode: newOrganization.passcode,
+            creationDate: new Date(),
         });
-        const result = newOrganization_.save();
-        return result;
+        return newOrganization_;
     }
     OrganizationService.create_New_Organization = create_New_Organization;
     async function create_Root_Admin(newOrganization, data) {
-        const newRootAdmin = data.rootAdmin;
-        const hashedPassword = await (0, hash_1.hashPassword)(newRootAdmin.password);
+        const newRootAdmin = data;
+        const hashedPassword = await (0, hash_1.hashPassword)(newRootAdmin.password.toString());
         validation_service_1.validationService.is_Email(newRootAdmin.email);
         const newAdminUser = new user_1.default({
             email: newRootAdmin.email,
+            name: newRootAdmin.name,
             organization: {
                 _id: newOrganization._id,
                 ID: newOrganization.ID
@@ -63,7 +62,7 @@ var OrganizationService;
             },
             role: user_1.role.admin,
         });
-        return await newAdminUser.save();
+        return newAdminUser;
     }
     OrganizationService.create_Root_Admin = create_Root_Admin;
     async function create_default_status(next) {

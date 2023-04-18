@@ -12,6 +12,7 @@ var role;
 const userSchema = new mongoose_1.Schema({
     ID: { type: String },
     email: { type: mongoose_1.Schema.Types.String, required: true },
+    name: { type: mongoose_1.Schema.Types.String, required: true },
     password: {
         hashed: { type: String, required: true },
         salt: { type: String, required: true },

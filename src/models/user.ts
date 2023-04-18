@@ -26,9 +26,10 @@ interface IPassword {
 export interface IUser extends Document {
     ID: string;
     email: string;
+    name:string;
     password: IPassword;
     organization: IOrganization;
-    contact: IContact;
+    contact?: IContact;
     role: role;
 
 }
@@ -36,6 +37,7 @@ export interface IUser extends Document {
 const userSchema = new Schema<IUser>({
     ID: { type: String },
     email: { type: Schema.Types.String, required: true },
+    name:{type:Schema.Types.String,required:true},
     password: {
         hashed: { type: String, required: true },
         salt: { type: String, required: true },

@@ -28,6 +28,7 @@ function clientErrorHandler(err, req, res, next) {
 }
 exports.clientErrorHandler = clientErrorHandler;
 function errorHandler(err, req, res, next) {
+    console.error(err);
     res.status(500).json({
         message: "Server error!",
         err: err

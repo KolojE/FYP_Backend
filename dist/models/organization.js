@@ -8,8 +8,7 @@ const organizationSchema = new mongoose_1.Schema({
     name: { type: String, required: true },
     contactNo: { type: String, required: true },
     address: { type: String, required: true },
-    passcode: { type: String, required: true },
-    creationDate: { type: mongoose_1.Schema.Types.Date },
+    creationDate: { type: mongoose_1.Schema.Types.Date, required: true },
     defaultStatus: { type: mongoose_1.Schema.Types.ObjectId, required: true },
 });
 organizationSchema.plugin(autoincrement_1.autoIncrement, { fieldName: "ID", ModelName: "organization", prefix: "OR_" });

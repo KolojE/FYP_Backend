@@ -10,6 +10,8 @@ organizationRouter.use(express.json())
 organizationRouter.post('/addOrganization', register_Organization);
 organizationRouter.post('/createCollection', create_Collection);
 
+organizationRouter.use(clientErrorHandler);
+organizationRouter.use(errorHandler)
 
 //error handler middleware
 export default organizationRouter;

@@ -5,10 +5,16 @@ import { OrganizationService } from "../services/organization.service";
 
 export async function register_Organization(req: Request, res: Response, next: Function) {
     try {
-        console.log("Creating new organization");
-        const newOrganization = await OrganizationService.create_New_Organization(req.body)
-        console.log("Creating Root Admin")
-        const newRootAdmin = await OrganizationService.create_Root_Admin(newOrganization, req.body);
+        const organization = req.body;
+        const rootAdmin = req.body.rootAdmin;
+
+        const newOrganization = await OrganizationService.create_New_Organization(organization)
+        await newOrganization.save();
+
+        const newRootAdmin = await OrganizationService.create_Root_Admin(newOrganization, rootAdmin);
+        await newRootAdmin.save();
+
+
         res.status(200).json({
             message: "successfully inserted organization and root admin is created",
             isCompleted: true,

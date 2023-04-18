@@ -1,23 +1,16 @@
+import { Document } from "mongoose";
 import { clientError, statusCode } from "../exception/errorHandler";
 import OrganizationModel, { IOrganization } from "../models/organization";
 import userModel, { role, IUser } from "../models/user";
 import { hashPassword } from "../utils/hash";
 import { validationService } from "./validation.service";
 
-interface newComplainant {
-    email: string,
-    password: string,
-    organization: {
-        ID: string,
-        passCode: string,
-    },
-    profile:
-    {
-        username: string,
-        contactNo?: string,
-    }
-
+type newComplainant  = Omit<IUser,keyof Document|"ID"> & {
+    password:string|Object
 }
+
+
+
 
 export namespace registrationService {
     export async function register_Complainant(complainantData: newComplainant): Promise<IUser> {
@@ -39,7 +32,6 @@ export namespace registrationService {
             }) 
         }
 
-        //TODO - validate passcode
 
         if (!validationService.is_Email(newComplainant.email)) {
             throw new clientError({
@@ -49,19 +41,16 @@ export namespace registrationService {
         }
 
         //hash password and store salt and hashed password
-        const hashedPassword = await hashPassword(newComplainant.password);
+        const hashedPassword = await hashPassword(newComplainant.password.toString());
 
-        const newComplainant_ = new userModel({
+        const newComplainant_ = new userModel<newComplainant>({
             email: newComplainant.email,
+            name:newComplainant.name,
             password: {
                 hashed: hashedPassword.hashValue,
-                salt: hashedPassword.salt
+                salt: hashedPassword.salt,
             },
             organization: { _id: Organization._id, ID: Organization.ID },
-            profile: {
-                username: newComplainant.profile.username,
-                contact: newComplainant.profile.contactNo,
-            },
             role: role.complainant,
         })
 

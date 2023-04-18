@@ -42,6 +42,7 @@ export function clientErrorHandler(err: clientError, req: Request, res: Response
 }
 
 export function errorHandler(err: Error, req: Request, res: Response, next: Function) {
+    console.error(err);
     res.status(500).json({
         message: "Server error!",
         err: err

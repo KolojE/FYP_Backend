@@ -6,5 +6,5 @@ const authenticationRouter = Router();
 
 authenticationRouter.post("/login", authentication);
 authenticationRouter.use(clientErrorHandler);
-authenticationRouter.use(errorHandler);
+authenticationRouter.use(errorHandler)
 export default authenticationRouter;

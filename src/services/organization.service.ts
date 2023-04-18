@@ -3,47 +3,35 @@ import { hashPassword } from "../utils/hash";
 import { validationService } from "./validation.service";
 import userModel, { role, IUser } from "../models/user";
 import statusModel, { Status } from "../models/status";
-type newOrganization = {
-    name: string,
-    address: string,
-    contactNo: string,
-    passcode: string,
-    rootAdmin: {
-        email: string,
-        password: string,
-    }
+import { Document } from "mongoose";
 
+type newOrganization = Omit<IOrganization,keyof Document|"ID"|"defaultStatus"> 
+type rootAdmin = Omit<IUser,keyof Document|"ID"> & {
+    password:string|Object
 }
 export namespace OrganizationService {
-    export async function create_New_Organization(data: newOrganization): Promise<IOrganization> {
+    export async function create_New_Organization(data: newOrganization): Promise<IOrganization>{
 
         const newOrganization = data;
 
-        await validationService.check_Email_Availability(newOrganization.rootAdmin.email);
-
-        const newOrganization_ = new OrganizationModel({
+        const newOrganization_ = new OrganizationModel<newOrganization>({
             name: newOrganization.name,
             address: newOrganization.address,
             contactNo: newOrganization.contactNo,
-            passcode: newOrganization.passcode,
+            creationDate:new Date(),
         });
-
-
-        const result = newOrganization_.save();
-
-
-
-        return result;
+return newOrganization_;
 
     }
 
-    export async function create_Root_Admin(newOrganization: IOrganization, data: newOrganization): Promise<IUser> {
-        const newRootAdmin = data.rootAdmin;
-        const hashedPassword = await hashPassword(newRootAdmin.password);
+    export async function create_Root_Admin(newOrganization: IOrganization, data: rootAdmin): Promise<IUser> {
+        const newRootAdmin = data;
+        const hashedPassword = await hashPassword(newRootAdmin.password.toString());
         validationService.is_Email(newRootAdmin.email);
         //create a default administrator
-        const newAdminUser = new userModel({
+        const newAdminUser = new userModel<rootAdmin>({
             email: newRootAdmin.email,
+            name:newRootAdmin.name,
             organization: {
                 _id: newOrganization._id,
                 ID: newOrganization.ID
@@ -54,7 +42,7 @@ export namespace OrganizationService {
             },
             role: role.admin,
         });
-        return await newAdminUser.save();
+        return newAdminUser;
     }
 
     export async function create_default_status(this: IOrganization, next: Function) {

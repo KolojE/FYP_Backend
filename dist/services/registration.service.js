@@ -51,18 +51,15 @@ var registrationService;
                 status: errorHandler_1.statusCode.badRequest
             });
         }
-        const hashedPassword = await (0, hash_1.hashPassword)(newComplainant.password);
+        const hashedPassword = await (0, hash_1.hashPassword)(newComplainant.password.toString());
         const newComplainant_ = new user_1.default({
             email: newComplainant.email,
+            name: newComplainant.name,
             password: {
                 hashed: hashedPassword.hashValue,
-                salt: hashedPassword.salt
+                salt: hashedPassword.salt,
             },
             organization: { _id: Organization._id, ID: Organization.ID },
-            profile: {
-                username: newComplainant.profile.username,
-                contact: newComplainant.profile.contactNo,
-            },
             role: user_1.role.complainant,
         });
         return newComplainant_.save();

@@ -13,7 +13,6 @@ export interface IOrganization extends Document {
     name: string;
     contactNo: string;
     address: string;
-    passcode: string;
     creationDate: Date;
     defaultStatus: Types.ObjectId;
 
@@ -24,8 +23,7 @@ const organizationSchema = new Schema<IOrganization>({
     name: { type: String, required: true },
     contactNo: { type: String, required: true },
     address: { type: String, required: true },
-    passcode: { type: String, required: true },
-    creationDate: { type: Schema.Types.Date },
+    creationDate: { type: Schema.Types.Date,required:true },
     defaultStatus: { type: Schema.Types.ObjectId, required: true },
 
 })
