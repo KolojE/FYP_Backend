@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateMembersController = exports.viewMembersController = exports.viewFormsController = exports.updateFormController = exports.addFormController = void 0;
+exports.updateMembersController = exports.viewMembersController = exports.deleteFormController = exports.updateFormController = exports.addFormController = void 0;
 const complainant_1 = __importDefault(require("../models/complainant"));
 const administrator_service_1 = require("../services/administrator.service");
 const validation_service_1 = require("../services/validation.service");
@@ -12,7 +12,7 @@ async function addFormController(req, res, next) {
     try {
         const newForm = req.body;
         const user = req.user;
-        validation_service_1.validationService.form_Validation(newForm);
+        await validation_service_1.validationService.form_Validation(newForm);
         const form = await administrator_service_1.administratorService.addNewForm(newForm, user);
         res.status(200).json({
             message: "successfully added new form",
@@ -27,8 +27,8 @@ exports.addFormController = addFormController;
 async function updateFormController(req, res, next) {
     try {
         const updateForm = req.body;
-        validation_service_1.validationService.form_Validation(updateForm);
-        const updatedForm = await administrator_service_1.administratorService.updateForm(updateForm);
+        await validation_service_1.validationService.form_Validation(updateForm);
+        const updatedForm = await administrator_service_1.administratorService.updateForm(updateForm, req.user);
         res.status(200).json({
             message: "successfully updated form",
             data: updatedForm,
@@ -39,30 +39,59 @@ async function updateFormController(req, res, next) {
     }
 }
 exports.updateFormController = updateFormController;
-async function viewFormsController(req, res, next) {
-    const admin = req.user;
+async function deleteFormController(req, res, next) {
     try {
-        const forms = await form_1.FormModel.find({ organization: admin.organization });
+        const formToDelete = req.query._id;
+        const user = req.user;
+        const deletedForm = await form_1.FormModel.deleteOne({ _id: formToDelete }).where({ organization: user.organization });
+        console.log(`Form ${formToDelete} is deleted. `);
         res.status(200).json({
-            data: forms,
+            message: `sucessfully deleted form ${formToDelete}`,
+            data: deletedForm
         });
     }
     catch (err) {
         next(err);
     }
 }
-exports.viewFormsController = viewFormsController;
+exports.deleteFormController = deleteFormController;
 async function viewMembersController(req, res, next) {
     try {
-        const members = await complainant_1.default.aggregate([{
+        const members = await complainant_1.default.aggregate([
+            {
                 $lookup: {
-                    from: "users", localField: "User._id", foreignField: "_id",
-                    as: "User"
+                    from: "users", localField: "user._id", foreignField: "_id",
+                    as: "user"
                 }
-            }]);
+            },
+            {
+                $lookup: {
+                    from: "organizations", localField: "user.organization._id", foreignField: "_id",
+                    as: "organization"
+                }
+            },
+            {
+                $match: {
+                    'user.organization': req.user.organization
+                }
+            },
+            {
+                $unwind: "$user"
+            },
+            {
+                $unwind: "$organization"
+            },
+            {
+                $project: {
+                    "user.password": 0,
+                    "user.organization": 0,
+                }
+            }
+        ]);
+        console.log(members);
         res.status(200).json({
             message: "successfully get all members info",
-            data: members
+            members: members
         });
     }
     catch (err) {

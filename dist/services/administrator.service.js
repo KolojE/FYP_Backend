@@ -18,12 +18,13 @@ var administratorService;
             organization: {
                 _id: user.organization._id,
                 ID: user.organization.ID,
-            }
+            },
+            creationDate: new Date()
         });
         return await newForm.save();
     }
     administratorService.addNewForm = addNewForm;
-    async function updateForm(formToUpdate) {
+    async function updateForm(formToUpdate, user) {
         if (!formToUpdate._id) {
             throw new errorHandler_1.clientError({
                 message: "ID is not provided !",
@@ -35,7 +36,7 @@ var administratorService;
                 fields: formToUpdate.fields,
                 activation_Status: formToUpdate.activation_Status,
             }
-        }, { returnDocument: "after", runValidators: true });
+        }, { returnDocument: "after", runValidators: true }).where({ organization: user.organization });
         if (!updatedForm) {
             throw new errorHandler_1.clientError({ message: "Form not found !", status: errorHandler_1.statusCode.notfound });
         }

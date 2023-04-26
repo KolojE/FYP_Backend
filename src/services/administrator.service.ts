@@ -20,13 +20,14 @@ export namespace administratorService {
             organization: {
                 _id: user.organization._id,
                 ID: user.organization.ID,
-            }
+            },
+            creationDate:new Date()
         });
 
         return await newForm.save();
     }
 
-    export async function updateForm(formToUpdate: Form): Promise<Form> {
+    export async function updateForm(formToUpdate: Form,user:IUser): Promise<Form> {
 
 
         if (!formToUpdate._id) {
@@ -36,6 +37,7 @@ export namespace administratorService {
             } )
 
         }
+
         const updatedForm = await FormModel.findByIdAndUpdate(
             formToUpdate._id, {$set: {
             name: formToUpdate.name,
@@ -43,7 +45,9 @@ export namespace administratorService {
             activation_Status: formToUpdate.activation_Status,
             }
         }, { returnDocument: "after",runValidators:true }
-        );
+        ).where({organization:user.organization})
+
+        
 
         if (!updatedForm) {
             throw new clientError({message:"Form not found !",status:statusCode.notfound})

@@ -26,7 +26,7 @@ const formSchema = new mongoose_1.Schema({
         _id: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "organizations" },
         ID: { type: String, required: true, ref: "organizations" },
     },
-    creationDate: { type: mongoose_1.Schema.Types.Date },
+    creationDate: { type: mongoose_1.Schema.Types.Date, required: true },
     activation_Status: { type: mongoose_1.Schema.Types.Boolean, required: true },
 });
 exports.FormModel = (0, mongoose_1.model)("Form", formSchema);

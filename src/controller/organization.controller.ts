@@ -3,7 +3,7 @@ import OrganizationModel from "../models/organization";
 import { OrganizationService } from "../services/organization.service";
 
 
-export async function register_Organization(req: Request, res: Response, next: Function) {
+export async function registerOrganizationController(req: Request, res: Response, next: Function) {
     try {
         const organization = req.body;
         const rootAdmin = req.body.rootAdmin;
@@ -38,7 +38,8 @@ export async function register_Organization(req: Request, res: Response, next: F
 
 }
 
-export function create_Collection(req: Request, res: Response) {
+
+export function createCollectionController(req: Request, res: Response) {
     OrganizationModel.createCollection().then((resolved) => {
         res.status(200).json({
             message: "Organization Collection is created, This doesnt have to be done manually since moongose will handle the creation.",

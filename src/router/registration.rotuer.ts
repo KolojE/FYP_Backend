@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { register_Complainant } from "../controller/registration.controller";
+import { registerComplainantController } from "../controller/registration.controller";
 
 const registrationRouter = Router();
 
 //use authentication middleware
 
-registrationRouter.post("/register", register_Complainant);
+registrationRouter.post("/register", registerComplainantController);
 export default registrationRouter;

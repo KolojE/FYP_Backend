@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { registrationService } from "../services/registration.service";
 
-export async function register_Complainant(req: Request, res: Response, next: Function) {
+export async function registerComplainantController(req: Request, res: Response, next: Function) {
 
     try {
         const result = await registrationService.register_Complainant(req.body);

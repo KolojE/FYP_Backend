@@ -1,4 +1,5 @@
 import { model, Model, Schema, Document, Types } from "mongoose";
+import { validationService } from "../services/validation.service";
 
 export enum inputType {
     Text = "Text",
@@ -46,9 +47,10 @@ const formSchema = new Schema<Form>({
         _id: { type: Schema.Types.ObjectId, required: true, ref: "organizations" },
         ID: { type: String, required: true, ref: "organizations" },
     },
-    creationDate: { type: Schema.Types.Date },
+    creationDate: { type: Schema.Types.Date,required:true },
     activation_Status: { type: Schema.Types.Boolean, required: true },
 })
+
 
 export const FormModel: Model<Form> = model<Form>("Form", formSchema)
 

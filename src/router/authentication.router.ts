@@ -1,10 +1,10 @@
 import { Router } from "express";
-import { authentication } from "../controller/authentication.controller";
+import { authenticationController } from "../controller/authentication.controller";
 import { clientError, clientErrorHandler, errorHandler } from "../exception/errorHandler";
 
 const authenticationRouter = Router();
 
-authenticationRouter.post("/login", authentication);
+authenticationRouter.post("/login", authenticationController);
 authenticationRouter.use(clientErrorHandler);
 authenticationRouter.use(errorHandler)
 export default authenticationRouter;

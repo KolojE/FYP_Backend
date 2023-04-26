@@ -8,8 +8,8 @@ const organization_controller_1 = require("../controller/organization.controller
 const errorHandler_1 = require("../exception/errorHandler");
 const organizationRouter = express_1.default.Router();
 organizationRouter.use(express_1.default.json());
-organizationRouter.post('/addOrganization', organization_controller_1.register_Organization);
-organizationRouter.post('/createCollection', organization_controller_1.create_Collection);
+organizationRouter.post('/addOrganization', organization_controller_1.registerOrganizationController);
+organizationRouter.post('/createCollection', organization_controller_1.createCollectionController);
 organizationRouter.use(errorHandler_1.clientErrorHandler);
 organizationRouter.use(errorHandler_1.errorHandler);
 exports.default = organizationRouter;

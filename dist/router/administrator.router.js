@@ -11,7 +11,7 @@ administratorRouter.post("/addForm", administrator_controller_1.addFormControlle
 administratorRouter.post("/updateForm", administrator_controller_1.updateFormController);
 administratorRouter.post("/updateMember", administrator_controller_1.updateMembersController);
 administratorRouter.get("/viewMembers", administrator_controller_1.viewMembersController);
-administratorRouter.get("/viewForms", administrator_controller_1.viewFormsController);
+administratorRouter.delete("/deleteForm", administrator_controller_1.deleteFormController);
 administratorRouter.use(errorHandler_1.clientErrorHandler);
 administratorRouter.use(errorHandler_1.errorHandler);
 exports.default = administratorRouter;

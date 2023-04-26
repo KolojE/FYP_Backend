@@ -1,6 +1,7 @@
 import { role, IUser } from "../models/user";
 import AdminModel from "../models/administrator";
-import complaiantModel from "../models/complainant";
+import complaiantModel, { IComplainant } from "../models/complainant";
+import { Document} from "mongoose";
 import { ObjectId } from "mongodb";
 
 export namespace userService {
@@ -8,7 +9,7 @@ export namespace userService {
     export async function create_role(doc: IUser, next: Function) {
         if (doc.role === role.admin) {
             const newAdmin = new AdminModel({
-                User: {
+                user: {
                     _id: new ObjectId(doc._id),
                     ID: doc.ID
                 }
@@ -19,10 +20,11 @@ export namespace userService {
 
         if (doc.role === role.complainant) {
             const newComplainant = new complaiantModel({
-                User: {
-                    _id: new ObjectId(doc._id),
+                user: {
+                    _id:doc._id,
                     ID: doc.ID
-                }
+                },
+                activation:false,
             });
             await newComplainant.save();
             next();

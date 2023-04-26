@@ -6,8 +6,8 @@ import { authenticationService } from "../services/authentication.services";
 
 export async function authenticationMiddleware(req: Request, res: Response, next: Function) {
     try {
-
         const token = req.headers["authorization"]?.split(' ')[1]; // get token, e.g. Bearer "token"
+        console.log(token)
         if (!token) {
             throw new clientError({
                 message: "Token is not provided !",

@@ -5,8 +5,8 @@ const autoincrement_1 = require("../plugin/autoincrement");
 const adminSchema = new mongoose_1.Schema({
     ID: { type: String, unique: true, required: true },
     User: {
-        _id: { type: mongoose_1.Schema.Types.ObjectId, unique: true, ref: "User" },
-        ID: { type: String, unique: true, ref: "User" }
+        _id: { type: mongoose_1.Schema.Types.ObjectId, unique: true, ref: "user" },
+        ID: { type: String, unique: true, ref: "user" }
     }
 });
 adminSchema.plugin(autoincrement_1.autoIncrement, { fieldName: "ID", ModelName: "administrator", prefix: "Admin_" });

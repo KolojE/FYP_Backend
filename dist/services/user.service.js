@@ -13,7 +13,7 @@ var userService;
     async function create_role(doc, next) {
         if (doc.role === user_1.role.admin) {
             const newAdmin = new administrator_1.default({
-                User: {
+                user: {
                     _id: new mongodb_1.ObjectId(doc._id),
                     ID: doc.ID
                 }
@@ -23,10 +23,11 @@ var userService;
         }
         if (doc.role === user_1.role.complainant) {
             const newComplainant = new complainant_1.default({
-                User: {
-                    _id: new mongodb_1.ObjectId(doc._id),
+                user: {
+                    _id: doc._id,
                     ID: doc.ID
-                }
+                },
+                activation: false,
             });
             await newComplainant.save();
             next();

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { clientError, statusCode } from "../exception/errorHandler";
 import { authenticationService } from "../services/authentication.services";
 
-export async function authentication(req: Request, res: Response, next: Function) {
+export async function authenticationController(req: Request, res: Response, next: Function) {
 
     try {
     

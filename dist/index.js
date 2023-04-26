@@ -47,4 +47,10 @@ httpServer.listen(8080, () => {
 (0, db_1.ConnectDatabase)(() => {
     console.log("Connected to Database");
 });
+process.on("uncaughtException", () => {
+    httpServer.close();
+});
+process.on("SIGTERM", () => {
+    httpServer.close();
+});
 //# sourceMappingURL=index.js.map

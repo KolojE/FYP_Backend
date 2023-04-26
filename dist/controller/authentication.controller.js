@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.authentication = void 0;
+exports.authenticationController = void 0;
 const errorHandler_1 = require("../exception/errorHandler");
 const authentication_services_1 = require("../services/authentication.services");
-async function authentication(req, res, next) {
+async function authenticationController(req, res, next) {
     try {
         const user = await authentication_services_1.authenticationService.authenticateUser(req.body);
         console.log(user);
@@ -27,5 +27,5 @@ async function authentication(req, res, next) {
         next(err);
     }
 }
-exports.authentication = authentication;
+exports.authenticationController = authenticationController;
 //# sourceMappingURL=authentication.controller.js.map
