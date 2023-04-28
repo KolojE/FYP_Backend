@@ -1,7 +1,9 @@
 import { clientError, statusCode } from "../exception/errorHandler";
-import { IField, Form, FormModel, inputType } from "../models/form"
-import userModel, { IUser } from "../models/user";
-import { validationService } from "./validation.service";
+import complaiantModel from "../models/complainant";
+import { IField, IForm, FormModel, inputType } from "../models/form"
+import  { IUser } from "../models/user";
+import { isObjectIdOrHexString } from "mongoose";
+
 
 export type newForm = {
     name: String,
@@ -10,7 +12,29 @@ export type newForm = {
 }
 
 export namespace administratorService {
-    export async function addNewForm(form: newForm, user: IUser): Promise<Form> {
+
+    export async function preFormSave(this:IForm,next:Function)
+    {
+        const doc=this
+
+        const defaultFields:Array<IField> = [{
+            label:"Date Of Occurence",
+            inputType:inputType.Date,
+            required:true,
+        },{
+            label:"Time of Occurence",
+            inputType:inputType.Time,
+            required:true,
+        },{
+            label:"Location",
+            inputType:inputType.Map,
+            required:true,
+        }]
+        doc.defaultFields.unshift(...defaultFields);
+        next();
+    }
+
+    export async function addNewForm(form: newForm, user: IUser): Promise<IForm> {
 
 
         const newForm = new FormModel({
@@ -21,70 +45,67 @@ export namespace administratorService {
                 _id: user.organization._id,
                 ID: user.organization.ID,
             },
-            creationDate:new Date()
+            creationDate: new Date()
         });
 
         return await newForm.save();
     }
 
-    export async function updateForm(formToUpdate: Form,user:IUser): Promise<Form> {
+    export async function updateForm(formToUpdate: IForm, user: IUser): Promise<IForm> {
 
 
         if (!formToUpdate._id) {
-            throw new clientError( {
+            throw new clientError({
                 message: "ID is not provided !",
                 status: statusCode.badRequest,
-            } )
+            })
 
         }
 
         const updatedForm = await FormModel.findByIdAndUpdate(
-            formToUpdate._id, {$set: {
-            name: formToUpdate.name,
-            fields: formToUpdate.fields,
-            activation_Status: formToUpdate.activation_Status,
+            formToUpdate._id, {
+            $set: {
+                name: formToUpdate.name,
+                fields: formToUpdate.fields,
+                activation_Status: formToUpdate.activation_Status,
             }
-        }, { returnDocument: "after",runValidators:true }
-        ).where({organization:user.organization})
+        }, { returnDocument: "after", runValidators: true }
+        ).where({ organization: user.organization })
 
-        
+
 
         if (!updatedForm) {
-            throw new clientError({message:"Form not found !",status:statusCode.notfound})
+            throw new clientError({ message: "Form not found !", status: statusCode.notfound })
         }
 
         return updatedForm
     }
 
-    export async function updateMember(member: IUser): Promise<IUser> {
-        if (!member._id) {
+    export async function updateMemberActivationStatus(id: string, activation: boolean, requester: IUser) {
+
+        
+        if (!isObjectIdOrHexString(id)) {
             throw new clientError({
-                message: "User ID is not provided",
                 status: statusCode.badRequest,
-            }) 
-        }
-
-        if (validationService.is_Email(member.email)) {
-
-        }
-
-        const updatedMember = await userModel.findByIdAndUpdate(
-            member._id, {
-            $set: {
-                contact: member.contact,
-            }
-        },
-            { returnDocument: "after" }
-        )
-
-        if (!updatedMember) {
-            throw new clientError({
-                message: "Member not found!",
-                status: statusCode.notfound
+                message: "ID invalid!"
             })
         }
-
-        return updatedMember;
+     const complainant = await complaiantModel.findOne({
+        'user._id':id
+     }).populate({
+        path:"user._id",
+        match:{
+            'organization._id':requester.organization._id
+        }
+        
+     }).updateOne({$set:{
+        activation:activation
+     }})  
+     console.log(complainant)
     }
+
+    
+
+
 }
 

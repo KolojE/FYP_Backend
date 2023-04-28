@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { ObjectId } from "mongodb";
 import userModel from "../models/user"; import { clientError, statusCode } from "../exception/errorHandler"; import OrganizationModel from "../models/organization";
-import { Form, FormModel } from "../models/form";
+import { IForm, FormModel } from "../models/form";
 
 
 
@@ -46,7 +46,7 @@ export async function getUserInfoController(req: Request, res: Response, next: F
 }
 export async function getAllForms(req: Request, res: Response, next: Function) {
     try {
-        const forms = await FormModel.find<Form>({
+        const forms = await FormModel.find<IForm>({
             organization: req.user.organization
         });
 
@@ -77,7 +77,7 @@ export async function getForm(req: Request, res: Response, next: Function) {
                 }`
             })
         }
-        const form = await FormModel.findById<Form>(formID
+        const form = await FormModel.findById<IForm>(formID
         )
 
         if(!form)

@@ -12,13 +12,14 @@ const user_1 = __importDefault(require("../models/user"));
 var authenticationService;
 (function (authenticationService) {
     async function authenticateUser(login) {
+        login.identifier = login.identifier.toLowerCase();
         if (!validation_service_1.validationService.is_Email(login.identifier)) {
             throw new errorHandler_1.clientError({
                 message: "Identifier is not an email!",
                 status: errorHandler_1.statusCode.unauthorize
             });
         }
-        const loginUser = await user_1.default.findOne({ email: login.identifier }).exec();
+        const loginUser = await user_1.default.findOne({ email: login.identifier }).lean();
         if (loginUser) {
             console.log(login.password);
             if (await (0, hash_1.verify)(login.password, loginUser.password.hashed))

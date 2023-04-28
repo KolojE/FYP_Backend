@@ -17,7 +17,7 @@ const adminSchema = new Schema<IAdministrator>({
     }
 })
 adminSchema.plugin(autoIncrement, { fieldName: "ID", ModelName: "administrator", prefix: "Admin_" });
-const adminModel = model<IAdministrator>("Administrator", adminSchema);
+const adminModel = model<IAdministrator>("administrator", adminSchema);
 
 export default adminModel;
 

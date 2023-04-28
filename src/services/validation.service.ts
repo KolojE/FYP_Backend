@@ -1,5 +1,5 @@
 import { clientError, statusCode } from "../exception/errorHandler";
-import { Form, inputType } from "../models/form";
+import { IForm, inputType } from "../models/form";
 import userModel, { IUser } from "../models/user";
 import { newForm } from "./administrator.service";
 import { generateSchema } from "../utils/joi";
@@ -26,7 +26,7 @@ export namespace validationService {
     }
 
 
-    export function form_Validation(form: newForm | Form) {
+    export function form_Validation(form: newForm | IForm) {
         form.fields.forEach((field) => {
             if (!Object.values(inputType).includes(field.inputType)) {
                 throw new clientError({
@@ -50,7 +50,7 @@ export namespace validationService {
         }
     }
 
-    export async function fields_Validation(field: Object, form: Form) {
+    export async function fields_Validation(field: Object, form: IForm) {
 
         console.log(field)
         const Schema = generateSchema(form);

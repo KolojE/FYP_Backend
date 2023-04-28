@@ -10,8 +10,8 @@ var role;
     role["complainant"] = "complainant";
 })(role = exports.role || (exports.role = {}));
 const userSchema = new mongoose_1.Schema({
-    ID: { type: String },
-    email: { type: mongoose_1.Schema.Types.String, required: true },
+    ID: { type: String, unique: true },
+    email: { type: mongoose_1.Schema.Types.String, unique: true, required: true },
     name: { type: mongoose_1.Schema.Types.String, required: true },
     password: {
         hashed: { type: String, required: true },
@@ -29,6 +29,7 @@ const userSchema = new mongoose_1.Schema({
 });
 userSchema.plugin(autoincrement_1.autoIncrement, { fieldName: "ID", ModelName: "user", prefix: "UR_" });
 userSchema.post('save', user_service_1.userService.create_role);
-const userModel = (0, mongoose_1.model)("User", userSchema);
+userSchema.post("findOneAndDelete", user_service_1.userService.delete_role);
+const userModel = (0, mongoose_1.model)("user", userSchema);
 exports.default = userModel;
 //# sourceMappingURL=user.js.map

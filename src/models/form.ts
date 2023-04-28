@@ -1,5 +1,5 @@
 import { model, Model, Schema, Document, Types } from "mongoose";
-import { validationService } from "../services/validation.service";
+import { administratorService } from "../services/administrator.service";
 
 export enum inputType {
     Text = "Text",
@@ -10,7 +10,7 @@ export enum inputType {
     Photo = "Photo",
 }
 
-export interface IField extends Document {
+export interface IField {
     label: string,
     inputType: inputType,
     options?: Array<any>,
@@ -25,9 +25,9 @@ const fieldSchema = new Schema<IField>(
         required: { type: Boolean, required: true },
     }
 )
-
-export interface Form extends Document {
+export interface IForm extends Document {
     name: string;
+    defaultFields:Array<IField>;
     fields: Array<IField>;
     organization: {
         _id: Types.ObjectId;
@@ -37,8 +37,11 @@ export interface Form extends Document {
     creationDate: Date;
 }
 
-const formSchema = new Schema<Form>({
+const formSchema = new Schema<IForm>({
     name: { type: Schema.Types.String, required: true },
+    defaultFields:[
+        { label: String, inputType: String, options: Schema.Types.Array, required: Boolean, type: fieldSchema}
+    ],
     fields: [
         { label: String, inputType: String, options: Schema.Types.Array, required: Boolean, type: fieldSchema }
     ]
@@ -51,6 +54,7 @@ const formSchema = new Schema<Form>({
     activation_Status: { type: Schema.Types.Boolean, required: true },
 })
 
+formSchema.pre('save',administratorService.preFormSave)
+export const FormModel: Model<IForm> = model<IForm>("form", formSchema)
 
-export const FormModel: Model<Form> = model<Form>("Form", formSchema)
 

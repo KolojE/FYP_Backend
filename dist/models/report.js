@@ -21,6 +21,6 @@ const reportSchema = new mongoose_1.Schema({
         }
     }
 });
-const ReportModel = (0, mongoose_1.model)('Report', reportSchema);
+const ReportModel = (0, mongoose_1.model)('report', reportSchema);
 exports.default = ReportModel;
 //# sourceMappingURL=report.js.map

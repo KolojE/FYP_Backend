@@ -1,8 +1,8 @@
 import { role, IUser } from "../models/user";
 import AdminModel from "../models/administrator";
 import complaiantModel, { IComplainant } from "../models/complainant";
-import { Document} from "mongoose";
 import { ObjectId } from "mongodb";
+import { clientError, statusCode } from "../exception/errorHandler";
 
 export namespace userService {
 
@@ -30,6 +30,23 @@ export namespace userService {
             next();
         }
     }
-}
+
+    export async function delete_role(doc:IUser,next:Function)
+    {
+        console.log(doc)
+        if(doc.role === role.admin)
+        {
+            throw new clientError({
+                message:"delete admin role is currently not allowed !",
+                status:statusCode.badRequest,
+            }) 
+        }
+
+
+        const deletedRole = await complaiantModel.findOneAndDelete({
+            "user._id":doc._id
+        })
+    }       
+    }
 
 

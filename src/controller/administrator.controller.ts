@@ -3,6 +3,8 @@ import complaiantModel from "../models/complainant";
 import { administratorService } from "../services/administrator.service";
 import { validationService } from "../services/validation.service";
 import { FormModel } from "../models/form";
+import { clientError, statusCode } from "../exception/errorHandler";
+import userModel, { role } from "../models/user";
 
 
 
@@ -96,7 +98,7 @@ export async function viewMembersController(req: Request, res: Response, next: F
             {
                 $project: {
                     "user.password": 0,
-                    "user.organization":0,
+                    "user.organization": 0,
                 }
             }
         ]);
@@ -113,16 +115,39 @@ export async function viewMembersController(req: Request, res: Response, next: F
 
 }
 
-export async function updateMembersController(req: Request, res: Response, next: Function) {
+export async function updateMemberActivationController(req: Request, res: Response, next: Function) {
 
     try {
-        const member = req.body;
-        const updatedMember = await administratorService.updateMember(member);
+        const body = req.body;
+        console.log(body)
+        const updatedMember = await administratorService.updateMemberActivationStatus(body.id, body.activation, req.user);
         res.status(200).json({
             message: "successfully updated member",
             data: updatedMember,
         }).send()
     } catch (err) {
         next(err)
+    }
+}
+
+export async function deleteMemberController(req: Request, res: Response, next: Function) {
+    try {
+        const user=req.user;
+        const deleteUserId = req.query._id;
+        const deletedMember = await userModel.findOneAndDelete({
+            _id:deleteUserId,role:role.complainant,"organization._id":user.organization._id
+        })
+        if(!deletedMember)
+        {
+            throw new clientError({
+                message:`No member is deleted cause the ID associated to the member is not found or trying to delete admin account ${deleteUserId}`,
+                status:statusCode.notfound,
+            })
+        }
+
+            
+    }
+    catch (err) {
+        next(err);
     }
 }

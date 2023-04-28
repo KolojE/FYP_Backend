@@ -17,7 +17,7 @@ export namespace registrationService {
 
         const newComplainant: newComplainant = complainantData;
         console.log(newComplainant)
-
+        newComplainant.email = newComplainant.email.toLowerCase()
         //Get organization from submitted ID
         const Organization = await OrganizationModel.findOne({ ID: newComplainant.organization.ID })
 

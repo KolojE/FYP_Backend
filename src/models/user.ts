@@ -35,8 +35,8 @@ export interface IUser extends Document {
 }
 
 const userSchema = new Schema<IUser>({
-    ID: { type: String },
-    email: { type: Schema.Types.String, required: true },
+    ID: { type: String,unique:true },
+    email: { type: Schema.Types.String, unique:true, required: true },
     name:{type:Schema.Types.String,required:true},
     password: {
         hashed: { type: String, required: true },
@@ -57,7 +57,8 @@ const userSchema = new Schema<IUser>({
 
 userSchema.plugin(autoIncrement, { fieldName: "ID", ModelName: "user", prefix: "UR_" })
 userSchema.post<IUser>('save', userService.create_role);
-const userModel = model<IUser>("User", userSchema);
+userSchema.post<IUser>("findOneAndDelete",userService.delete_role);
+const userModel = model<IUser>("user", userSchema);
 
 export default userModel;
 

@@ -1,14 +1,17 @@
-import { IField, Form, inputType } from "../models/form";
+import { IField, IForm, inputType } from "../models/form";
 import Joi, { string } from "joi";
 type schema = {
     [key: string]: Joi.Schema
 }
 //TODO - Validate the submitted form schema
 
-export function generateSchema(form: Form) {
+export function generateSchema(form: IForm) {
     const formSchema: schema = {}
-    form.fields.forEach(field => {
 
+    const fields:Array<IField> = form.fields;
+    fields.unshift(...form.defaultFields);
+
+    fields.forEach(field => {
         switch (field.inputType) {
             case inputType.DropDown:
                 if (!field.options) {
@@ -40,7 +43,6 @@ export function generateSchema(form: Form) {
 
     })
 
-    console.log(formSchema);
 
     return Joi.object(formSchema);
 

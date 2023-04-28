@@ -52,6 +52,6 @@ const reportSchema = new Schema<Report>({
     }
 });
 
-const ReportModel: Model<Report> = model<Report>('Report', reportSchema);
+const ReportModel: Model<Report> = model<Report>('report', reportSchema);
 
 export default ReportModel;

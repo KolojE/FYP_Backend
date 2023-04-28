@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addFormController, deleteFormController, updateFormController, updateMembersController,  viewMembersController } from "../controller/administrator.controller";
+import { addFormController, deleteFormController, deleteMemberController, updateFormController, updateMemberActivationController,  viewMembersController } from "../controller/administrator.controller";
 import { clientErrorHandler, errorHandler } from "../exception/errorHandler";
 import { adminVerificationMiddleware, authenticationMiddleware } from "../middleware/authentication.middleware";
 
@@ -11,13 +11,14 @@ administratorRouter.use(authenticationMiddleware);
 administratorRouter.use(adminVerificationMiddleware)
 administratorRouter.post("/addForm", addFormController);
 administratorRouter.post("/updateForm", updateFormController);
-administratorRouter.post("/updateMember", updateMembersController);
+administratorRouter.post("/memberActivation", updateMemberActivationController);
 
 
 administratorRouter.get("/viewMembers", viewMembersController);
 
 
 administratorRouter.delete("/deleteForm",deleteFormController)
+administratorRouter.delete("/deleteMember",deleteMemberController);
 
 administratorRouter.use(clientErrorHandler);
 administratorRouter.use(errorHandler);

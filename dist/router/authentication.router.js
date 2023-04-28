@@ -5,6 +5,7 @@ const authentication_controller_1 = require("../controller/authentication.contro
 const errorHandler_1 = require("../exception/errorHandler");
 const authenticationRouter = (0, express_1.Router)();
 authenticationRouter.post("/login", authentication_controller_1.authenticationController);
+authenticationRouter.get("/login", authentication_controller_1.tokenAuthenticationController);
 authenticationRouter.use(errorHandler_1.clientErrorHandler);
 authenticationRouter.use(errorHandler_1.errorHandler);
 exports.default = authenticationRouter;

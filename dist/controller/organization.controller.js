@@ -6,10 +6,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createCollectionController = exports.registerOrganizationController = void 0;
 const organization_1 = __importDefault(require("../models/organization"));
 const organization_service_1 = require("../services/organization.service");
+const validation_service_1 = require("../services/validation.service");
 async function registerOrganizationController(req, res, next) {
     try {
         const organization = req.body;
         const rootAdmin = req.body.rootAdmin;
+        await validation_service_1.validationService.check_Email_Availability(rootAdmin.email);
         const newOrganization = await organization_service_1.OrganizationService.create_New_Organization(organization);
         await newOrganization.save();
         const newRootAdmin = await organization_service_1.OrganizationService.create_Root_Admin(newOrganization, rootAdmin);

@@ -1,12 +1,15 @@
 import { Request, Response } from "express";
 import OrganizationModel from "../models/organization";
 import { OrganizationService } from "../services/organization.service";
+import { validationService } from "../services/validation.service";
 
 
 export async function registerOrganizationController(req: Request, res: Response, next: Function) {
     try {
         const organization = req.body;
         const rootAdmin = req.body.rootAdmin;
+
+        await validationService.check_Email_Availability(rootAdmin.email)
 
         const newOrganization = await OrganizationService.create_New_Organization(organization)
         await newOrganization.save();

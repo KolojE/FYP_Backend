@@ -13,6 +13,6 @@ const organizationSchema = new mongoose_1.Schema({
 });
 organizationSchema.plugin(autoincrement_1.autoIncrement, { fieldName: "ID", ModelName: "organization", prefix: "OR_" });
 organizationSchema.pre("validate", organization_service_1.OrganizationService.create_default_status);
-const OrganizationModel = (0, mongoose_1.model)('Organization', organizationSchema);
+const OrganizationModel = (0, mongoose_1.model)('organization', organizationSchema);
 exports.default = OrganizationModel;
 //# sourceMappingURL=organization.js.map

@@ -22,7 +22,7 @@ const complainantSchema = new Schema<IComplainant>({
     },
     activation:{type:Boolean},
 })
-complainantSchema.plugin(autoIncrement, { fieldName: "ID", ModelName: "Complainant", prefix: "Comp_" });
-const complaiantModel = model<IComplainant>("Complainant", complainantSchema);
+complainantSchema.plugin(autoIncrement, { fieldName: "ID", ModelName: "complainant", prefix: "Comp_" });
+const complaiantModel = model<IComplainant>("complainant", complainantSchema);
 
 export default complaiantModel;

@@ -23,6 +23,9 @@ export namespace authenticationService {
     @param {login} login - login contain identifier(email) and password  
     **/
     export async function authenticateUser(login: login): Promise<IUser | null > {
+
+        login.identifier = login.identifier.toLowerCase()
+        
         if (!validationService.is_Email(login.identifier)) {
             throw new clientError({
                 message: "Identifier is not an email!",
@@ -32,7 +35,7 @@ export namespace authenticationService {
 
 
         //find the identifier owner and verify password
-        const loginUser = await userModel.findOne({ email: login.identifier }).exec()
+        const loginUser = await userModel.findOne({ email: login.identifier }).lean()
         if (loginUser) {
             console.log(login.password)
             if (await verify(login.password, loginUser.password.hashed))

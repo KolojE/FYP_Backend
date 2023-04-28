@@ -32,7 +32,7 @@ organizationSchema.plugin(autoIncrement, { fieldName: "ID", ModelName: "organiza
 organizationSchema.pre("validate", OrganizationService.create_default_status);
 
 
-const OrganizationModel: Model<IOrganization> = model<IOrganization>('Organization', organizationSchema);
+const OrganizationModel: Model<IOrganization> = model<IOrganization>('organization', organizationSchema);
 export default OrganizationModel;
 
 

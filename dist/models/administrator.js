@@ -10,6 +10,6 @@ const adminSchema = new mongoose_1.Schema({
     }
 });
 adminSchema.plugin(autoincrement_1.autoIncrement, { fieldName: "ID", ModelName: "administrator", prefix: "Admin_" });
-const adminModel = (0, mongoose_1.model)("Administrator", adminSchema);
+const adminModel = (0, mongoose_1.model)("administrator", adminSchema);
 exports.default = adminModel;
 //# sourceMappingURL=administrator.js.map

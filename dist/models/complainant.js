@@ -10,7 +10,7 @@ const complainantSchema = new mongoose_1.Schema({
     },
     activation: { type: Boolean },
 });
-complainantSchema.plugin(autoincrement_1.autoIncrement, { fieldName: "ID", ModelName: "Complainant", prefix: "Comp_" });
-const complaiantModel = (0, mongoose_1.model)("Complainant", complainantSchema);
+complainantSchema.plugin(autoincrement_1.autoIncrement, { fieldName: "ID", ModelName: "complainant", prefix: "Comp_" });
+const complaiantModel = (0, mongoose_1.model)("complainant", complainantSchema);
 exports.default = complaiantModel;
 //# sourceMappingURL=complainant.js.map
