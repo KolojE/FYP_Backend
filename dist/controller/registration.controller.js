@@ -7,7 +7,7 @@ async function registerComplainantController(req, res, next) {
         const result = await registration_service_1.registrationService.register_Complainant(req.body);
         res.status(200).json({
             message: "Registration Successful !",
-            resolved: result,
+            user: result,
         }).send();
     }
     catch (err) {

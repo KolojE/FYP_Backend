@@ -9,8 +9,9 @@ const userRouter = Router()
 userRouter.use(authenticationMiddleware)
 
 userRouter.get("/getUserInfo",getUserInfoController);
-userRouter.get('/getForms',getAllForms)
-userRouter.get('/getForm',getForm)
+userRouter.get('/getForms',getAllForms);
+userRouter.get('/getForm',getForm);
+
 userRouter.use(clientErrorHandler);
 userRouter.use(errorHandler);
 export default userRouter;

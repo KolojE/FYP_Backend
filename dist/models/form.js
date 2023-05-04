@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FormModel = exports.inputType = void 0;
 const mongoose_1 = require("mongoose");
-const administrator_service_1 = require("../services/administrator.service");
 var inputType;
 (function (inputType) {
     inputType["Text"] = "Text";
@@ -33,6 +32,5 @@ const formSchema = new mongoose_1.Schema({
     creationDate: { type: mongoose_1.Schema.Types.Date, required: true },
     activation_Status: { type: mongoose_1.Schema.Types.Boolean, required: true },
 });
-formSchema.pre('save', administrator_service_1.administratorService.preFormSave);
 exports.FormModel = (0, mongoose_1.model)("form", formSchema);
 //# sourceMappingURL=form.js.map

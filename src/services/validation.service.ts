@@ -54,7 +54,6 @@ export namespace validationService {
 
         console.log(field)
         const Schema = generateSchema(form);
-        console.log(Schema)
         try {
             await Schema.validateAsync(field);
         } catch (err) {

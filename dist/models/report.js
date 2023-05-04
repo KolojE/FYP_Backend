@@ -2,8 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
 const reportSchema = new mongoose_1.Schema({
-    date: { type: Date, required: true },
-    details: { type: [Object] },
+    updateDate: { type: Date, required: true },
+    submissionDate: { type: Date, required: true },
+    details: { type: Object, required: true },
     form: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "Form" },
     organization: {
         _id: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "Organization" },

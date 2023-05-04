@@ -10,8 +10,7 @@ const form_1 = require("../models/form");
 const mongoose_1 = require("mongoose");
 var administratorService;
 (function (administratorService) {
-    async function preFormSave(next) {
-        const doc = this;
+    async function addNewForm(form, user) {
         const defaultFields = [{
                 label: "Date Of Occurence",
                 inputType: form_1.inputType.Date,
@@ -25,13 +24,9 @@ var administratorService;
                 inputType: form_1.inputType.Map,
                 required: true,
             }];
-        doc.defaultFields.unshift(...defaultFields);
-        next();
-    }
-    administratorService.preFormSave = preFormSave;
-    async function addNewForm(form, user) {
         const newForm = new form_1.FormModel({
             name: form.name,
+            defaultFields: defaultFields,
             fields: form.fields,
             activation_Status: form.activation,
             organization: {

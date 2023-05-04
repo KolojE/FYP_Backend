@@ -10,7 +10,7 @@ export enum inputType {
     Photo = "Photo",
 }
 
-export interface IField {
+export interface IField extends Document {
     label: string,
     inputType: inputType,
     options?: Array<any>,
@@ -25,6 +25,7 @@ const fieldSchema = new Schema<IField>(
         required: { type: Boolean, required: true },
     }
 )
+
 export interface IForm extends Document {
     name: string;
     defaultFields:Array<IField>;
@@ -54,7 +55,6 @@ const formSchema = new Schema<IForm>({
     activation_Status: { type: Schema.Types.Boolean, required: true },
 })
 
-formSchema.pre('save',administratorService.preFormSave)
 export const FormModel: Model<IForm> = model<IForm>("form", formSchema)
 
 

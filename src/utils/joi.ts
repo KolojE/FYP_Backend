@@ -18,27 +18,27 @@ export function generateSchema(form: IForm) {
                     console.error("type dropdown shouldnt have empty options array ")
                     break;
                 }
-                formSchema[field.label] = Joi.string().valid(...field.options);
+                formSchema[field._id] = Joi.string().valid(...field.options);
                 break;
             case inputType.Map:
-                formSchema[field.label] = Joi.object().keys({
+                formSchema[field._id] = Joi.object().keys({
                     La: Joi.number(),
                     Lo: Joi.number(),
                 })
                 break;
             case inputType.Date:
-                formSchema[field.label] = Joi.date();
+                formSchema[field._id] = Joi.date().iso();
                 break;
             case inputType.Text:
-                formSchema[field.label] = Joi.string();
+                formSchema[field._id] = Joi.string();
                 break;
             case inputType.Time:
-                formSchema[field.label] = Joi.string().regex(/^([0-9]{2})\:([0-9]{2})$/)
+                formSchema[field._id] = Joi.date().iso();
                 break;
         }
 
         if (field.required) {
-            formSchema[field.label].required();
+            formSchema[field._id].required();
         }
 
     })

@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { reportIncidentController } from "../controller/complainant.controller";
+import { getReportController, reportIncidentController } from "../controller/complainant.controller";
 import { authenticationMiddleware, complainantVerificationMiddleware } from "../middleware/authentication.middleware";
 
 
@@ -10,5 +10,5 @@ complainantRouter.use(authenticationMiddleware);
 complainantRouter.use(complainantVerificationMiddleware);
 
 complainantRouter.post("/reportIncident", reportIncidentController);
-
+complainantRouter.get("/getSubmittedReports",getReportController);
 export default complainantRouter;

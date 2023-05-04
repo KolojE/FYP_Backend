@@ -1,7 +1,8 @@
+import { Document } from "mongoose";
 import { clientError, statusCode } from "../exception/errorHandler";
 import { FormModel } from "../models/form";
 import OrganizationModel, { IOrganization } from "../models/organization";
-import ReportModel from "../models/report";
+import ReportModel, { IReport } from "../models/report";
 import { IUser } from "../models/user";
 import { validationService } from "./validation.service";
 
@@ -33,11 +34,12 @@ export namespace reportIncidentService {
         await validationService.validate_User_Belong_To_Organziation(user, organization._id);
 
         await validationService.fields_Validation(submission.field, form);
-        const newReport = new ReportModel({
-            date: new Date(),
+        const newReport = new ReportModel<Omit<IReport,keyof Document|"ID">>({
+            updateDate:new Date(),
+            submissionDate:new Date("2022-01-01T14:30:00.000Z"),
             complainant: { _id: user._id, ID: user.ID },
             organization: { _id: organization._id, ID: organization.ID },
-            form: { _id: form._id },
+            form: form._id,
             status: { _id: organization.defaultStatus._id },
             details: submission.field
         })

@@ -50,7 +50,6 @@ var validationService;
     async function fields_Validation(field, form) {
         console.log(field);
         const Schema = (0, joi_1.generateSchema)(form);
-        console.log(Schema);
         try {
             await Schema.validateAsync(field);
         }

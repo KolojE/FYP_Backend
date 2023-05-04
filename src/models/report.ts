@@ -20,20 +20,21 @@ interface IStatus {
     }
 }
 
-export interface Report extends Document {
-    date: Date;
-    details: object[];
+export interface IReport extends Document {
+    submissionDate: Date;
+    updateDate:Date;
+    details: object;
     form: Types.ObjectId;
-    ReportStatus: IStatus;
     organization: IOrganization;
     complainant: IComplainant;
     status: IStatus;
 
 }
 
-const reportSchema = new Schema<Report>({
-    date: { type: Date, required: true },
-    details: { type: [Object] },
+const reportSchema = new Schema<IReport>({
+    updateDate:{type:Date,required:true},
+    submissionDate: { type: Date, required: true },
+    details: { type: Object ,required:true },
     form: { type: Schema.Types.ObjectId, required: true, ref: "Form" },
     organization: {
         _id: { type: Schema.Types.ObjectId, required: true, ref: "Organization" },
@@ -52,6 +53,6 @@ const reportSchema = new Schema<Report>({
     }
 });
 
-const ReportModel: Model<Report> = model<Report>('report', reportSchema);
+const ReportModel: Model<IReport> = model<IReport>('report', reportSchema);
 
 export default ReportModel;

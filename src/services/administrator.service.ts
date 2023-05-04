@@ -13,11 +13,10 @@ export type newForm = {
 
 export namespace administratorService {
 
-    export async function preFormSave(this:IForm,next:Function)
-    {
-        const doc=this
 
-        const defaultFields:Array<IField> = [{
+    export async function addNewForm(form: newForm, user: IUser): Promise<IForm> {
+
+        const defaultFields = [{
             label:"Date Of Occurence",
             inputType:inputType.Date,
             required:true,
@@ -30,15 +29,10 @@ export namespace administratorService {
             inputType:inputType.Map,
             required:true,
         }]
-        doc.defaultFields.unshift(...defaultFields);
-        next();
-    }
-
-    export async function addNewForm(form: newForm, user: IUser): Promise<IForm> {
-
 
         const newForm = new FormModel({
             name: form.name,
+            defaultFields:defaultFields,
             fields: form.fields,
             activation_Status: form.activation,
             organization: {

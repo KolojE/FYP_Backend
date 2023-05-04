@@ -1,7 +1,6 @@
 
 import { Document, model, Schema, Types } from "mongoose";
 import { autoIncrement } from "../plugin/autoincrement";
-import { boolean } from "joi";
 
 export interface IComplainant extends Document {
     ID: string;
