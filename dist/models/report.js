@@ -5,7 +5,7 @@ const reportSchema = new mongoose_1.Schema({
     updateDate: { type: Date, required: true },
     submissionDate: { type: Date, required: true },
     details: { type: Object, required: true },
-    form: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "Form" },
+    form_id: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "Form" },
     organization: {
         _id: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "Organization" },
         ID: { type: String, required: true }
@@ -16,6 +16,7 @@ const reportSchema = new mongoose_1.Schema({
     },
     status: {
         _id: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "status" },
+        comment: { type: mongoose_1.Schema.Types.String, required: false },
         admin: {
             _id: { type: mongoose_1.Schema.Types.ObjectId, ref: "administrator" },
             ID: { type: String }

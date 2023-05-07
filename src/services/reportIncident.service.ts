@@ -36,11 +36,11 @@ export namespace reportIncidentService {
         await validationService.fields_Validation(submission.field, form);
         const newReport = new ReportModel<Omit<IReport,keyof Document|"ID">>({
             updateDate:new Date(),
-            submissionDate:new Date("2022-01-01T14:30:00.000Z"),
+            submissionDate:new Date(),
             complainant: { _id: user._id, ID: user.ID },
             organization: { _id: organization._id, ID: organization.ID },
-            form: form._id,
-            status: { _id: organization.defaultStatus._id },
+            form_id: form._id,
+            status: { _id: organization.defaultStatus._id,comment:"Incident Reprot Submitted." },
             details: submission.field
         })
 

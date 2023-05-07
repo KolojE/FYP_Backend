@@ -14,6 +14,7 @@ interface IComplainant {
 
 interface IStatus {
     _id: Types.ObjectId;
+    comment:string;
     admin?: {
         _id: Types.ObjectId;
         ID: string;
@@ -24,7 +25,7 @@ export interface IReport extends Document {
     submissionDate: Date;
     updateDate:Date;
     details: object;
-    form: Types.ObjectId;
+    form_id: Types.ObjectId;
     organization: IOrganization;
     complainant: IComplainant;
     status: IStatus;
@@ -35,7 +36,7 @@ const reportSchema = new Schema<IReport>({
     updateDate:{type:Date,required:true},
     submissionDate: { type: Date, required: true },
     details: { type: Object ,required:true },
-    form: { type: Schema.Types.ObjectId, required: true, ref: "Form" },
+    form_id: { type: Schema.Types.ObjectId, required: true, ref: "Form" },
     organization: {
         _id: { type: Schema.Types.ObjectId, required: true, ref: "Organization" },
         ID: { type: String, required: true }
@@ -46,6 +47,7 @@ const reportSchema = new Schema<IReport>({
     },
     status: {
         _id: { type: Schema.Types.ObjectId, required: true, ref: "status" },
+        comment:{type:Schema.Types.String,required:false},
         admin: {
             _id: { type: Schema.Types.ObjectId,  ref: "administrator" },
             ID: { type: String }

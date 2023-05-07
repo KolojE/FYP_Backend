@@ -38,10 +38,15 @@ async function getReportController(req, res, next) {
             {
                 $lookup: {
                     from: "forms",
-                    localField: "form",
+                    localField: "form_id",
                     foreignField: "_id",
                     as: "form",
                 },
+            },
+            {
+                $addFields: {
+                    "comment": "$status.comment",
+                }
             },
             {
                 $lookup: {
@@ -60,7 +65,7 @@ async function getReportController(req, res, next) {
             {
                 $addFields: {
                     "name": "$form.name",
-                    "status": "$status.desc"
+                    "status": "$status.desc",
                 }
             },
             {
@@ -69,11 +74,6 @@ async function getReportController(req, res, next) {
                 }
             },
         ];
-        if (limit) {
-            pipeline.push({
-                $limit: Number(limit)
-            });
-        }
         if (subDate.fromDate) {
             console.log(subDate);
             pipeline.push({
@@ -94,6 +94,7 @@ async function getReportController(req, res, next) {
             });
         }
         if (sortBy === "subDate") {
+            console.log("sort by sub Date");
             pipeline.push({
                 $sort: {
                     submissionDate: -1,
@@ -101,14 +102,21 @@ async function getReportController(req, res, next) {
             });
         }
         else if (sortBy === "upDate") {
+            console.log("sort By up Date");
             pipeline.push({
                 $sort: {
                     updateDate: -1,
                 }
             });
         }
+        if (limit) {
+            pipeline.push({
+                $limit: Number(limit)
+            });
+        }
         const submittedReports = report_1.default.aggregate(pipeline);
         const reports = await submittedReports;
+        console.log(subDate.fromDate);
         console.log(JSON.stringify(reports, null, 2));
         res.status(200).send({
             message: `successfully get the submitted reprots by User ${user._id}`,

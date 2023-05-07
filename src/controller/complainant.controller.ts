@@ -43,10 +43,15 @@ export async function getReportController(req: Request, res: Response, next: Fun
             {
                 $lookup: {
                     from: "forms",
-                    localField: "form",
+                    localField: "form_id",
                     foreignField: "_id",
                     as: "form",
                 },
+            },
+            {
+                $addFields: {
+                    "comment":"$status.comment",
+                }
             },
             {
                 $lookup:{
@@ -58,7 +63,6 @@ export async function getReportController(req: Request, res: Response, next: Fun
             },
             {
                 $unwind: "$form"
-
             },
             {
                 $unwind:"$status"
@@ -66,8 +70,7 @@ export async function getReportController(req: Request, res: Response, next: Fun
             {
                 $addFields: {
                     "name": "$form.name",
-                    "status":"$status.desc"
-                
+                    "status":"$status.desc",
                 }
             },
             {
@@ -79,11 +82,6 @@ export async function getReportController(req: Request, res: Response, next: Fun
         ]
 
 
-        if (limit) {
-            pipeline.push({
-                $limit: Number(limit)
-            })
-        }
 
         if (subDate.fromDate) {
             console.log(subDate)
@@ -108,6 +106,7 @@ export async function getReportController(req: Request, res: Response, next: Fun
 
         if(sortBy==="subDate")
         {
+            console.log("sort by sub Date")
             pipeline.push({
                 $sort:{
                     submissionDate:-1, 
@@ -115,10 +114,17 @@ export async function getReportController(req: Request, res: Response, next: Fun
             })
         }else if(sortBy==="upDate")
         {
+            console.log("sort By up Date")
             pipeline.push({
                 $sort:{
                     updateDate:-1,
                 }
+            })
+        }
+        
+        if (limit) {
+            pipeline.push({
+                $limit: Number(limit)
             })
         }
 
@@ -128,7 +134,7 @@ export async function getReportController(req: Request, res: Response, next: Fun
 
 
         const reports = await submittedReports;
-
+        console.log(subDate.fromDate)
         console.log(JSON.stringify(reports, null, 2))
         res.status(200).send({
             message: `successfully get the submitted reprots by User ${user._id}`,
