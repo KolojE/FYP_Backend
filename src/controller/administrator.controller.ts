@@ -5,8 +5,12 @@ import { validationService } from "../services/validation.service";
 import { FormModel } from "../models/form";
 import { clientError, statusCode } from "../exception/errorHandler";
 import userModel, { role } from "../models/user";
-import { PipelineStage } from "mongoose";
+import { FilterQuery, PipelineStage } from "mongoose";
 import ReportModel from "../models/report";
+import statusModel from "../models/status";
+import { any } from "joi";
+import { stat } from "fs";
+import { ObjectId } from "mongodb";
 
 
 
@@ -162,7 +166,8 @@ export async function getReportController(req: Request, res: Response, next: Fun
             fromDate: req.query?.subFromDate,
             toDate: req.query?.subToDate,
         };
-
+        const status = req.query?.status?.toString().split(",");
+        const type = req.query?.type?.toString().split(",");
 
         const pipeline: PipelineStage[] = [
             {
@@ -174,19 +179,46 @@ export async function getReportController(req: Request, res: Response, next: Fun
         ]
 
 
-        if(subDate.fromDate)
-        {
+        if (subDate.fromDate) {
+            console.log(subDate.fromDate)
             pipeline.push({
-                $match:{
-                    submissionDate:{$gte:new Date(subDate.fromDate.toString())},
+                $match: {
+                    submissionDate: { $gte: new Date(subDate.fromDate.toString()) },
                 }
             })
         }
-        if(subDate.toDate)
-        {
+        if (subDate.toDate) {
             pipeline.push({
-                $match:{
-                    submissionDate:{$lte:new Date(subDate.toDate.toString())},
+                $match: {
+                    submissionDate: { $lte: new Date(subDate.toDate.toString()) },
+                }
+            })
+        }
+
+        if (status) {
+            const statuses:FilterQuery<any>[] = []
+            status.forEach((type) => {
+                console.log(type)
+                statuses.push({ "status._id":new ObjectId(type) })
+            })
+            pipeline.push({
+                $match: {
+                    $or: statuses
+                    
+                }
+            })
+        }
+
+        if (type) {
+            const types:FilterQuery<any>[] = []
+            type.forEach((type) => {
+                console.log(type)
+                types.push({ "form_id":new ObjectId(type) })
+            })
+            pipeline.push({
+                $match: {
+                    $or: types
+                    
                 }
             })
         }
@@ -217,18 +249,18 @@ export async function getReportController(req: Request, res: Response, next: Fun
                 }
             },
             {
-                $unwind:"$form"
+                $unwind: "$form"
             },
             {
-                $addFields:{
-                    name:"$form.name"
+                $addFields: {
+                    name: "$form.name"
                 }
             }
             ])
         }
 
 
-        const result=await ReportModel.aggregate(pipeline);
+        const result = await ReportModel.aggregate(pipeline);
         console.log(result)
         res.status(200).send({
             message: `Successfully returned reports for organization`,
@@ -239,4 +271,38 @@ export async function getReportController(req: Request, res: Response, next: Fun
     } catch (err) {
         next(err)
     }
+}
+
+export async function getReportElement(req: Request, res: Response, next: Function) {
+    try {
+        const user = req.user;
+        const includeType: boolean = req.query?.type ? true : false;
+        const includeStatus: boolean = req.query?.status ? true : false;
+        const element: {
+            type: any,
+            status: any
+        } = {
+            type: null,
+            status: null,
+        }
+
+        if (includeType)
+            element.type = await FormModel.find({ "organization._id": user.organization._id }).select('name');
+
+        if (includeStatus)
+            element.status = await statusModel.find({ "organization._id": user.organization._id }).select('desc');
+
+
+        res.status(200).send({
+            message: "succesfully returned Report Element ",
+            element: element,
+        })
+
+
+
+    }
+    catch (err) {
+
+    }
+
 }

@@ -26,7 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getReportController = exports.deleteMemberController = exports.updateMemberActivationController = exports.viewMembersController = exports.deleteFormController = exports.updateFormController = exports.addFormController = void 0;
+exports.getReportElement = exports.getReportController = exports.deleteMemberController = exports.updateMemberActivationController = exports.viewMembersController = exports.deleteFormController = exports.updateFormController = exports.addFormController = void 0;
 const complainant_1 = __importDefault(require("../models/complainant"));
 const administrator_service_1 = require("../services/administrator.service");
 const validation_service_1 = require("../services/validation.service");
@@ -34,6 +34,8 @@ const form_1 = require("../models/form");
 const errorHandler_1 = require("../exception/errorHandler");
 const user_1 = __importStar(require("../models/user"));
 const report_1 = __importDefault(require("../models/report"));
+const status_1 = __importDefault(require("../models/status"));
+const mongodb_1 = require("mongodb");
 async function addFormController(req, res, next) {
     try {
         const newForm = req.body;
@@ -160,7 +162,7 @@ async function deleteMemberController(req, res, next) {
 }
 exports.deleteMemberController = deleteMemberController;
 async function getReportController(req, res, next) {
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e, _f, _g, _h;
     try {
         const user = req.user;
         const sortBy = (_a = req.query) === null || _a === void 0 ? void 0 : _a.sortBy;
@@ -169,6 +171,8 @@ async function getReportController(req, res, next) {
             fromDate: (_c = req.query) === null || _c === void 0 ? void 0 : _c.subFromDate,
             toDate: (_d = req.query) === null || _d === void 0 ? void 0 : _d.subToDate,
         };
+        const status = (_f = (_e = req.query) === null || _e === void 0 ? void 0 : _e.status) === null || _f === void 0 ? void 0 : _f.toString().split(",");
+        const type = (_h = (_g = req.query) === null || _g === void 0 ? void 0 : _g.type) === null || _h === void 0 ? void 0 : _h.toString().split(",");
         const pipeline = [
             {
                 $match: {
@@ -177,6 +181,7 @@ async function getReportController(req, res, next) {
             },
         ];
         if (subDate.fromDate) {
+            console.log(subDate.fromDate);
             pipeline.push({
                 $match: {
                     submissionDate: { $gte: new Date(subDate.fromDate.toString()) },
@@ -187,6 +192,30 @@ async function getReportController(req, res, next) {
             pipeline.push({
                 $match: {
                     submissionDate: { $lte: new Date(subDate.toDate.toString()) },
+                }
+            });
+        }
+        if (status) {
+            const statuses = [];
+            status.forEach((type) => {
+                console.log(type);
+                statuses.push({ "status._id": new mongodb_1.ObjectId(type) });
+            });
+            pipeline.push({
+                $match: {
+                    $or: statuses
+                }
+            });
+        }
+        if (type) {
+            const types = [];
+            type.forEach((type) => {
+                console.log(type);
+                types.push({ "form_id": new mongodb_1.ObjectId(type) });
+            });
+            pipeline.push({
+                $match: {
+                    $or: types
                 }
             });
         }
@@ -236,4 +265,27 @@ async function getReportController(req, res, next) {
     }
 }
 exports.getReportController = getReportController;
+async function getReportElement(req, res, next) {
+    var _a, _b;
+    try {
+        const user = req.user;
+        const includeType = ((_a = req.query) === null || _a === void 0 ? void 0 : _a.type) ? true : false;
+        const includeStatus = ((_b = req.query) === null || _b === void 0 ? void 0 : _b.status) ? true : false;
+        const element = {
+            type: null,
+            status: null,
+        };
+        if (includeType)
+            element.type = await form_1.FormModel.find({ "organization._id": user.organization._id }).select('name');
+        if (includeStatus)
+            element.status = await status_1.default.find({ "organization._id": user.organization._id }).select('desc');
+        res.status(200).send({
+            message: "succesfully returned Report Element ",
+            element: element,
+        });
+    }
+    catch (err) {
+    }
+}
+exports.getReportElement = getReportElement;
 //# sourceMappingURL=administrator.controller.js.map

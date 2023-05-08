@@ -12,6 +12,7 @@ administratorRouter.post("/updateForm", administrator_controller_1.updateFormCon
 administratorRouter.post("/memberActivation", administrator_controller_1.updateMemberActivationController);
 administratorRouter.get("/viewMembers", administrator_controller_1.viewMembersController);
 administratorRouter.get("/getReport", administrator_controller_1.getReportController);
+administratorRouter.get("/getReportElement", administrator_controller_1.getReportElement);
 administratorRouter.delete("/deleteForm", administrator_controller_1.deleteFormController);
 administratorRouter.delete("/deleteMember", administrator_controller_1.deleteMemberController);
 administratorRouter.use(errorHandler_1.clientErrorHandler);
