@@ -6,7 +6,8 @@ import userModel, { IUser, role } from "../models/user";
 export async function socketIOAuthenticationMiddleware(socket: Socket, next: Function) {
     try {
 
-        const token = socket.handshake.headers["authorization"]?.split(' ')[1]; // get token, e.g. Bearer "token"
+        const token = socket.handshake.auth.token.toString().split(" ")[1]; // get token, e.g. Bearer "token"
+        console.log(token)
         if (!token) {
             throw new clientError({
                 message: "Token is not provided !",
@@ -40,6 +41,7 @@ export async function sendMessageEventValidationMiddleware(user: IUser, event: E
     const args = event[1];
 
     const receipientID: string = args;
+
 
     try {
 

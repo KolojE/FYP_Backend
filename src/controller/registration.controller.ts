@@ -1,10 +1,17 @@
 import { Request, Response } from "express";
 import { registrationService } from "../services/registration.service";
+import { authenticationService } from "../services/authentication.services";
 
 export async function registerComplainantController(req: Request, res: Response, next: Function) {
 
     try {
         const result = await registrationService.register_Complainant(req.body);
+        const token = await authenticationService.generateJWT(result);
+
+        res.set({
+            "Authorization": `Baerer ${token}`
+        })
+        
         res.status(200).json({
             message: "Registration Successful !",
             user: result,

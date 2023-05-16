@@ -1,4 +1,5 @@
 import { Namespace, Server, Socket } from "socket.io";
+import { IUser } from "../models/user";
 
 
 type message = {
@@ -10,6 +11,8 @@ type message = {
 export function onSendMessage(io:Server|Namespace,socket:Socket,args:any)
 {
     const [userID,message]:[string,message]= args;
-    io.to(userID).emit("receiveMessage",message.message);
+    const sender:IUser = socket.data.user;
+    console.log(sender)
+    io.to(userID).emit("receiveMessage",sender._id,message)
     
 }

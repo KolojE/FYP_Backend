@@ -13,12 +13,14 @@ export function socketRouter(socket: Socket) {
         sendMessageEventValidationMiddleware(user, event, next)
     });
 
+
     socket.on("sendMessage", (...args) => {
+        console.log("asd")
         onSendMessage(IO, socket, args)
     });
 
-    socket.on("error",()=>{
-console.log("error")
+    socket.on("error",(error)=>{
+    console.log(error)
     })
 
 

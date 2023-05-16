@@ -15,12 +15,12 @@ function socketIO(httpServer: httpServer.Server) {
         }
     })
 
-    const clientIO = io.of("/chat");
 
-    clientIO.on("connection", socketRouter)
-    clientIO.use(socketIOAuthenticationMiddleware);
+    io.on("connection", socketRouter)
+    io.use(socketIOAuthenticationMiddleware);
 
 }
+
 
 
 export default socketIO;
