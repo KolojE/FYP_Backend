@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { reportIncidentService } from "../services/reportIncident.service";
 import ReportModel from "../models/report";
 import { PipelineStage } from "mongoose";
+import { clientError, statusCode } from "../exception/errorHandler";
+import userModel from "../models/user";
 
 
 export async function reportIncidentController(req: Request, res: Response, next: Function) {
@@ -18,6 +20,27 @@ export async function reportIncidentController(req: Request, res: Response, next
         next(err)
     }
 
+}
+
+export async function reportPhotoUploadController(req: Request, res: Response, next: Function) {
+try {
+        const file = req.file;
+        if (!file) {
+            throw new clientError({
+                message: "No File Uploaded",
+                status: statusCode.badRequest,
+            })
+        }
+
+        res.status(200).json({
+            message: `Photo Uploaded Successfully path is ${file.path}`,
+            filePath: file.path
+        })
+
+    } catch (err) {
+        next(err)
+    }
+    
 }
 
 

@@ -1,16 +1,17 @@
 import { Request, Response, query } from "express";
-import complaiantModel from "../models/complainant";
+import complaiantModel, { IComplainant } from "../models/complainant";
 import { administratorService } from "../services/administrator.service";
 import { validationService } from "../services/validation.service";
 import { FormModel } from "../models/form";
 import { clientError, statusCode } from "../exception/errorHandler";
-import userModel, { role } from "../models/user";
+import userModel, { IUser, role } from "../models/user";
 import { FilterQuery, PipelineStage } from "mongoose";
 import ReportModel from "../models/report";
 import statusModel from "../models/status";
-import { any } from "joi";
-import { stat } from "fs";
 import { ObjectId } from "mongodb";
+import { userService } from "../services/user.service";
+import { IOrganization } from "../models/organization";
+import { promises } from "dns";
 
 
 
@@ -70,10 +71,12 @@ export async function deleteFormController(req: Request, res: Response, next: Fu
 }
 
 
-
 export async function viewMembersController(req: Request, res: Response, next: Function) {
+
+    type Members = { user: IUser, organization: IOrganization, base64ProfilePicture: string | null} & IComplainant[]
+
     try {
-        const members = await complaiantModel.aggregate([
+        const members = await complaiantModel.aggregate<Members>([
             {
                 $lookup: {
                     from: "users", localField: "user._id", foreignField: "_id",
@@ -109,7 +112,9 @@ export async function viewMembersController(req: Request, res: Response, next: F
             }
         ]);
 
-        console.log(members)
+
+        
+
         res.status(200).json({
             message: "successfully get all members info",
             members: members

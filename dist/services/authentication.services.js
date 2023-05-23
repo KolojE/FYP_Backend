@@ -16,7 +16,7 @@ var authenticationService;
         if (!validation_service_1.validationService.is_Email(login.identifier)) {
             throw new errorHandler_1.clientError({
                 message: "Identifier is not an email!",
-                status: errorHandler_1.statusCode.unauthorize
+                status: errorHandler_1.statusCode.unauthorized
             });
         }
         const loginUser = await user_1.default.findOne({ email: login.identifier }).lean();
@@ -27,7 +27,7 @@ var authenticationService;
             else {
                 throw new errorHandler_1.clientError({
                     message: "password incorrect !",
-                    status: errorHandler_1.statusCode.unauthorize
+                    status: errorHandler_1.statusCode.unauthorized
                 });
             }
         }
@@ -55,7 +55,7 @@ var authenticationService;
             if (!User)
                 throw new errorHandler_1.clientError({
                     message: "Token invalid!",
-                    status: errorHandler_1.statusCode.unauthorize
+                    status: errorHandler_1.statusCode.unauthorized
                 });
             return User;
         }
@@ -63,7 +63,7 @@ var authenticationService;
             throw new errorHandler_1.clientError({
                 data: err,
                 message: "token veification error",
-                status: errorHandler_1.statusCode.unauthorize
+                status: errorHandler_1.statusCode.unauthorized
             });
         }
     }

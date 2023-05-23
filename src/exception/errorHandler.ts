@@ -5,7 +5,7 @@ export enum statusCode {
     badRequest = 400,
     notfound = 404,
     conflict = 409,
-    unauthorize = 401
+    unauthorized = 401
 
 }
 

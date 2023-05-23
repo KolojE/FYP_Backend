@@ -3,9 +3,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getReportController = exports.reportIncidentController = void 0;
+exports.getReportController = exports.reportPhotoUploadController = exports.reportIncidentController = void 0;
 const reportIncident_service_1 = require("../services/reportIncident.service");
 const report_1 = __importDefault(require("../models/report"));
+const errorHandler_1 = require("../exception/errorHandler");
 async function reportIncidentController(req, res, next) {
     try {
         await reportIncident_service_1.reportIncidentService.reportIncident(req.body, req.user);
@@ -18,6 +19,25 @@ async function reportIncidentController(req, res, next) {
     }
 }
 exports.reportIncidentController = reportIncidentController;
+async function reportPhotoUploadController(req, res, next) {
+    try {
+        const file = req.file;
+        if (!file) {
+            throw new errorHandler_1.clientError({
+                message: "No File Uploaded",
+                status: errorHandler_1.statusCode.badRequest,
+            });
+        }
+        res.status(200).json({
+            message: `Photo Uploaded Successfully path is ${file.path}`,
+            filePath: file.path
+        });
+    }
+    catch (err) {
+        next(err);
+    }
+}
+exports.reportPhotoUploadController = reportPhotoUploadController;
 async function getReportController(req, res, next) {
     var _a, _b, _c, _d;
     try {

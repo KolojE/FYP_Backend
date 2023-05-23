@@ -9,6 +9,7 @@ const administrator_1 = __importDefault(require("../models/administrator"));
 const complainant_1 = __importDefault(require("../models/complainant"));
 const mongodb_1 = require("mongodb");
 const errorHandler_1 = require("../exception/errorHandler");
+const promises_1 = require("fs/promises");
 var userService;
 (function (userService) {
     async function create_role(doc, next) {
@@ -48,5 +49,37 @@ var userService;
         });
     }
     userService.delete_role = delete_role;
+    async function getBased64profilePicture(user) {
+        const profilePicturePath = user.profilePicture;
+        if (!profilePicturePath) {
+            return null;
+        }
+        const data = await (0, promises_1.readFile)(profilePicturePath).catch(err => {
+            throw new errorHandler_1.clientError({
+                message: "Error while reading profile picture",
+                status: errorHandler_1.statusCode.badRequest,
+            });
+        });
+        if (!data) {
+            throw new Error("while reading profile picture" + data);
+        }
+        const profilePictureFileID = profilePicturePath.substring(profilePicturePath.lastIndexOf('/') + 1, profilePicturePath.lastIndexOf("."));
+        const base64Data = Buffer.from(data).toString('base64');
+        return base64Data;
+    }
+    userService.getBased64profilePicture = getBased64profilePicture;
+    async function updatedBase64ProfilePicture(user, profilePictureFileNameID) {
+        if (!user) {
+            throw new errorHandler_1.clientError({
+                message: "user not found",
+                status: errorHandler_1.statusCode.notfound,
+            });
+        }
+        if (user.profilePicture === profilePictureFileNameID) {
+            return null;
+        }
+        return getBased64profilePicture(user);
+    }
+    userService.updatedBase64ProfilePicture = updatedBase64ProfilePicture;
 })(userService = exports.userService || (exports.userService = {}));
 //# sourceMappingURL=user.service.js.map

@@ -37,7 +37,7 @@ async function tokenAuthenticationController(req, res, next) {
         if (!authorization)
             throw new errorHandler_1.clientError({
                 message: "Please Porvid token",
-                status: errorHandler_1.statusCode.unauthorize,
+                status: errorHandler_1.statusCode.unauthorized,
             });
         const type = authorization[0];
         console.log(type);

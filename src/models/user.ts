@@ -25,6 +25,7 @@ interface IPassword {
 
 export interface IUser extends Document {
     ID: string;
+    profilePicture?:string;
     email: string;
     name:string;
     password: IPassword;
@@ -37,6 +38,7 @@ export interface IUser extends Document {
 const userSchema = new Schema<IUser>({
     ID: { type: String,unique:true },
     email: { type: Schema.Types.String, unique:true, required: true },
+    profilePicture:{type:Schema.Types.String,required:false},   
     name:{type:Schema.Types.String,required:true},
     password: {
         hashed: { type: String, required: true },

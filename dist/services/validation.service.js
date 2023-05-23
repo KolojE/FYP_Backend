@@ -41,7 +41,7 @@ var validationService;
         if (!user.organization._id.equals(organizationID)) {
             throw new errorHandler_1.clientError({
                 message: "You are not authorized to process !",
-                status: errorHandler_1.statusCode.unauthorize,
+                status: errorHandler_1.statusCode.unauthorized,
                 data: "Invlid action",
             });
         }

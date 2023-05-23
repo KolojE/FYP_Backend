@@ -29,7 +29,7 @@ export namespace authenticationService {
         if (!validationService.is_Email(login.identifier)) {
             throw new clientError({
                 message: "Identifier is not an email!",
-                status: statusCode.unauthorize
+                status: statusCode.unauthorized
             }) 
         }
 
@@ -43,7 +43,7 @@ export namespace authenticationService {
             else {
                 throw new clientError( {
                     message: "password incorrect !",
-                    status: statusCode.unauthorize
+                    status: statusCode.unauthorized
                 })
             }
         }
@@ -82,7 +82,7 @@ export namespace authenticationService {
             if (!User)
                 throw new clientError ({
                     message: "Token invalid!",
-                    status: statusCode.unauthorize
+                    status: statusCode.unauthorized
                 }) 
 
             return User;
@@ -91,7 +91,7 @@ export namespace authenticationService {
             throw new clientError ({
                 data:err,
                 message: "token veification error",
-                status: statusCode.unauthorize
+                status: statusCode.unauthorized
             } )
         }
 

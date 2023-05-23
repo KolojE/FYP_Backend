@@ -11,7 +11,7 @@ export async function socketIOAuthenticationMiddleware(socket: Socket, next: Fun
         if (!token) {
             throw new clientError({
                 message: "Token is not provided !",
-                status: statusCode.unauthorize,
+                status: statusCode.unauthorized,
             })
         }
 
@@ -21,7 +21,7 @@ export async function socketIOAuthenticationMiddleware(socket: Socket, next: Fun
         if (!user) {
             throw new clientError({
                 message: "The token is not belong to any user!",
-                status: statusCode.unauthorize,
+                status: statusCode.unauthorized,
             })
         }
         console.log(user._id + 'joined room')

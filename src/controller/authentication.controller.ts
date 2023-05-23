@@ -42,7 +42,7 @@ export async function tokenAuthenticationController(req: Request, res: Response,
             throw new clientError(
                 {
                     message: "Please Porvid token",
-                    status: statusCode.unauthorize,
+                    status: statusCode.unauthorized,
 
                 }
             )

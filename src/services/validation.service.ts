@@ -43,7 +43,7 @@ export namespace validationService {
         if (!user.organization._id.equals(organizationID)) {
             throw new clientError({
                 message: "You are not authorized to process !",
-                status: statusCode.unauthorize,
+                status: statusCode.unauthorized,
                 data: "Invlid action",
 
             }) 

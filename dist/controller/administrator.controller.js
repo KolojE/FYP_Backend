@@ -116,7 +116,6 @@ async function viewMembersController(req, res, next) {
                 }
             }
         ]);
-        console.log(members);
         res.status(200).json({
             message: "successfully get all members info",
             members: members

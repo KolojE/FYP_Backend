@@ -35,6 +35,8 @@ export function generateSchema(form: IForm) {
             case inputType.Time:
                 formSchema[field._id] = Joi.date().iso();
                 break;
+            case inputType.Photo:
+                formSchema[field._id] = Joi.array().items(Joi.string());
         }
 
         if (field.required) {

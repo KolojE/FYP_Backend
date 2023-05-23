@@ -6,7 +6,7 @@ var statusCode;
     statusCode[statusCode["badRequest"] = 400] = "badRequest";
     statusCode[statusCode["notfound"] = 404] = "notfound";
     statusCode[statusCode["conflict"] = 409] = "conflict";
-    statusCode[statusCode["unauthorize"] = 401] = "unauthorize";
+    statusCode[statusCode["unauthorized"] = 401] = "unauthorized";
 })(statusCode = exports.statusCode || (exports.statusCode = {}));
 class clientError extends Error {
     constructor({ message, status, data }) {
