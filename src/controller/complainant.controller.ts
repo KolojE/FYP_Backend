@@ -3,7 +3,6 @@ import { reportIncidentService } from "../services/reportIncident.service";
 import ReportModel from "../models/report";
 import { PipelineStage } from "mongoose";
 import { clientError, statusCode } from "../exception/errorHandler";
-import userModel from "../models/user";
 
 
 export async function reportIncidentController(req: Request, res: Response, next: Function) {

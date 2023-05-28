@@ -9,9 +9,7 @@ import { FilterQuery, PipelineStage } from "mongoose";
 import ReportModel from "../models/report";
 import statusModel from "../models/status";
 import { ObjectId } from "mongodb";
-import { userService } from "../services/user.service";
 import { IOrganization } from "../models/organization";
-import { promises } from "dns";
 
 
 

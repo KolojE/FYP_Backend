@@ -1,6 +1,5 @@
 import { Document, model, Schema, Types } from "mongoose";
 import { autoIncrement } from "../plugin/autoincrement";
-import { ObjectId } from "mongodb";
 
 interface IAdministrator extends Document {
     ID: string;
