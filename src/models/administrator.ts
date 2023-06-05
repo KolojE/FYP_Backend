@@ -3,14 +3,14 @@ import { autoIncrement } from "../plugin/autoincrement";
 
 interface IAdministrator extends Document {
     ID: string;
-    User: {
+    user: {
         _id: Types.ObjectId;
         ID: string;
     },
 }
 const adminSchema = new Schema<IAdministrator>({
     ID: { type: String, unique: true, required: true },
-    User: {
+    user: {
         _id: { type: Schema.Types.ObjectId, unique: true, ref: "user" },
         ID: { type: String, unique: true, ref: "user" }
     }

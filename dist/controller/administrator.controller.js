@@ -145,15 +145,30 @@ async function deleteMemberController(req, res, next) {
     try {
         const user = req.user;
         const deleteUserId = req.query._id;
-        const deletedMember = await user_1.default.findOneAndDelete({
-            _id: deleteUserId, role: user_1.role.complainant, "organization._id": user.organization._id
-        });
+        const deletedMember = await user_1.default.findOne({ _id: deleteUserId, role: user_1.role.complainant, "organization._id": user.organization._id });
+        const deletedComplainant = await complainant_1.default.findOne({ user: deleteUserId });
+        if (!deletedComplainant) {
+            throw new errorHandler_1.clientError({
+                message: `No member is deleted cause the ID associated to the member is not found or trying to delete admin account ${deleteUserId}`,
+                status: errorHandler_1.statusCode.notfound,
+            });
+        }
+        if (deletedComplainant.activation) {
+            throw new errorHandler_1.clientError({
+                message: `No member is deleted cause the member is activated ${deleteUserId}`,
+                status: errorHandler_1.statusCode.notfound,
+            });
+        }
         if (!deletedMember) {
             throw new errorHandler_1.clientError({
                 message: `No member is deleted cause the ID associated to the member is not found or trying to delete admin account ${deleteUserId}`,
                 status: errorHandler_1.statusCode.notfound,
             });
         }
+        res.status(200).json({
+            message: `successfully deleted member ${deleteUserId}`,
+            data: deletedMember,
+        }).send();
     }
     catch (err) {
         next(err);
@@ -249,11 +264,27 @@ async function getReportController(req, res, next) {
                     $addFields: {
                         name: "$form.name"
                     }
-                }
+                },
+                {
+                    $lookup: {
+                        from: "status",
+                        localField: "reports.status._id",
+                        foreignField: "_id",
+                        as: "status"
+                    }
+                },
+                {
+                    $unwind: "$status"
+                },
+                {
+                    $addFields: {
+                        "reports.status.desc": "$status.desc"
+                    }
+                },
             ]);
         }
         const result = await report_1.default.aggregate(pipeline);
-        console.log(result);
+        console.log(result[0]);
         res.status(200).send({
             message: `Successfully returned reports for organization`,
             reports: result,

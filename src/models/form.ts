@@ -36,6 +36,7 @@ export interface IForm extends Document {
     },
     activation_Status: boolean;
     creationDate: Date;
+    isDeleted: boolean;
 }
 
 const formSchema = new Schema<IForm>({
@@ -53,6 +54,7 @@ const formSchema = new Schema<IForm>({
     },
     creationDate: { type: Schema.Types.Date,required:true },
     activation_Status: { type: Schema.Types.Boolean, required: true },
+    isDeleted: { type: Schema.Types.Boolean, required: true, default: false },
 })
 
 export const FormModel: Model<IForm> = model<IForm>("form", formSchema)

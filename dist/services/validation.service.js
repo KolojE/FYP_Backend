@@ -8,6 +8,7 @@ const errorHandler_1 = require("../exception/errorHandler");
 const form_1 = require("../models/form");
 const user_1 = __importDefault(require("../models/user"));
 const joi_1 = require("../utils/joi");
+const complainant_1 = __importDefault(require("../models/complainant"));
 var validationService;
 (function (validationService) {
     function is_Email(email) {
@@ -47,6 +48,24 @@ var validationService;
         }
     }
     validationService.validate_User_Belong_To_Organziation = validate_User_Belong_To_Organziation;
+    async function is_Complinant_Active(user) {
+        const complainant = await complainant_1.default.findOne({ "user._id": user._id });
+        if (!complainant) {
+            throw new errorHandler_1.clientError({
+                message: "You are not authorized to process !",
+                status: errorHandler_1.statusCode.unauthorized,
+                data: "Invlid action",
+            });
+        }
+        if (!complainant.activation) {
+            throw new errorHandler_1.clientError({
+                message: "Account is not activated ! Please contact the administrator",
+                status: errorHandler_1.statusCode.unauthorized,
+                data: "Invlid action",
+            });
+        }
+    }
+    validationService.is_Complinant_Active = is_Complinant_Active;
     async function fields_Validation(field, form) {
         console.log(field);
         const Schema = (0, joi_1.generateSchema)(form);

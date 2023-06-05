@@ -4,6 +4,7 @@ import userModel, { IUser } from "../models/user";
 import { newForm } from "./administrator.service";
 import { generateSchema } from "../utils/joi";
 import { Types } from "mongoose";
+import complaiantModel from "../models/complainant";
 
 
 export namespace validationService {
@@ -48,6 +49,25 @@ export namespace validationService {
 
             }) 
         }
+    }
+
+    export async function is_Complinant_Active(user: IUser) {
+        const complainant = await complaiantModel.findOne({ "user._id": user._id });
+        if (!complainant) {
+            throw new clientError({
+                message: "You are not authorized to process !",
+                status: statusCode.unauthorized,
+                data: "Invlid action",
+            }) 
+        }
+        if (!complainant.activation) {
+            throw new clientError({
+                message: "Account is not activated ! Please contact the administrator",
+                status: statusCode.unauthorized,
+                data: "Invlid action",
+            })
+        }
+
     }
 
     export async function fields_Validation(field: Object, form: IForm) {

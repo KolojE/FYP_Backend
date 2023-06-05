@@ -7,7 +7,7 @@ async function hashPassword(password) {
     const hashValue = await (0, bcrypt_1.hash)(password, saltValue);
     const result = {
         salt: saltValue,
-        hashValue: hashValue,
+        hashed: hashValue,
     };
     return result;
 }

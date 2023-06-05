@@ -4,6 +4,7 @@ exports.complainantVerificationMiddleware = exports.adminVerificationMiddleware 
 const errorHandler_1 = require("../exception/errorHandler");
 const user_1 = require("../models/user");
 const authentication_services_1 = require("../services/authentication.services");
+const validation_service_1 = require("../services/validation.service");
 async function authenticationMiddleware(req, res, next) {
     var _a;
     try {
@@ -21,6 +22,9 @@ async function authenticationMiddleware(req, res, next) {
                 message: "The token is not belong to any user!",
                 status: errorHandler_1.statusCode.unauthorized,
             });
+        }
+        if (user.role === user_1.role.complainant) {
+            validation_service_1.validationService.is_Complinant_Active(user);
         }
         req.user = user;
         next();

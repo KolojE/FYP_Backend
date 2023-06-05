@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
 import httpServer from "http";
-import { socketRouter } from "./socket.router";
+import { socketConnceted } from "./socket.router";
 import { socketIOAuthenticationMiddleware } from "../middleware/sokcetIOMiddleware";
 
 
@@ -16,7 +16,7 @@ function socketIO(httpServer: httpServer.Server) {
     })
 
 
-    io.on("connection", socketRouter)
+    io.on("connection", socketConnceted)
     io.use(socketIOAuthenticationMiddleware);
 
 }

@@ -47,7 +47,7 @@ export namespace registrationService {
             email: newComplainant.email,
             name:newComplainant.name,
             password: {
-                hashed: hashedPassword.hashValue,
+                hashed: hashedPassword.hashed,
                 salt: hashedPassword.salt,
             },
             organization: { _id: Organization._id, ID: Organization.ID },

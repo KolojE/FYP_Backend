@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import { clientError, statusCode } from "../exception/errorHandler";
 import { authenticationService } from "../services/authentication.services";
-import userModel from "../models/user";
+import userModel, { role } from "../models/user";
+import { validationService } from "../services/validation.service";
 
 export async function authenticationController(req: Request, res: Response, next: Function) {
 
@@ -12,6 +13,10 @@ export async function authenticationController(req: Request, res: Response, next
                 message: "Failed to authenticate user, no user found.",
                 status: statusCode.notfound,
             })
+
+        if (user.role === role.complainant) {
+         await validationService.is_Complinant_Active(user);
+        }
 
         const token = await authenticationService.generateJWT(user);
         res.set({
@@ -28,6 +33,7 @@ export async function authenticationController(req: Request, res: Response, next
         })
 
     } catch (err) {
+        console.log(err)
         next(err)
     }
 
@@ -47,7 +53,7 @@ export async function tokenAuthenticationController(req: Request, res: Response,
                 }
             )
         const type = authorization[0]
-console.log(type)
+
         if (type != "Baerer")
             throw new clientError(
                 {
@@ -57,17 +63,27 @@ console.log(type)
             )
 
         const token = authorization[1]
-        const decodedToken =await authenticationService.verifyToken(token)
+        const decodedToken = await authenticationService.verifyToken(token)
         const loginUser = await userModel.findById(
             decodedToken._id).lean()
+        if (!loginUser) {
+            throw new clientError(
+                {
+                    message: "User not found",
+                    status: statusCode.notfound,
+                }
+            )
+        }
 
-        
+        if (loginUser.role === role.complainant) {
+            validationService.is_Complinant_Active(loginUser);
+        }
+
         const userOmitPassword = { ...loginUser, password: undefined }
-        console.log(userOmitPassword)
         res.status(200).send(
             {
-                loginUser:userOmitPassword,
-                message:"Login Sucessfully",
+                loginUser: userOmitPassword,
+                message: "Login Sucessfully",
             }
         )
 

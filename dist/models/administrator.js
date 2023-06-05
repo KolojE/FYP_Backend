@@ -4,7 +4,7 @@ const mongoose_1 = require("mongoose");
 const autoincrement_1 = require("../plugin/autoincrement");
 const adminSchema = new mongoose_1.Schema({
     ID: { type: String, unique: true, required: true },
-    User: {
+    user: {
         _id: { type: mongoose_1.Schema.Types.ObjectId, unique: true, ref: "user" },
         ID: { type: String, unique: true, ref: "user" }
     }

@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { clientError, statusCode } from "../exception/errorHandler";
 import { role } from "../models/user";
 import { authenticationService } from "../services/authentication.services";
+import { validationService } from "../services/validation.service";
 
 
 export async function authenticationMiddleware(req: Request, res: Response, next: Function) {
@@ -21,6 +22,10 @@ export async function authenticationMiddleware(req: Request, res: Response, next
                 message: "The token is not belong to any user!",
                 status: statusCode.unauthorized,
             })
+        }
+
+        if(user.role === role.complainant){
+            validationService.is_Complinant_Active(user);
         }
 
         req.user = user;
@@ -56,6 +61,7 @@ export async function complainantVerificationMiddleware(req: Request, res: Respo
             next()
             return;
         }
+
         throw new clientError({
             message: "You do not have sufficient permission to make the request",
             status: statusCode.unauthorized,

@@ -1,9 +1,12 @@
 import { Request, Response } from "express";
 import { ObjectId } from "mongodb";
-import userModel from "../models/user"; import { clientError, statusCode } from "../exception/errorHandler"; import OrganizationModel from "../models/organization";
+import userModel, { IUser, role } from "../models/user"; import { clientError, statusCode } from "../exception/errorHandler"; import OrganizationModel from "../models/organization";
 import { IForm, FormModel } from "../models/form";
-import { readFile } from "fs";
 import { userService } from "../services/user.service";
+import ReportModel from "../models/report";
+import { hashPassword } from "../utils/hash";
+import adminModel from "../models/administrator";
+import complaiantModel from "../models/complainant";
 
 
 
@@ -21,6 +24,33 @@ export async function getUserInfoController(req: Request, res: Response, next: F
                     status: statusCode.notfound,
                 })
         }
+        let roleID = ""
+
+        if (user.role === role.admin) {
+            const admin = await adminModel.findOne({ "user._id": user._id })
+            if (!admin) {
+                throw new clientError(
+                    {
+                        message: `No admin Found with _id ${user._id}`,
+                        status: statusCode.notfound,
+                    })
+            }
+            roleID = admin.ID
+        }
+        else if (user.role === role.complainant) {
+            const complainant = await complaiantModel.findOne({ "user._id": user._id })
+            if (!complainant) {
+                throw new clientError(
+                    {
+                        message: `No complainant Found with _id ${user._id}`,
+                        status: statusCode.notfound,
+                    })
+            }
+            roleID = complainant.ID
+
+        }
+
+
         const organization = await OrganizationModel.findById(user.organization._id)
 
         if (!organization) {
@@ -30,15 +60,33 @@ export async function getUserInfoController(req: Request, res: Response, next: F
                     status: statusCode.notfound,
                 })
         }
-        console.log(organization);
 
+        const admins = await userModel.find({ "organization._id": user.organization._id, role: "admin" });
 
-        res.status(200).json({
-            message: "User",
-            loggedInUser: { ...user.toObject(), password: undefined },
-            organization: organization,
+        if(!admins){
+            throw new clientError(
+                {
+                    message: `No admins Found with _id ${user.organization._id}`,
+                    status: statusCode.notfound,
+                })
+        }
+
+        const noPasswordAdmins = admins.map((admin) => {
+            return { ...admin.toObject(), password: undefined }
         })
 
+        console.log(noPasswordAdmins)
+        const reportCount = await ReportModel.find({ "complainant._id": user._id }).countDocuments();
+
+        console.log(reportCount)
+        res.status(200).json({
+            message: "User",
+            user: { ...user.toObject(),roleID:roleID, password: undefined },
+            organization: organization,
+            admins: noPasswordAdmins,
+            totalReportCount: reportCount,
+            totalResolvedCount: 0.
+        })
 
 
     }
@@ -198,6 +246,45 @@ export async function getUpdatedProfilePicture(req: Request, res: Response, next
             })
         }
         res.status(200).sendFile(profilePicture, { root: "./" });
+    } catch (err) {
+        next(err)
+    }
+}
+
+
+export async function updateProfile(req: Request, res: Response, next: Function) {
+    try {
+        const userID = req.user._id;
+        const { name, phoneNo, address, password } = req.body;
+
+        const hashedPassword = await hashPassword(password);
+
+        console.log(req.body)
+
+        const user = await userModel.findByIdAndUpdate(userID, {
+            $set: {
+                name: name,
+                contact: {
+                    phoneNo: phoneNo,
+                    address: address
+                },
+                password: {
+                    hashed: hashedPassword.hashed,
+                    salt: hashedPassword.salt
+                },
+            }
+        })
+        if (!user) {
+            throw new clientError({
+                message: `No User Found with _id ${req.user._id}`,
+                status: statusCode.notfound
+            })
+        }
+        res.status(200).json({
+            message: "Profile Updated Successfully",
+            user: user
+        })
+
     } catch (err) {
         next(err)
     }

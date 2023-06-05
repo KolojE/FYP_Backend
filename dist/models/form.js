@@ -31,6 +31,7 @@ const formSchema = new mongoose_1.Schema({
     },
     creationDate: { type: mongoose_1.Schema.Types.Date, required: true },
     activation_Status: { type: mongoose_1.Schema.Types.Boolean, required: true },
+    isDeleted: { type: mongoose_1.Schema.Types.Boolean, required: true, default: false },
 });
 exports.FormModel = (0, mongoose_1.model)("form", formSchema);
 //# sourceMappingURL=form.js.map

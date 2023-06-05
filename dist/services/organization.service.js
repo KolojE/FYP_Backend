@@ -57,7 +57,7 @@ var OrganizationService;
                 ID: newOrganization.ID
             },
             password: {
-                hashed: hashedPassword.hashValue,
+                hashed: hashedPassword.hashed,
                 salt: hashedPassword.salt,
             },
             role: user_1.role.admin,

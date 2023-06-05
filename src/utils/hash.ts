@@ -1,7 +1,7 @@
 import { hash, genSalt, compare, } from "bcrypt";
 
 type hash_salt = {
-    hashValue: string,
+    hashed: string,
     salt: string
 }
 
@@ -12,7 +12,7 @@ export async function hashPassword(password: string): Promise<hash_salt> {
     const result: hash_salt =
     {
         salt: saltValue,
-        hashValue: hashValue,
+        hashed: hashValue,
     }
     return result;
 

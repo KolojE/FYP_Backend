@@ -46,9 +46,12 @@ export async function sendMessageEventValidationMiddleware(user: IUser, event: E
     try {
 
         const receipientUser = await userModel.findById(receipientID)
-        console.log(user)
         if (!receipientUser) {
-            return
+            console.log("Warning !: user " + user._id + "is trying to connect user" + receipientID + " which does not exist")
+            throw new clientError({
+                message: "Receipient user not found",
+                status: statusCode.notfound,
+            })
         }
         //Validate if sender have the right to interact with receipient
         if (!receipientUser.organization._id.equals(user.organization._id)) {
@@ -57,7 +60,10 @@ export async function sendMessageEventValidationMiddleware(user: IUser, event: E
         }
 
         if (user.role === role.complainant && receipientUser.role === role.complainant) {
-            return;
+            throw new clientError({ 
+                message: "Complainant can only send message to admin",
+                status: statusCode.badRequest,
+            })
         }
 
         next();

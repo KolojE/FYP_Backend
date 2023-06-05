@@ -143,9 +143,26 @@ export async function deleteMemberController(req: Request, res: Response, next: 
     try {
         const user = req.user;
         const deleteUserId = req.query._id;
-        const deletedMember = await userModel.findOneAndDelete({
-            _id: deleteUserId, role: role.complainant, "organization._id": user.organization._id
-        })
+
+        const deletedMember = await userModel.findOne({ _id: deleteUserId, role: role.complainant, "organization._id": user.organization._id })
+
+        const deletedComplainant = await complaiantModel.findOne({ user: deleteUserId })
+        
+        if(!deletedComplainant){
+            throw new clientError({
+                message: `No member is deleted cause the ID associated to the member is not found or trying to delete admin account ${deleteUserId}`,
+                status: statusCode.notfound,
+            })
+        }
+
+        if(deletedComplainant.activation)
+        {
+            throw new clientError({
+                message: `No member is deleted cause the member is activated ${deleteUserId}`,
+                status: statusCode.notfound,
+            })
+        }
+
         if (!deletedMember) {
             throw new clientError({
                 message: `No member is deleted cause the ID associated to the member is not found or trying to delete admin account ${deleteUserId}`,
@@ -153,6 +170,10 @@ export async function deleteMemberController(req: Request, res: Response, next: 
             })
         }
 
+        res.status(200).json({
+            message: `successfully deleted member ${deleteUserId}`,
+            data: deletedMember,
+        }).send()
 
     }
     catch (err) {
@@ -178,6 +199,7 @@ export async function getReportController(req: Request, res: Response, next: Fun
                     "organization._id": user.organization._id,
                 },
 
+
             },
         ]
 
@@ -199,7 +221,7 @@ export async function getReportController(req: Request, res: Response, next: Fun
         }
 
         if (status) {
-            const statuses:FilterQuery<any>[] = []
+            const statuses:FilterQuery<any>[] = []// array of status to match from the query params - mongoose filter query
             status.forEach((type) => {
                 console.log(type)
                 statuses.push({ "status._id":new ObjectId(type) })
@@ -207,7 +229,6 @@ export async function getReportController(req: Request, res: Response, next: Fun
             pipeline.push({
                 $match: {
                     $or: statuses
-                    
                 }
             })
         }
@@ -258,13 +279,29 @@ export async function getReportController(req: Request, res: Response, next: Fun
                 $addFields: {
                     name: "$form.name"
                 }
-            }
+            },
+            {
+                $lookup: {
+                  from: "status",
+                  localField: "reports.status._id",
+                  foreignField: "_id",
+                  as: "status"
+                }
+              },
+              {
+                $unwind: "$status"
+              },
+              {
+                $addFields: {
+                  "reports.status.desc": "$status.desc"
+                }
+              },
             ])
         }
 
 
         const result = await ReportModel.aggregate(pipeline);
-        console.log(result)
+        console.log(result[0])
         res.status(200).send({
             message: `Successfully returned reports for organization`,
             reports: result,
@@ -274,6 +311,7 @@ export async function getReportController(req: Request, res: Response, next: Fun
     } catch (err) {
         next(err)
     }
+
 }
 
 export async function getReportElement(req: Request, res: Response, next: Function) {

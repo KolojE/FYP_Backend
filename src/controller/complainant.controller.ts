@@ -71,16 +71,19 @@ export async function getReportController(req: Request, res: Response, next: Fun
                 },
             },
             {
-                $addFields: {
-                    "comment":"$status.comment",
-                }
-            },
-            {
                 $lookup:{
                     from:"status",
                     localField:"status._id",
                     foreignField:"_id",
-                    as:"status",
+                    as:"statusData",
+                }
+            },
+            {
+                $unwind:"$statusData",
+            },
+            {
+                $addFields:{
+                    "status.desc":"$statusData.desc",
                 }
             },
             {
@@ -92,12 +95,13 @@ export async function getReportController(req: Request, res: Response, next: Fun
             {
                 $addFields: {
                     "name": "$form.name",
-                    "status":"$status.desc",
+                    
                 }
             },
             {
                 $project: {
                     "form": 0,
+                    "statusData":0,
                 }
                 
             },
@@ -153,13 +157,11 @@ export async function getReportController(req: Request, res: Response, next: Fun
 
         const submittedReports = ReportModel.aggregate(pipeline)
 
-
-
+        
         const reports = await submittedReports;
-        console.log(subDate.fromDate)
-        console.log(JSON.stringify(reports, null, 2))
+        console.log(reports)
         res.status(200).send({
-            message: `successfully get the submitted reprots by User ${user._id}`,
+            message: `successfully get the submitted reports by User ${user._id}`,
             reports: reports
         })
 

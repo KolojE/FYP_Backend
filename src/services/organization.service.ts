@@ -37,7 +37,7 @@ return newOrganization_;
                 ID: newOrganization.ID
             },
             password: {
-                hashed: hashedPassword.hashValue,
+                hashed: hashedPassword.hashed,
                 salt: hashedPassword.salt,
             },
             role: role.admin,
