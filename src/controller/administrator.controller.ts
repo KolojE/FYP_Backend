@@ -5,11 +5,12 @@ import { validationService } from "../services/validation.service";
 import { FormModel } from "../models/form";
 import { clientError, statusCode } from "../exception/errorHandler";
 import userModel, { IUser, role } from "../models/user";
-import { FilterQuery, PipelineStage } from "mongoose";
-import ReportModel from "../models/report";
-import statusModel from "../models/status";
+import mongoose, { FilterQuery, PipelineStage, isObjectIdOrHexString } from "mongoose";
+import ReportModel, { IReport } from "../models/report";
+import statusModel, { Status } from "../models/status";
 import { ObjectId } from "mongodb";
-import { IOrganization } from "../models/organization";
+import OrganizationModel, { IOrganization } from "../models/organization";
+import adminModel from "../models/administrator";
 
 
 
@@ -71,7 +72,7 @@ export async function deleteFormController(req: Request, res: Response, next: Fu
 
 export async function viewMembersController(req: Request, res: Response, next: Function) {
 
-    type Members = { user: IUser, organization: IOrganization, base64ProfilePicture: string | null} & IComplainant[]
+    type Members = { user: IUser, organization: IOrganization, base64ProfilePicture: string | null } & IComplainant[]
 
     try {
         const members = await complaiantModel.aggregate<Members>([
@@ -111,7 +112,7 @@ export async function viewMembersController(req: Request, res: Response, next: F
         ]);
 
 
-        
+
 
         res.status(200).json({
             message: "successfully get all members info",
@@ -147,16 +148,15 @@ export async function deleteMemberController(req: Request, res: Response, next: 
         const deletedMember = await userModel.findOne({ _id: deleteUserId, role: role.complainant, "organization._id": user.organization._id })
 
         const deletedComplainant = await complaiantModel.findOne({ user: deleteUserId })
-        
-        if(!deletedComplainant){
+
+        if (!deletedComplainant) {
             throw new clientError({
                 message: `No member is deleted cause the ID associated to the member is not found or trying to delete admin account ${deleteUserId}`,
                 status: statusCode.notfound,
             })
         }
 
-        if(deletedComplainant.activation)
-        {
+        if (deletedComplainant.activation) {
             throw new clientError({
                 message: `No member is deleted cause the member is activated ${deleteUserId}`,
                 status: statusCode.notfound,
@@ -221,10 +221,10 @@ export async function getReportController(req: Request, res: Response, next: Fun
         }
 
         if (status) {
-            const statuses:FilterQuery<any>[] = []// array of status to match from the query params - mongoose filter query
+            const statuses: FilterQuery<any>[] = []// array of status to match from the query params - mongoose filter query
             status.forEach((type) => {
                 console.log(type)
-                statuses.push({ "status._id":new ObjectId(type) })
+                statuses.push({ "status._id": new ObjectId(type) })
             })
             pipeline.push({
                 $match: {
@@ -234,15 +234,15 @@ export async function getReportController(req: Request, res: Response, next: Fun
         }
 
         if (type) {
-            const types:FilterQuery<any>[] = []
+            const types: FilterQuery<any>[] = []
             type.forEach((type) => {
                 console.log(type)
-                types.push({ "form_id":new ObjectId(type) })
+                types.push({ "form_id": new ObjectId(type) })
             })
             pipeline.push({
                 $match: {
                     $or: types
-                    
+
                 }
             })
         }
@@ -282,20 +282,20 @@ export async function getReportController(req: Request, res: Response, next: Fun
             },
             {
                 $lookup: {
-                  from: "status",
-                  localField: "reports.status._id",
-                  foreignField: "_id",
-                  as: "status"
+                    from: "status",
+                    localField: "reports.status._id",
+                    foreignField: "_id",
+                    as: "status"
                 }
-              },
-              {
+            },
+            {
                 $unwind: "$status"
-              },
-              {
+            },
+            {
                 $addFields: {
-                  "reports.status.desc": "$status.desc"
+                    "reports.status.desc": "$status.desc"
                 }
-              },
+            },
             ])
         }
 
@@ -343,7 +343,197 @@ export async function getReportElement(req: Request, res: Response, next: Functi
 
     }
     catch (err) {
+        next(err)
+    }
+
+}
+
+export async function updateOrganization(req: Request, res: Response, next: Function) {
+    const user = req.user;
+
+    const organizationToUpdate: IOrganization = req.body.organization;
+    const stattusesToUpdateAndCreate: Status[] = req.body.statuses;
+    const statusesToDelete: Status[] = req.body.statusesToDelete;
+
+
+    const defaultStatusID = organizationToUpdate.system.defaultStatus;
+
+    console.log(organizationToUpdate)
+    try {
+
+        const organization = await OrganizationModel.findOne({ _id: user.organization._id });
+
+        if (!organization) {
+            throw new clientError({
+                message: `Organization not found`,
+                status: statusCode.notfound,
+            })
+        }
+        if (user.organization._id != organizationToUpdate._id) {
+            throw new clientError({
+                message: `You are not authorized to update organization`,
+                status: statusCode.unauthorized,
+            })
+        }
+
+        const newStatuses: Status[] = [];
+        const updatedStatuses: Status[] = [];
+        const deletedStatuses: Status[] = [];
+        if (stattusesToUpdateAndCreate) {
+            for (let i = 0; i < stattusesToUpdateAndCreate.length; i++) {
+                const status = stattusesToUpdateAndCreate[i];
+                let newID = ""
+                if (!isObjectIdOrHexString(status._id)) {
+                    const newStatus = new statusModel({
+                        desc: status.desc,
+                        organization: {
+                            _id: user.organization._id,
+                            ID: user.organization.ID,
+                        },
+                    });
+
+                    newStatuses.push(newStatus);
+                    newID = newStatus._id;
+                }
+                else {
+                    const updatedStatus = await statusModel.findOne({ _id: status._id, "organization._id": user.organization._id });
+                    if (!updatedStatus) {
+                        throw new clientError({
+                            message: `no status with id ${status._id} was found`,
+                            status: statusCode.notfound,
+                        })
+                    }
+                    updatedStatus.desc = status.desc;
+                    updatedStatuses.push(updatedStatus);
+                    newID = updatedStatus._id;
+                }
+
+                if (status._id == defaultStatusID) {
+                    const ID = new mongoose.Types.ObjectId(newID);
+                    organizationToUpdate.system.defaultStatus = ID
+                }
+            }
+        }
+
+        if (statusesToDelete) {
+            for (let i = 0; i < statusesToDelete.length; i++) {
+                const status = statusesToDelete[i];
+                if (!isObjectIdOrHexString(status._id)) {
+                    throw new clientError({
+                        message: `status to be delete id ${status._id} is not a valid id`,
+                        status: statusCode.notfound,
+                    })
+                }
+                const deletedStatus = await statusModel.findOne({ _id: status._id, "organization._id": user.organization._id });
+                if (!deletedStatus) {
+                    throw new clientError({
+                        message: `no status with id ${status._id} was found`,
+                        status: statusCode.notfound,
+                    })
+                }
+                if (deletedStatus._id === organization.system.defaultStatus) {
+                    throw new clientError({
+                        message: `default status cannot be deleted`,
+                        status: statusCode.badRequest,
+                    })
+                }
+
+                deletedStatuses.push(deletedStatus);
+            }
+        }
+
+        if (organizationToUpdate) {
+            await OrganizationModel.findOneAndUpdate({ _id: new ObjectId(user.organization._id) }, {
+                name: organizationToUpdate.name,
+                contactNo: organizationToUpdate.contactNo,
+                address: organizationToUpdate.address,
+                "system.defaultStatus": organizationToUpdate.system.defaultStatus,
+                "system.autoActiveNewUser": organizationToUpdate.system.autoActiveNewUser,
+            }, { new: true }).lean();
+        }
+
+        console.log(deletedStatuses)
+        if (newStatuses.length > 0) {
+            await statusModel.insertMany(newStatuses);
+        }
+
+        if(deletedStatuses.length > 0){
+            await statusModel.deleteMany({ $or: statusesToDelete.map((status) => ({ _id: status._id })) });
+        }
+
+        if(updatedStatuses.length > 0){
+            await statusModel.bulkWrite(updatedStatuses.map((status) => ({
+                updateOne: {
+                    filter: { _id: status._id },
+                    update: { desc: status.desc },
+                }
+            })))
+        }
+
+        const updatedNewStatuses = await statusModel.find({ "organization._id": user.organization._id }).select({ organization: 0 });
+        const updatedOrganization = await OrganizationModel.findOne({ _id: user.organization._id });
+
+        res.status(200).send({
+            message: "succesfully updated organization ",
+            organization: updatedOrganization,
+            statuses: updatedNewStatuses,
+        })
+    }
+    catch (err) {
+        next(err)
+    }
+
+}
+
+export async function updateReportController(req: Request, res: Response, next: Function) {
+
+    console.log(req.body)
+    const user = req.user;
+    const reportID:string= req.body.reportID;
+    const reportStatus: string = req.body.status;
+    const reportComment: string = req.body.comment;
+
+    try {
+    const status =await statusModel.findOne({ _id: reportStatus, "organization._id": user.organization._id });
+
+    if(!status){    
+        throw new clientError({
+            message: `status not found`,
+            status: statusCode.notfound,
+        })
+    }
+
+    const adminID= await adminModel.findOne({"user._id": user._id}).select('_id');
+
+
+    const report =await ReportModel.findOneAndUpdate({ _id: reportID, "organization._id": user.organization._id },
+    {
+        "status._id": status._id,
+        "status.comment": reportComment,
+        "status.admin": adminID,
+    },{
+        new: true,
+    });
+
+    console.log(JSON.stringify(report,null,2))
+
+    if(!report){
+        throw new clientError({
+            message: `report not found`,
+            status: statusCode.notfound,
+        })
+    }
+
+
+    res.status(200).send({
+        message: "succesfully updated report ",
+        report: report,
+    })
 
     }
+    catch (err) {
+        next(err)
+    }
+
 
 }

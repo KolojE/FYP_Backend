@@ -12,35 +12,44 @@ export function generateSchema(form: IForm) {
     fields.unshift(...form.defaultFields);
 
     fields.forEach(field => {
+        const fieldID = field._id.toString();
         switch (field.inputType) {
             case inputType.DropDown:
                 if (!field.options) {
                     console.error("type dropdown shouldnt have empty options array ")
+        console.log(field._id+" "+field.label+" "+field.inputType)
                     break;
                 }
-                formSchema[field._id] = Joi.string().valid(...field.options);
+                formSchema[fieldID] = Joi.string().valid(...field.options);
                 break;
             case inputType.Map:
-                formSchema[field._id] = Joi.object().keys({
+        console.log(field._id+" "+field.label+" "+field.inputType)
+                formSchema[fieldID] = Joi.object().keys({
                     La: Joi.number(),
                     Lo: Joi.number(),
                 })
                 break;
             case inputType.Date:
-                formSchema[field._id] = Joi.date().iso();
+                formSchema[fieldID] = Joi.date().iso();
+        console.log(field._id+" "+field.label+" "+field.inputType)
                 break;
             case inputType.Text:
-                formSchema[field._id] = Joi.string();
+                formSchema[fieldID] = Joi.string();
+        console.log(field._id+" "+field.label+" "+field.inputType)
                 break;
             case inputType.Time:
-                formSchema[field._id] = Joi.date().iso();
+                formSchema[fieldID] = Joi.date().iso();
+        console.log(field._id+" "+field.label+" "+field.inputType)
                 break;
             case inputType.Photo:
-                formSchema[field._id] = Joi.array().items(Joi.string());
+                formSchema[fieldID] = Joi.array().items(Joi.string());
+        console.log(field._id+" "+field.label+" "+field.inputType)
+        break;
         }
 
+
         if (field.required) {
-            formSchema[field._id].required();
+            formSchema[fieldID].required();
         }
 
     })

@@ -37,7 +37,7 @@ async function authenticationController(req, res, next) {
                 status: errorHandler_1.statusCode.notfound,
             });
         if (user.role === user_1.role.complainant) {
-            await validation_service_1.validationService.is_Complinant_Active(user);
+            await validation_service_1.validationService.is_Complainant_Active(user);
         }
         const token = await authentication_services_1.authenticationService.generateJWT(user);
         res.set({
@@ -46,6 +46,7 @@ async function authenticationController(req, res, next) {
         const userOmitPassword = Object.assign(Object.assign({}, user), { password: undefined });
         res.status(200).json({
             loginUser: userOmitPassword,
+            token: token ? token : undefined,
             message: "Sucessfully authenticatd token returned in the header",
         });
     }
@@ -80,7 +81,7 @@ async function tokenAuthenticationController(req, res, next) {
             });
         }
         if (loginUser.role === user_1.role.complainant) {
-            validation_service_1.validationService.is_Complinant_Active(loginUser);
+            await validation_service_1.validationService.is_Complainant_Active(loginUser);
         }
         const userOmitPassword = Object.assign(Object.assign({}, loginUser), { password: undefined });
         res.status(200).send({

@@ -51,7 +51,7 @@ export namespace validationService {
         }
     }
 
-    export async function is_Complinant_Active(user: IUser) {
+    export async function is_Complainant_Active(user: IUser) {
         const complainant = await complaiantModel.findOne({ "user._id": user._id });
         if (!complainant) {
             throw new clientError({
@@ -75,7 +75,7 @@ export namespace validationService {
         console.log(field)
         const Schema = generateSchema(form);
         try {
-            await Schema.validateAsync(field);
+            await Schema.validate(field);
         } catch (err) {
             throw new clientError({
                 message: "Failed to validate the form's fields",

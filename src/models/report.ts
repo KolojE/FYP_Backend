@@ -1,4 +1,6 @@
-import { Document, Model, model, Schema, Types } from "mongoose";
+import { Document, Mixed, Model, model, Schema, Types } from "mongoose";
+import { inputType } from "./form";
+import { any } from "joi";
 
 
 interface IOrganization {
@@ -21,10 +23,26 @@ interface IStatus {
     }
 }
 
+export interface IDetails 
+{
+[key:string]:{
+    label:string;
+    inputType:inputType;
+    value:any;
+};
+}
+
+const detailsSchema = new Schema<IDetails>({
+    label: { type: String, required: true },
+    inputType: { type: String, required: true },
+    value: { type:Schema.Types.Mixed, required: true },
+  });
+
+
 export interface IReport extends Document {
     submissionDate: Date;
     updateDate:Date;
-    details: object;
+    details: IDetails;
     form_id: Types.ObjectId;
     organization: IOrganization;
     complainant: IComplainant;
@@ -32,10 +50,15 @@ export interface IReport extends Document {
 
 }
 
+
 const reportSchema = new Schema<IReport>({
     updateDate:{type:Date,required:true},
     submissionDate: { type: Date, required: true },
-    details: { type: Object ,required:true },
+    details: { 
+        type: Map,
+        of: detailsSchema,
+        required: true
+    },
     form_id: { type: Schema.Types.ObjectId, required: true, ref: "Form" },
     organization: {
         _id: { type: Schema.Types.ObjectId, required: true, ref: "Organization" },

@@ -5,7 +5,7 @@ import userModel, { role, IUser } from "../models/user";
 import statusModel, { Status } from "../models/status";
 import { Document } from "mongoose";
 
-type newOrganization = Omit<IOrganization,keyof Document|"ID"|"defaultStatus"> 
+type newOrganization = Omit<IOrganization,keyof Document|"ID"|"system"> 
 type rootAdmin = Omit<IUser,keyof Document|"ID"> & {
     password:string|Object
 }
@@ -45,8 +45,9 @@ return newOrganization_;
         return newAdminUser;
     }
 
-    export async function create_default_status(this: IOrganization, next: Function) {
+    export async function create_default_system_config(this: IOrganization, next: Function) {
         const doc = this;
+
 
         const pendingStatus = new statusModel({
             desc: "Pending",
@@ -68,7 +69,10 @@ return newOrganization_;
         const systemDefaultStatus = await pendingStatus.save();
         await resolvedStatus.save();
 
-        doc.defaultStatus = pendingStatus._id;
+        doc.system = {
+            autoActiveNewUser: false,
+            defaultStatus: systemDefaultStatus._id,
+        }
         next();
 
 

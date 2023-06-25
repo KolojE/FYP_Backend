@@ -44,6 +44,7 @@ app.use(cors.default());
 httpServer.listen(8080, () => {
     console.log("Listening on port:8080");
 });
+app.use(express_1.default.static('public'));
 (0, db_1.ConnectDatabase)(() => {
     console.log("Connected to Database");
 });

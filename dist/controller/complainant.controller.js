@@ -28,6 +28,8 @@ async function reportPhotoUploadController(req, res, next) {
                 status: errorHandler_1.statusCode.badRequest,
             });
         }
+        file.path = file.path.replace(/\\/g, "/");
+        file.path = file.path.replace("public", "");
         res.status(200).json({
             message: `Photo Uploaded Successfully path is ${file.path}`,
             filePath: file.path

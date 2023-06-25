@@ -1,15 +1,13 @@
-import { Schema, Types, model } from "mongoose"
+import { Document, Schema, Types, model } from "mongoose"
 
 interface Organization {
     _id: Types.ObjectId;
     ID: string;
 }
-export interface Status {
+export interface Status extends Document{
     desc: string;
     organization: Organization;
 }
-
-
 
 const statusSchema = new Schema<Status>(
     {

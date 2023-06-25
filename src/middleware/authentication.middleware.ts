@@ -25,7 +25,7 @@ export async function authenticationMiddleware(req: Request, res: Response, next
         }
 
         if(user.role === role.complainant){
-            validationService.is_Complinant_Active(user);
+            validationService.is_Complainant_Active(user);
         }
 
         req.user = user;

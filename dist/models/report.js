@@ -1,10 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = require("mongoose");
+const detailsSchema = new mongoose_1.Schema({
+    label: { type: String, required: true },
+    inputType: { type: String, required: true },
+    value: { type: mongoose_1.Schema.Types.Mixed, required: true },
+});
 const reportSchema = new mongoose_1.Schema({
     updateDate: { type: Date, required: true },
     submissionDate: { type: Date, required: true },
-    details: { type: Object, required: true },
+    details: {
+        type: Map,
+        of: detailsSchema,
+        required: true
+    },
     form_id: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "Form" },
     organization: {
         _id: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "Organization" },

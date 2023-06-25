@@ -98,8 +98,7 @@ export namespace administratorService {
      console.log(complainant)
     }
 
-    
-
-
 }
+
+
 

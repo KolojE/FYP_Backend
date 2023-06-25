@@ -8,7 +8,7 @@ import { clientError, statusCode } from "../exception/errorHandler";
 export async function reportIncidentController(req: Request, res: Response, next: Function) {
 
     try {
-
+        
         await reportIncidentService.reportIncident(req.body, req.user);
         res.status(200).json(
             {
@@ -30,6 +30,10 @@ try {
                 status: statusCode.badRequest,
             })
         }
+
+        file.path = file.path.replace(/\\/g, "/");
+
+        file.path = file.path.replace("public", "");
 
         res.status(200).json({
             message: `Photo Uploaded Successfully path is ${file.path}`,

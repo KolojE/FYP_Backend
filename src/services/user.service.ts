@@ -1,10 +1,10 @@
-import userModel, { role, IUser } from "../models/user";
+import { role, IUser } from "../models/user";
 import AdminModel from "../models/administrator";
 import complaiantModel, { IComplainant } from "../models/complainant";
 import { ObjectId } from "mongodb";
 import { clientError, statusCode } from "../exception/errorHandler";
 import { readFile} from "fs/promises";
-import { getProfilePicture } from "../controller/user.controller";
+import OrganizationModel from "../models/organization";
 
 export namespace userService {
 
@@ -21,12 +21,20 @@ export namespace userService {
         }
 
         if (doc.role === role.complainant) {
+            const organization = await OrganizationModel.findById(doc.organization._id)
+            if (!organization) {
+                throw new clientError({
+                    message: "organization not found",
+                    status: statusCode.notfound,
+                })
+            }
+            const defaultActivation = organization?.system.autoActiveNewUser
             const newComplainant = new complaiantModel({
                 user: {
                     _id: doc._id,
                     ID: doc.ID
                 },
-                activation: false,
+                activation: defaultActivation,
             });
             await newComplainant.save();
             next();
@@ -87,5 +95,6 @@ export namespace userService {
 
 
 }
+
 
 

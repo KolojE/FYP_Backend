@@ -10,6 +10,8 @@ administratorRouter.use(authentication_middleware_1.adminVerificationMiddleware)
 administratorRouter.post("/addForm", administrator_controller_1.addFormController);
 administratorRouter.post("/updateForm", administrator_controller_1.updateFormController);
 administratorRouter.post("/memberActivation", administrator_controller_1.updateMemberActivationController);
+administratorRouter.post("/updateReport", administrator_controller_1.updateReportController);
+administratorRouter.post("/updateOrganization", administrator_controller_1.updateOrganization);
 administratorRouter.get("/viewMembers", administrator_controller_1.viewMembersController);
 administratorRouter.get("/getReport", administrator_controller_1.getReportController);
 administratorRouter.get("/getReportElement", administrator_controller_1.getReportElement);

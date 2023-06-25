@@ -48,7 +48,7 @@ var validationService;
         }
     }
     validationService.validate_User_Belong_To_Organziation = validate_User_Belong_To_Organziation;
-    async function is_Complinant_Active(user) {
+    async function is_Complainant_Active(user) {
         const complainant = await complainant_1.default.findOne({ "user._id": user._id });
         if (!complainant) {
             throw new errorHandler_1.clientError({
@@ -65,12 +65,12 @@ var validationService;
             });
         }
     }
-    validationService.is_Complinant_Active = is_Complinant_Active;
+    validationService.is_Complainant_Active = is_Complainant_Active;
     async function fields_Validation(field, form) {
         console.log(field);
         const Schema = (0, joi_1.generateSchema)(form);
         try {
-            await Schema.validateAsync(field);
+            await Schema.validate(field);
         }
         catch (err) {
             throw new errorHandler_1.clientError({

@@ -65,7 +65,7 @@ var OrganizationService;
         return newAdminUser;
     }
     OrganizationService.create_Root_Admin = create_Root_Admin;
-    async function create_default_status(next) {
+    async function create_default_system_config(next) {
         const doc = this;
         const pendingStatus = new status_1.default({
             desc: "Pending",
@@ -83,9 +83,12 @@ var OrganizationService;
         });
         const systemDefaultStatus = await pendingStatus.save();
         await resolvedStatus.save();
-        doc.defaultStatus = pendingStatus._id;
+        doc.system = {
+            autoActiveNewUser: false,
+            defaultStatus: systemDefaultStatus._id,
+        };
         next();
     }
-    OrganizationService.create_default_status = create_default_status;
+    OrganizationService.create_default_system_config = create_default_system_config;
 })(OrganizationService = exports.OrganizationService || (exports.OrganizationService = {}));
 //# sourceMappingURL=organization.service.js.map

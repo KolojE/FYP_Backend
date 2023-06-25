@@ -15,7 +15,7 @@ export async function authenticationController(req: Request, res: Response, next
             })
 
         if (user.role === role.complainant) {
-         await validationService.is_Complinant_Active(user);
+         await validationService.is_Complainant_Active(user);
         }
 
         const token = await authenticationService.generateJWT(user);
@@ -29,6 +29,7 @@ export async function authenticationController(req: Request, res: Response, next
 
         res.status(200).json({
             loginUser: userOmitPassword,
+            token: token?token:undefined,
             message: "Sucessfully authenticatd token returned in the header",
         })
 
@@ -61,7 +62,6 @@ export async function tokenAuthenticationController(req: Request, res: Response,
                     status: statusCode.badRequest,
                 }
             )
-
         const token = authorization[1]
         const decodedToken = await authenticationService.verifyToken(token)
         const loginUser = await userModel.findById(
@@ -76,7 +76,7 @@ export async function tokenAuthenticationController(req: Request, res: Response,
         }
 
         if (loginUser.role === role.complainant) {
-            validationService.is_Complinant_Active(loginUser);
+            await validationService.is_Complainant_Active(loginUser);
         }
 
         const userOmitPassword = { ...loginUser, password: undefined }

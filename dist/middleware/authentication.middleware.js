@@ -24,7 +24,7 @@ async function authenticationMiddleware(req, res, next) {
             });
         }
         if (user.role === user_1.role.complainant) {
-            validation_service_1.validationService.is_Complinant_Active(user);
+            validation_service_1.validationService.is_Complainant_Active(user);
         }
         req.user = user;
         next();

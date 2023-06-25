@@ -1,12 +1,13 @@
 import { Request, Response } from "express";
 import { ObjectId } from "mongodb";
 import userModel, { IUser, role } from "../models/user"; import { clientError, statusCode } from "../exception/errorHandler"; import OrganizationModel from "../models/organization";
-import { IForm, FormModel } from "../models/form";
+import { IForm, FormModel, inputType } from "../models/form";
 import { userService } from "../services/user.service";
 import ReportModel from "../models/report";
 import { hashPassword } from "../utils/hash";
 import adminModel from "../models/administrator";
 import complaiantModel from "../models/complainant";
+import statusModel from "../models/status";
 
 
 
@@ -63,7 +64,7 @@ export async function getUserInfoController(req: Request, res: Response, next: F
 
         const admins = await userModel.find({ "organization._id": user.organization._id, role: "admin" });
 
-        if(!admins){
+        if (!admins) {
             throw new clientError(
                 {
                     message: `No admins Found with _id ${user.organization._id}`,
@@ -75,15 +76,17 @@ export async function getUserInfoController(req: Request, res: Response, next: F
             return { ...admin.toObject(), password: undefined }
         })
 
-        console.log(noPasswordAdmins)
+        const statuses = await statusModel.find({ "organization._id": user.organization._id }).select({ "organization": 0 });
         const reportCount = await ReportModel.find({ "complainant._id": user._id }).countDocuments();
 
-        console.log(reportCount)
+    
+
         res.status(200).json({
             message: "User",
-            user: { ...user.toObject(),roleID:roleID, password: undefined },
+            user: { ...user.toObject(), roleID: roleID, password: undefined },
             organization: organization,
             admins: noPasswordAdmins,
+            statuses: statuses,
             totalReportCount: reportCount,
             totalResolvedCount: 0.
         })
@@ -289,6 +292,54 @@ export async function updateProfile(req: Request, res: Response, next: Function)
         next(err)
     }
 }
+
+export async function getReportPhotoUri(req: Request, res: Response, next: Function) {
+    try {
+        const userID = req.user._id;
+        const reportID = req.query.reportID;
+
+        if (!reportID) {
+            throw new clientError({
+                message: `reportID not provided`,
+                status: statusCode.badRequest,
+            })
+        }
+
+        const report = await ReportModel.findOne({
+            _id: reportID,
+            organization: req.user.organization
+        });
+
+        if (!report) {
+            throw new clientError({
+                message: `No Report Found with _id ${reportID}`,
+                status: statusCode.notfound,
+            })
+        }
+
+        let imageUri:{
+            [key:string]:string[]
+        } = {};
+
+        for(const key in report.details)
+        {
+            if(report.details[key].inputType == inputType.Photo)
+            {
+                imageUri[key] = [...imageUri[key],...report.details[key].value];
+            }
+        }
+
+        res.status(200).send({
+            message: "Image Uri Returned Successfully",
+            imageUri: imageUri
+        })
+
+
+    } catch (err) {
+        next(err)
+    }
+}
+
 
 
 

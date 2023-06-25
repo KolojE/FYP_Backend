@@ -10,6 +10,7 @@ const complainant_1 = __importDefault(require("../models/complainant"));
 const mongodb_1 = require("mongodb");
 const errorHandler_1 = require("../exception/errorHandler");
 const promises_1 = require("fs/promises");
+const organization_1 = __importDefault(require("../models/organization"));
 var userService;
 (function (userService) {
     async function create_role(doc, next) {
@@ -24,12 +25,20 @@ var userService;
             next();
         }
         if (doc.role === user_1.role.complainant) {
+            const organization = await organization_1.default.findById(doc.organization._id);
+            if (!organization) {
+                throw new errorHandler_1.clientError({
+                    message: "organization not found",
+                    status: errorHandler_1.statusCode.notfound,
+                });
+            }
+            const defaultActivation = organization === null || organization === void 0 ? void 0 : organization.system.autoActiveNewUser;
             const newComplainant = new complainant_1.default({
                 user: {
                     _id: doc._id,
                     ID: doc.ID
                 },
-                activation: false,
+                activation: defaultActivation,
             });
             await newComplainant.save();
             next();
