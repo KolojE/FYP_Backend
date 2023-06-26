@@ -5,8 +5,8 @@ import { validationService } from "../services/validation.service";
 import { FormModel } from "../models/form";
 import { clientError, statusCode } from "../exception/errorHandler";
 import userModel, { IUser, role } from "../models/user";
-import mongoose, { FilterQuery, PipelineStage, isObjectIdOrHexString } from "mongoose";
-import ReportModel, { IReport } from "../models/report";
+import mongoose, {isObjectIdOrHexString} from "mongoose";
+import ReportModel from "../models/report";
 import statusModel, { Status } from "../models/status";
 import { ObjectId } from "mongodb";
 import OrganizationModel, { IOrganization } from "../models/organization";
@@ -183,136 +183,37 @@ export async function deleteMemberController(req: Request, res: Response, next: 
 
 export async function getReportController(req: Request, res: Response, next: Function) {
     try {
-        const user = req.user;
-        const sortBy = req.query?.sortBy;
-        const groupByType = req.query?.groupByType ? false : true// group report by type, default to true
-        const subDate = {
-            fromDate: req.query?.subFromDate,
-            toDate: req.query?.subToDate,
-        };
-        const status = req.query?.status?.toString().split(",");
-        const type = req.query?.type?.toString().split(",");
-
-        const pipeline: PipelineStage[] = [
-            {
-                $match: {
-                    "organization._id": user.organization._id,
-                },
-
-
-            },
-        ]
-
-
-        if (subDate.fromDate) {
-            console.log(subDate.fromDate)
-            pipeline.push({
-                $match: {
-                    submissionDate: { $gte: new Date(subDate.fromDate.toString()) },
-                }
-            })
-        }
-        if (subDate.toDate) {
-            pipeline.push({
-                $match: {
-                    submissionDate: { $lte: new Date(subDate.toDate.toString()) },
-                }
-            })
-        }
-
-        if (status) {
-            const statuses: FilterQuery<any>[] = []// array of status to match from the query params - mongoose filter query
-            status.forEach((type) => {
-                console.log(type)
-                statuses.push({ "status._id": new ObjectId(type) })
-            })
-            pipeline.push({
-                $match: {
-                    $or: statuses
-                }
-            })
-        }
-
-        if (type) {
-            const types: FilterQuery<any>[] = []
-            type.forEach((type) => {
-                console.log(type)
-                types.push({ "form_id": new ObjectId(type) })
-            })
-            pipeline.push({
-                $match: {
-                    $or: types
-
-                }
-            })
-        }
-
-        if (sortBy == "upDate") {
-            pipeline.push({
-                $sort: { "updateDate": 1 }
-            })
-        }
-        else {
-            pipeline.push({
-                $sort: { "submissionDate": 1 }
-            })
-        }
-
-        if (groupByType) {
-            pipeline.push(...[{
-                $group: {
-                    _id: "$form_id",
-                    reports: { $push: "$$ROOT" },
-                }
-            }, {
-                $lookup: {
-                    from: "forms",
-                    localField: "_id",
-                    foreignField: "_id",
-                    as: "form"
-                }
-            },
-            {
-                $unwind: "$form"
-            },
-            {
-                $addFields: {
-                    name: "$form.name"
-                }
-            },
-            {
-                $lookup: {
-                    from: "status",
-                    localField: "reports.status._id",
-                    foreignField: "_id",
-                    as: "status"
-                }
-            },
-            {
-                $unwind: "$status"
-            },
-            {
-                $addFields: {
-                    "reports.status.desc": "$status.desc"
-                }
-            },
-            ])
-        }
-
-
+        const pipeline = administratorService.filterPipelineBuilder(req);
         const result = await ReportModel.aggregate(pipeline);
-        console.log(result[0])
+        console.log(result)
         res.status(200).send({
             message: `Successfully returned reports for organization`,
             reports: result,
         })
-
 
     } catch (err) {
         next(err)
     }
 
 }
+
+export async function getReportExcelController(req: Request, res: Response, next: Function) {
+    try {
+        const pipeline = administratorService.filterPipelineBuilder(req);
+        const result = await ReportModel.aggregate(pipeline);
+        const transformedResult = await administratorService.reportResultTransformer(result);
+        const reportExcel = await administratorService.generateReportExcel(transformedResult);
+
+        res.status(200).send({
+            fileUrl: reportExcel,
+        })
+        
+    } catch (err) {
+        next(err)
+    }
+
+}
+
 
 export async function getReportElement(req: Request, res: Response, next: Function) {
     try {

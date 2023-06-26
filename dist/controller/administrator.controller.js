@@ -26,7 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateReportController = exports.updateOrganization = exports.getReportElement = exports.getReportController = exports.deleteMemberController = exports.updateMemberActivationController = exports.viewMembersController = exports.deleteFormController = exports.updateFormController = exports.addFormController = void 0;
+exports.updateReportController = exports.updateOrganization = exports.getReportElement = exports.getReportExcelController = exports.getReportController = exports.deleteMemberController = exports.updateMemberActivationController = exports.viewMembersController = exports.deleteFormController = exports.updateFormController = exports.addFormController = void 0;
 const complainant_1 = __importDefault(require("../models/complainant"));
 const administrator_service_1 = require("../services/administrator.service");
 const validation_service_1 = require("../services/validation.service");
@@ -179,115 +179,10 @@ async function deleteMemberController(req, res, next) {
 }
 exports.deleteMemberController = deleteMemberController;
 async function getReportController(req, res, next) {
-    var _a, _b, _c, _d, _e, _f, _g, _h;
     try {
-        const user = req.user;
-        const sortBy = (_a = req.query) === null || _a === void 0 ? void 0 : _a.sortBy;
-        const groupByType = ((_b = req.query) === null || _b === void 0 ? void 0 : _b.groupByType) ? false : true;
-        const subDate = {
-            fromDate: (_c = req.query) === null || _c === void 0 ? void 0 : _c.subFromDate,
-            toDate: (_d = req.query) === null || _d === void 0 ? void 0 : _d.subToDate,
-        };
-        const status = (_f = (_e = req.query) === null || _e === void 0 ? void 0 : _e.status) === null || _f === void 0 ? void 0 : _f.toString().split(",");
-        const type = (_h = (_g = req.query) === null || _g === void 0 ? void 0 : _g.type) === null || _h === void 0 ? void 0 : _h.toString().split(",");
-        const pipeline = [
-            {
-                $match: {
-                    "organization._id": user.organization._id,
-                },
-            },
-        ];
-        if (subDate.fromDate) {
-            console.log(subDate.fromDate);
-            pipeline.push({
-                $match: {
-                    submissionDate: { $gte: new Date(subDate.fromDate.toString()) },
-                }
-            });
-        }
-        if (subDate.toDate) {
-            pipeline.push({
-                $match: {
-                    submissionDate: { $lte: new Date(subDate.toDate.toString()) },
-                }
-            });
-        }
-        if (status) {
-            const statuses = [];
-            status.forEach((type) => {
-                console.log(type);
-                statuses.push({ "status._id": new mongodb_1.ObjectId(type) });
-            });
-            pipeline.push({
-                $match: {
-                    $or: statuses
-                }
-            });
-        }
-        if (type) {
-            const types = [];
-            type.forEach((type) => {
-                console.log(type);
-                types.push({ "form_id": new mongodb_1.ObjectId(type) });
-            });
-            pipeline.push({
-                $match: {
-                    $or: types
-                }
-            });
-        }
-        if (sortBy == "upDate") {
-            pipeline.push({
-                $sort: { "updateDate": 1 }
-            });
-        }
-        else {
-            pipeline.push({
-                $sort: { "submissionDate": 1 }
-            });
-        }
-        if (groupByType) {
-            pipeline.push(...[{
-                    $group: {
-                        _id: "$form_id",
-                        reports: { $push: "$$ROOT" },
-                    }
-                }, {
-                    $lookup: {
-                        from: "forms",
-                        localField: "_id",
-                        foreignField: "_id",
-                        as: "form"
-                    }
-                },
-                {
-                    $unwind: "$form"
-                },
-                {
-                    $addFields: {
-                        name: "$form.name"
-                    }
-                },
-                {
-                    $lookup: {
-                        from: "status",
-                        localField: "reports.status._id",
-                        foreignField: "_id",
-                        as: "status"
-                    }
-                },
-                {
-                    $unwind: "$status"
-                },
-                {
-                    $addFields: {
-                        "reports.status.desc": "$status.desc"
-                    }
-                },
-            ]);
-        }
+        const pipeline = administrator_service_1.administratorService.filterPipelineBuilder(req);
         const result = await report_1.default.aggregate(pipeline);
-        console.log(result[0]);
+        console.log(result);
         res.status(200).send({
             message: `Successfully returned reports for organization`,
             reports: result,
@@ -298,6 +193,21 @@ async function getReportController(req, res, next) {
     }
 }
 exports.getReportController = getReportController;
+async function getReportExcelController(req, res, next) {
+    try {
+        const pipeline = administrator_service_1.administratorService.filterPipelineBuilder(req);
+        const result = await report_1.default.aggregate(pipeline);
+        const transformedResult = await administrator_service_1.administratorService.reportResultTransformer(result);
+        const reportExcel = await administrator_service_1.administratorService.generateReportExcel(transformedResult);
+        res.status(200).send({
+            fileUrl: reportExcel,
+        });
+    }
+    catch (err) {
+        next(err);
+    }
+}
+exports.getReportExcelController = getReportExcelController;
 async function getReportElement(req, res, next) {
     var _a, _b;
     try {

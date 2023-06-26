@@ -12,6 +12,7 @@ administratorRouter.post("/updateForm", administrator_controller_1.updateFormCon
 administratorRouter.post("/memberActivation", administrator_controller_1.updateMemberActivationController);
 administratorRouter.post("/updateReport", administrator_controller_1.updateReportController);
 administratorRouter.post("/updateOrganization", administrator_controller_1.updateOrganization);
+administratorRouter.get("/downloadReportExcel", administrator_controller_1.getReportExcelController);
 administratorRouter.get("/viewMembers", administrator_controller_1.viewMembersController);
 administratorRouter.get("/getReport", administrator_controller_1.getReportController);
 administratorRouter.get("/getReportElement", administrator_controller_1.getReportElement);
