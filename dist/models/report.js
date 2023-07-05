@@ -14,13 +14,17 @@ const reportSchema = new mongoose_1.Schema({
         of: detailsSchema,
         required: true
     },
-    form_id: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "Form" },
+    location: {
+        latitude: { type: mongoose_1.Schema.Types.Number, required: true },
+        longitude: { type: mongoose_1.Schema.Types.Number, required: true }
+    },
+    form_id: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "form" },
     organization: {
-        _id: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "Organization" },
+        _id: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "organization" },
         ID: { type: String, required: true }
     },
     complainant: {
-        _id: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "User" },
+        _id: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "user" },
         ID: { type: String, required: true }
     },
     status: {

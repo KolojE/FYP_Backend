@@ -33,6 +33,7 @@ var administratorService;
             defaultFields: defaultFields,
             fields: form.fields,
             activation_Status: form.activation,
+            color: form.color,
             organization: {
                 _id: user.organization._id,
                 ID: user.organization.ID,
@@ -109,6 +110,9 @@ var administratorService;
         return reports;
     }
     administratorService.reportResultTransformer = reportResultTransformer;
+    async function generateReportPDF(result) {
+    }
+    administratorService.generateReportPDF = generateReportPDF;
     async function generateReportExcel(result) {
         function flattenObject(obj, prefix = '') {
             let flattened = {};
@@ -129,10 +133,11 @@ var administratorService;
             }
             return flattened;
         }
+        const worksheets = {};
         const workbook = new exceljs_1.default.Workbook();
-        const worksheet = workbook.addWorksheet('Data');
-        console.log(result);
+        const worksheet = workbook.addWorksheet('All Reports');
         const flattenedData = result.map((obj) => flattenObject(obj));
+        console.log(flattenedData);
         const headers = Array.from(new Set(flattenedData.flatMap((obj) => Object.keys(obj))));
         const columnMapping = {};
         headers.forEach((header, index) => {
@@ -140,12 +145,40 @@ var administratorService;
         });
         worksheet.addRow(headers);
         flattenedData.forEach((obj) => {
+            var _a;
             const rowData = [];
+            let typeHeaders = "";
+            const rowForType = [];
+            let type = "";
+            const headersAdded = {};
             Object.entries(obj).forEach(([property, value]) => {
+                var _a;
+                if (property === "reportType") {
+                    type = value;
+                    if (!worksheets[type]) {
+                        worksheets[type] = workbook.addWorksheet(type);
+                    }
+                }
+                if (!headersAdded[type]) {
+                    const columnIndex = columnMapping[property];
+                    typeHeaders += columnMapping[property] + ",";
+                    const cell = (_a = worksheets[type]) === null || _a === void 0 ? void 0 : _a.getCell(1, columnIndex);
+                    if (cell) {
+                        cell.value = property;
+                        cell.fill = {
+                            type: 'pattern',
+                            pattern: 'solid',
+                            fgColor: { argb: '7df2ff' },
+                        };
+                    }
+                }
+                rowForType.push(value);
                 const columnIndex = columnMapping[property];
-                rowData[columnIndex] = value || '';
+                rowData[columnIndex] = value || "";
             });
+            headersAdded[type] = true;
             worksheet.addRow(rowData);
+            (_a = worksheets[type]) === null || _a === void 0 ? void 0 : _a.addRow(rowForType);
         });
         const firstRow = worksheet.getRow(1);
         firstRow.eachCell((cell) => {
@@ -247,11 +280,23 @@ var administratorService;
                     }
                 },
                 {
+                    $lookup: {
+                        from: "users",
+                        localField: "complainant._id",
+                        foreignField: "_id",
+                        as: "complainant"
+                    }
+                },
+                {
+                    $unwind: "$complainant",
+                },
+                {
                     $unwind: "$status"
                 },
                 {
                     $addFields: {
-                        "reports.status.desc": "$status.desc"
+                        "reports.status.desc": "$status.desc",
+                        "reports.status.comment": "$status.comment",
                     }
                 },
                 {
@@ -272,7 +317,8 @@ var administratorService;
                 },
                 {
                     $addFields: {
-                        name: "$form.name"
+                        name: "$form.name",
+                        color: "$form.color"
                     }
                 },
             ]);

@@ -41,15 +41,35 @@ async function reportPhotoUploadController(req, res, next) {
 }
 exports.reportPhotoUploadController = reportPhotoUploadController;
 async function getReportController(req, res, next) {
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e;
     try {
         const user = req.user;
         const limit = (_a = req.query) === null || _a === void 0 ? void 0 : _a.limit;
+        const reportID = (_b = req.query) === null || _b === void 0 ? void 0 : _b.reportID;
         const subDate = {
-            fromDate: (_b = req.query) === null || _b === void 0 ? void 0 : _b.subFromDate,
-            toDate: (_c = req.query) === null || _c === void 0 ? void 0 : _c.subToDate
+            fromDate: (_c = req.query) === null || _c === void 0 ? void 0 : _c.subFromDate,
+            toDate: (_d = req.query) === null || _d === void 0 ? void 0 : _d.subToDate
         };
-        const sortBy = (_d = req.query) === null || _d === void 0 ? void 0 : _d.sortBy;
+        const sortBy = (_e = req.query) === null || _e === void 0 ? void 0 : _e.sortBy;
+        if (reportID) {
+            const report = await report_1.default.findOne({
+                _id: reportID,
+                "organization._id": user.organization._id,
+                "complainant._id": user._id,
+            }).populate("status._id").populate("form_id");
+            if (!report) {
+                throw new errorHandler_1.clientError({
+                    message: `No Report Found with _id ${reportID}`,
+                    status: errorHandler_1.statusCode.notfound,
+                });
+            }
+            console.log(report);
+            res.status(200).json({
+                message: "Report Found",
+                report: report
+            });
+            return;
+        }
         const pipeline = [
             {
                 $match: {

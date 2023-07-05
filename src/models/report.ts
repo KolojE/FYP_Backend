@@ -43,6 +43,10 @@ export interface IReport extends Document {
     submissionDate: Date;
     updateDate:Date;
     details: IDetails;
+    location:{
+        latitude:number;
+        longitude:number;
+    }
     form_id: Types.ObjectId;
     organization: IOrganization;
     complainant: IComplainant;
@@ -59,13 +63,17 @@ const reportSchema = new Schema<IReport>({
         of: detailsSchema,
         required: true
     },
-    form_id: { type: Schema.Types.ObjectId, required: true, ref: "Form" },
+    location:{
+        latitude:{type:Schema.Types.Number,required:true},
+        longitude:{type:Schema.Types.Number,required:true}
+    },
+    form_id: { type: Schema.Types.ObjectId, required: true, ref: "form" },
     organization: {
-        _id: { type: Schema.Types.ObjectId, required: true, ref: "Organization" },
+        _id: { type: Schema.Types.ObjectId, required: true, ref: "organization" },
         ID: { type: String, required: true }
     },
     complainant: {
-        _id: { type: Schema.Types.ObjectId, required: true, ref: "User" },
+        _id: { type: Schema.Types.ObjectId, required: true, ref: "user" },
         ID: { type: String, required: true }
     },
     status: {

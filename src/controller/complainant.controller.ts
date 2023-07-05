@@ -52,11 +52,35 @@ export async function getReportController(req: Request, res: Response, next: Fun
     try {
         const user = req.user;
         const limit = req.query?.limit;
+        const reportID = req.query?.reportID;
         const subDate = {
             fromDate: req.query?.subFromDate,
             toDate: req.query?.subToDate
         }
         const sortBy = req.query?.sortBy;
+
+
+        if (reportID) {
+            const report = await ReportModel.findOne({
+                _id: reportID,
+                "organization._id": user.organization._id,
+                "complainant._id": user._id,
+            }).populate("status._id").populate("form_id");
+
+            if (!report) {
+                throw new clientError({
+                    message: `No Report Found with _id ${reportID}`,
+                    status: statusCode.notfound,
+                })
+            }
+            console.log(report)
+            res.status(200).json({
+                message: "Report Found",
+                report: report
+            })
+
+            return
+        }
 
         //default pipeline.
         const pipeline: PipelineStage[] = [

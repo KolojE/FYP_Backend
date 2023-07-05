@@ -35,6 +35,7 @@ export interface IForm extends Document {
         ID: String;
     },
     activation_Status: boolean;
+    color: string;
     creationDate: Date;
     isDeleted: boolean;
 }
@@ -52,8 +53,9 @@ const formSchema = new Schema<IForm>({
         _id: { type: Schema.Types.ObjectId, required: true, ref: "organizations" },
         ID: { type: String, required: true, ref: "organizations" },
     },
-    creationDate: { type: Schema.Types.Date,required:true },
     activation_Status: { type: Schema.Types.Boolean, required: true },
+    color: { type: Schema.Types.String, required: true },
+    creationDate: { type: Schema.Types.Date,required:true },
     isDeleted: { type: Schema.Types.Boolean, required: true, default: false },
 })
 

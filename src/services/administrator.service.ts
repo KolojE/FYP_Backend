@@ -12,6 +12,7 @@ import path from "path";
 export type newForm = {
     name: String,
     fields: Array<IField>,
+    color: string,
     activation: boolean,
 }
 
@@ -39,6 +40,7 @@ export namespace administratorService {
             defaultFields: defaultFields,
             fields: form.fields,
             activation_Status: form.activation,
+            color:form.color,
             organization: {
                 _id: user.organization._id,
                 ID: user.organization.ID,
@@ -50,7 +52,6 @@ export namespace administratorService {
     }
 
     export async function updateForm(formToUpdate: IForm, user: IUser): Promise<IForm> {
-
 
         if (!formToUpdate._id) {
             throw new clientError({
@@ -131,6 +132,9 @@ export namespace administratorService {
         return reports
     }
 
+    export async function generateReportPDF(result: any[]) {
+
+    }
 
     export async function generateReportExcel(result: any[]) {
         function flattenObject(obj: any, prefix = ''): any {
@@ -151,11 +155,14 @@ export namespace administratorService {
 
             return flattened;
         }
-        const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet('Data');
+        const worksheets: { [key: string]: ExcelJS.Worksheet } = {}
 
-        console.log(result)
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('All Reports');
+
         const flattenedData = result.map((obj) => flattenObject(obj));
+
+        console.log(flattenedData)
         // console.log(flattenedData)
         // Create headers array with all property names
         const headers = Array.from(new Set(flattenedData.flatMap((obj) => Object.keys(obj))));
@@ -172,28 +179,60 @@ export namespace administratorService {
         // Add data rows to the worksheet
         flattenedData.forEach((obj) => {
             const rowData: any = [];
+            let typeHeaders = "";
+            const rowForType: any = [];
+            let type = "";
+            const headersAdded: { [key: string]: boolean } = {}; // Track added headers
+
             Object.entries(obj).forEach(([property, value]) => {
+                if (property === "reportType") {
+                    type = value as string;
+                    if (!worksheets[type]) {
+                        worksheets[type] = workbook.addWorksheet(type);
+                    }
+                }
+
+                // Add headers if not already added
+                if (!headersAdded[type]) {
+                    const columnIndex = columnMapping[property];
+                    typeHeaders += columnMapping[property] + ",";
+                    const cell = worksheets[type]?.getCell(1, columnIndex); // Set header value
+                    if (cell) {
+                        cell.value = property;
+                        cell.fill = {
+                            type: 'pattern',
+                            pattern: 'solid',
+                            fgColor: { argb: '7df2ff' }, // Specify the desired color for the fill (e.g., red)
+                        }
+                    }
+                }
+
+                rowForType.push(value);
                 const columnIndex = columnMapping[property];
-                rowData[columnIndex] = value || ''; // Use placeholder value if property is missing
+                rowData[columnIndex] = value || ""; // Use placeholder value if property is missing
             });
+
+            headersAdded[type] = true; // Mark header as added
             worksheet.addRow(rowData);
+            worksheets[type]?.addRow(rowForType);
         });
+
 
         const firstRow = worksheet.getRow(1);
         firstRow.eachCell((cell) => {
-          cell.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: '7df2ff' }, // Specify the desired color for the fill (e.g., red)
-          };
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: '7df2ff' }, // Specify the desired color for the fill (e.g., red)
+            };
         });
 
         worksheet.columns.forEach(column => {
             const lengths = column.values?.map(v => v?.toString().length);
-            if(lengths === undefined) return;
+            if (lengths === undefined) return;
             const maxLength = Math.max(...lengths.filter(v => typeof v === 'number')?.map(v => v as number));
             column.width = maxLength;
-          });
+        });
 
         const fileName = path.join("reports", `${randomUUID()}.xlsx`); // Specify the desired file name
         await workbook.xlsx.writeFile(path.join("public", fileName));
@@ -280,43 +319,56 @@ export namespace administratorService {
 
         if (groupByType) {
             pipeline.push(...[
-            {
-                $lookup: {
-                    from: "status",
-                    localField: "status._id",
-                    foreignField: "_id",
-                    as: "status"
-                }
-            },
-            {
-                $unwind: "$status"
-            },
-            {
-                $addFields: {
-                    "reports.status.desc": "$status.desc"
-                }
-            },
                 {
-                $group: {
-                    _id: "$form_id",
-                    reports:{$push:"$$ROOT"}
-                }
-            }, {
-                $lookup: {
-                    from: "forms",
-                    localField: "_id",
-                    foreignField: "_id",
-                    as: "form"
-                }
-            },
-            {
-                $unwind: "$form"
-            },
-            {
-                $addFields: {
-                    name: "$form.name"
-                }
-            },
+                    $lookup: {
+                        from: "status",
+                        localField: "status._id",
+                        foreignField: "_id",
+                        as: "status"
+                    }
+                },
+                {
+                    $lookup: {
+                        from:"users",
+                        localField:"complainant._id",
+                        foreignField:"_id",
+                        as:"complainant"
+                    }
+                },
+                {
+                    $unwind:"$complainant",
+                },
+                {
+                    $unwind: "$status"
+                },
+                {
+                    $addFields: {
+                        "reports.status.desc": "$status.desc",
+                        "reports.status.comment": "$status.comment",
+                    }
+                },
+                {
+                    $group: {
+                        _id: "$form_id",
+                        reports: { $push: "$$ROOT" }
+                    }
+                }, {
+                    $lookup: {
+                        from: "forms",
+                        localField: "_id",
+                        foreignField: "_id",
+                        as: "form"
+                    }
+                },
+                {
+                    $unwind: "$form"
+                },
+                {
+                    $addFields: {
+                        name: "$form.name",
+                        color: "$form.color"
+                    }
+                },
             ])
         } else {
             pipeline.push(...[{
@@ -331,7 +383,7 @@ export namespace administratorService {
                 $unwind: "$form"
             },
             {
-                $lookup:{
+                $lookup: {
                     from: "status",
                     localField: "status._id",
                     foreignField: "_id",

@@ -18,9 +18,8 @@ export async function addFormController(req: Request, res: Response, next: Funct
     try {
         const newForm = req.body;
         const user = req.user;
-
+        console.log(newForm)
         await validationService.form_Validation(newForm);
-
 
 
         const form = await administratorService.addNewForm(newForm, user);
@@ -183,9 +182,42 @@ export async function deleteMemberController(req: Request, res: Response, next: 
 
 export async function getReportController(req: Request, res: Response, next: Function) {
     try {
+
+        console.log(req.query)
+
+        if(req.query.reportID)
+        {
+            const reportID = req.query.reportID;
+            const report = await ReportModel.findOne({_id: reportID
+            ,"organization._id": req.user.organization._id
+        }).populate("status._id").populate("form_id").populate({
+            path:"complainant._id",
+            select: "-password -organization",
+            options: { lean: true },
+            justOne: true,
+        }).lean(); 
+
+        console.log(report)
+        if(!report)
+        {
+            throw new clientError({
+                message: `Report with id ${reportID} is not found`,
+                status: statusCode.notfound,
+            })
+        }
+
+            res.status(200).send({
+                message: `Successfully returned report`,
+                report: {...report,complainant: report.complainant._id},
+            })
+
+            return;
+        }
+
         const pipeline = administratorService.filterPipelineBuilder(req);
         const result = await ReportModel.aggregate(pipeline);
-        console.log(result)
+
+        console.log(JSON.stringify(result, null, 2))
         res.status(200).send({
             message: `Successfully returned reports for organization`,
             reports: result,
@@ -414,6 +446,8 @@ export async function updateReportController(req: Request, res: Response, next: 
         "status.admin": adminID,
     },{
         new: true,
+    }).populate({
+        path: 'status._id',
     });
 
     console.log(JSON.stringify(report,null,2))
@@ -425,6 +459,7 @@ export async function updateReportController(req: Request, res: Response, next: 
         })
     }
 
+    console.log(report.status._id)
 
     res.status(200).send({
         message: "succesfully updated report ",
