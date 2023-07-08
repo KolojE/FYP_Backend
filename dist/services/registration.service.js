@@ -36,7 +36,6 @@ var registrationService;
 (function (registrationService) {
     async function register_Complainant(complainantData) {
         const newComplainant = complainantData;
-        console.log(newComplainant);
         newComplainant.email = newComplainant.email.toLowerCase();
         const Organization = await organization_1.default.findOne({ ID: newComplainant.organization.ID });
         await validation_service_1.validationService.check_Email_Availability(newComplainant.email);
@@ -60,7 +59,7 @@ var registrationService;
                 hashed: hashedPassword.hashed,
                 salt: hashedPassword.salt,
             },
-            organization: { _id: Organization._id, ID: Organization.ID },
+            organization: Organization._id,
             role: user_1.role.complainant,
         });
         return newComplainant_.save();

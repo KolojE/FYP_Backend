@@ -28,7 +28,7 @@ export async function getUserInfoController(req: Request, res: Response, next: F
         let roleID = ""
 
         if (user.role === role.admin) {
-            const admin = await adminModel.findOne({ "user._id": user._id })
+            const admin = await adminModel.findOne({ "user": user._id })
             if (!admin) {
                 throw new clientError(
                     {
@@ -39,7 +39,7 @@ export async function getUserInfoController(req: Request, res: Response, next: F
             roleID = admin.ID
         }
         else if (user.role === role.complainant) {
-            const complainant = await complaiantModel.findOne({ "user._id": user._id })
+            const complainant = await complaiantModel.findOne({ "user": user._id })
             if (!complainant) {
                 throw new clientError(
                     {
@@ -62,7 +62,7 @@ export async function getUserInfoController(req: Request, res: Response, next: F
                 })
         }
 
-        const admins = await userModel.find({ "organization._id": user.organization._id, role: "admin" });
+        const admins = await userModel.find({ "organization": user.organization._id, role: "admin" });
 
         if (!admins) {
             throw new clientError(
@@ -76,8 +76,8 @@ export async function getUserInfoController(req: Request, res: Response, next: F
             return { ...admin.toObject(), password: undefined }
         })
 
-        const statuses = await statusModel.find({ "organization._id": user.organization._id }).select({ "organization": 0 });
-        const reportCount = await ReportModel.find({ "complainant._id": user._id }).countDocuments();
+        const statuses = await statusModel.find({ "organization": user.organization }).select({ "organization": 0 });
+        const reportCount = await ReportModel.find({ "complainant": user._id }).countDocuments();
 
     
 
@@ -102,7 +102,8 @@ export async function getUserInfoController(req: Request, res: Response, next: F
 export async function getAllForms(req: Request, res: Response, next: Function) {
     try {
         const forms = await FormModel.find<IForm>({
-            organization: req.user.organization
+            organization: req.user.organization,
+            isDeleted: false
         });
 
         res.status(200).send({
@@ -112,6 +113,40 @@ export async function getAllForms(req: Request, res: Response, next: Function) {
     } catch (err) {
         next(err)
     }
+}
+
+export async function getReportElement(req: Request, res: Response, next: Function) {
+    try {
+        const user = req.user;
+        const includeType: boolean = req.query?.type ? true : false;
+        const includeStatus: boolean = req.query?.status ? true : false;
+        const element: {
+            type: any,
+            status: any
+        } = {
+            type: null,
+            status: null,
+        }
+
+        if (includeType)
+            element.type = await FormModel.find({ "organization": user.organization,isDeleted:false}).select('name');
+
+        if (includeStatus)
+            element.status = await statusModel.find({ "organization": user.organization}).select('desc');
+
+
+        res.status(200).send({
+            message: "succesfully returned Report Element ",
+            element: element,
+        })
+
+
+
+    }
+    catch (err) {
+        next(err)
+    }
+
 }
 
 export async function getForm(req: Request, res: Response, next: Function) {

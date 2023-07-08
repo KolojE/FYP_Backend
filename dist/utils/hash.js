@@ -14,7 +14,6 @@ async function hashPassword(password) {
 exports.hashPassword = hashPassword;
 async function verify(password, hashedPassword) {
     const result = await (0, bcrypt_1.compare)(password, hashedPassword);
-    console.log(result);
     return result;
 }
 exports.verify = verify;

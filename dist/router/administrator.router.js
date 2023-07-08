@@ -15,7 +15,6 @@ administratorRouter.post("/updateOrganization", administrator_controller_1.updat
 administratorRouter.get("/downloadReportExcel", administrator_controller_1.getReportExcelController);
 administratorRouter.get("/viewMembers", administrator_controller_1.viewMembersController);
 administratorRouter.get("/getReport", administrator_controller_1.getReportController);
-administratorRouter.get("/getReportElement", administrator_controller_1.getReportElement);
 administratorRouter.delete("/deleteForm", administrator_controller_1.deleteFormController);
 administratorRouter.delete("/deleteMember", administrator_controller_1.deleteMemberController);
 administratorRouter.use(errorHandler_1.clientErrorHandler);

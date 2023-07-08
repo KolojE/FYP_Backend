@@ -12,6 +12,7 @@ const mongodb_1 = require("mongodb");
 const exceljs_1 = __importDefault(require("exceljs"));
 const crypto_1 = require("crypto");
 const path_1 = __importDefault(require("path"));
+const report_1 = __importDefault(require("../models/report"));
 var administratorService;
 (function (administratorService) {
     async function addNewForm(form, user) {
@@ -33,12 +34,10 @@ var administratorService;
             defaultFields: defaultFields,
             fields: form.fields,
             activation_Status: form.activation,
+            icon: form.icon,
             color: form.color,
-            organization: {
-                _id: user.organization._id,
-                ID: user.organization.ID,
-            },
-            creationDate: new Date()
+            organization: user.organization._id,
+            creationDate: new Date(),
         });
         return await newForm.save();
     }
@@ -54,7 +53,8 @@ var administratorService;
             $set: {
                 name: formToUpdate.name,
                 fields: formToUpdate.fields,
-                activation_Status: formToUpdate.activation_Status,
+                color: formToUpdate.color,
+                icon: formToUpdate.icon,
             }
         }, { returnDocument: "after", runValidators: true }).where({ organization: user.organization });
         if (!updatedForm) {
@@ -71,11 +71,11 @@ var administratorService;
             });
         }
         const complainant = await complainant_1.default.findOne({
-            'user._id': id
+            'user': id
         }).populate({
-            path: "user._id",
+            path: "user",
             match: {
-                'organization._id': requester.organization._id
+                'organization': requester.organization._id
             }
         }).updateOne({
             $set: {
@@ -201,155 +201,62 @@ var administratorService;
         return fileName;
     }
     administratorService.generateReportExcel = generateReportExcel;
-    function filterPipelineBuilder(req) {
-        var _a, _b, _c, _d, _e, _f, _g, _h;
+    function filterQueryBuilder(req) {
+        var _a, _b, _c, _d, _e, _f, _g;
         const user = req.user;
         const sortBy = (_a = req.query) === null || _a === void 0 ? void 0 : _a.sortBy;
-        const groupByType = ((_b = req.query) === null || _b === void 0 ? void 0 : _b.groupByType) ? true : false;
         const subDate = {
-            fromDate: (_c = req.query) === null || _c === void 0 ? void 0 : _c.subFromDate,
-            toDate: (_d = req.query) === null || _d === void 0 ? void 0 : _d.subToDate,
+            fromDate: (_b = req.query) === null || _b === void 0 ? void 0 : _b.subFromDate,
+            toDate: (_c = req.query) === null || _c === void 0 ? void 0 : _c.subToDate,
         };
-        const status = (_f = (_e = req.query) === null || _e === void 0 ? void 0 : _e.status) === null || _f === void 0 ? void 0 : _f.toString().split(",");
-        const type = (_h = (_g = req.query) === null || _g === void 0 ? void 0 : _g.type) === null || _h === void 0 ? void 0 : _h.toString().split(",");
-        console.log("Grouped By Type : " + req.query.groupByType);
-        const pipeline = [
-            {
-                $match: {
-                    "organization._id": user.organization._id,
-                },
-            },
-        ];
+        const status = (_e = (_d = req.query) === null || _d === void 0 ? void 0 : _d.status) === null || _e === void 0 ? void 0 : _e.toString().split(",");
+        const type = (_g = (_f = req.query) === null || _f === void 0 ? void 0 : _f.type) === null || _g === void 0 ? void 0 : _g.toString().split(",");
+        console.log(user);
+        const query = report_1.default.find({
+            organization: user.organization._id,
+        });
         if (subDate.fromDate) {
-            console.log(subDate.fromDate);
-            pipeline.push({
-                $match: {
-                    submissionDate: { $gte: new Date(subDate.fromDate.toString()) },
-                }
+            query.find({
+                submissionDate: { $gte: new Date(subDate.fromDate.toString()) },
             });
         }
         if (subDate.toDate) {
-            pipeline.push({
-                $match: {
-                    submissionDate: { $lte: new Date(subDate.toDate.toString()) },
-                }
+            query.find({
+                submissionDate: { $lte: new Date(subDate.toDate.toString()) },
             });
         }
-        if (status) {
-            const statuses = [];
-            status.forEach((type) => {
-                console.log(type);
-                statuses.push({ "status._id": new mongodb_1.ObjectId(type) });
-            });
-            pipeline.push({
-                $match: {
-                    $or: statuses
-                }
-            });
-        }
-        if (type) {
-            const types = [];
-            type.forEach((type) => {
-                console.log(type);
-                types.push({ "form_id": new mongodb_1.ObjectId(type) });
-            });
-            pipeline.push({
-                $match: {
-                    $or: types
-                }
+        if (status || type) {
+            const statuses = (status === null || status === void 0 ? void 0 : status.map((id) => {
+                return { "status": new mongodb_1.ObjectId(id) };
+            })) || [];
+            const types = (type === null || type === void 0 ? void 0 : type.map((id) => {
+                return { "form": new mongodb_1.ObjectId(id) };
+            })) || [];
+            const and = [];
+            if (statuses.length > 0) {
+                and.push({ $or: statuses });
+            }
+            if (types.length > 0) {
+                and.push({ $or: types });
+            }
+            console.log(statuses);
+            query.find({
+                $and: and
             });
         }
         if (sortBy == "upDate") {
-            pipeline.push({
-                $sort: { "updateDate": 1 }
+            query.sort({
+                "updateDate": 1
             });
         }
         else {
-            pipeline.push({
-                $sort: { "submissionDate": 1 }
+            query.sort({
+                "submissionDate": 1
             });
         }
-        if (groupByType) {
-            pipeline.push(...[
-                {
-                    $lookup: {
-                        from: "status",
-                        localField: "status._id",
-                        foreignField: "_id",
-                        as: "status"
-                    }
-                },
-                {
-                    $lookup: {
-                        from: "users",
-                        localField: "complainant._id",
-                        foreignField: "_id",
-                        as: "complainant"
-                    }
-                },
-                {
-                    $unwind: "$complainant",
-                },
-                {
-                    $unwind: "$status"
-                },
-                {
-                    $addFields: {
-                        "reports.status.desc": "$status.desc",
-                        "reports.status.comment": "$status.comment",
-                    }
-                },
-                {
-                    $group: {
-                        _id: "$form_id",
-                        reports: { $push: "$$ROOT" }
-                    }
-                }, {
-                    $lookup: {
-                        from: "forms",
-                        localField: "_id",
-                        foreignField: "_id",
-                        as: "form"
-                    }
-                },
-                {
-                    $unwind: "$form"
-                },
-                {
-                    $addFields: {
-                        name: "$form.name",
-                        color: "$form.color"
-                    }
-                },
-            ]);
-        }
-        else {
-            pipeline.push(...[{
-                    $lookup: {
-                        from: "forms",
-                        localField: "form_id",
-                        foreignField: "_id",
-                        as: "form"
-                    }
-                },
-                {
-                    $unwind: "$form"
-                },
-                {
-                    $lookup: {
-                        from: "status",
-                        localField: "status._id",
-                        foreignField: "_id",
-                        as: "currentStatus"
-                    }
-                },
-                {
-                    $unwind: "$currentStatus"
-                }
-            ]);
-        }
-        return pipeline;
+        query.populate("status").populate("complainant").populate("form");
+        return query;
     }
-    administratorService.filterPipelineBuilder = filterPipelineBuilder;
+    administratorService.filterQueryBuilder = filterQueryBuilder;
 })(administratorService = exports.administratorService || (exports.administratorService = {}));
 //# sourceMappingURL=administrator.service.js.map

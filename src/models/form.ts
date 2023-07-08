@@ -8,6 +8,7 @@ export enum inputType {
     DropDown = "DropDown",
     Map = "Map",
     Photo = "Photo",
+    Video="Video"
 }
 
 export interface IField extends Document {
@@ -30,11 +31,8 @@ export interface IForm extends Document {
     name: string;
     defaultFields:Array<IField>;
     fields: Array<IField>;
-    organization: {
-        _id: Types.ObjectId;
-        ID: String;
-    },
-    activation_Status: boolean;
+    organization: Types.ObjectId;
+    icon:string;
     color: string;
     creationDate: Date;
     isDeleted: boolean;
@@ -49,11 +47,8 @@ const formSchema = new Schema<IForm>({
         { label: String, inputType: String, options: Schema.Types.Array, required: Boolean, type: fieldSchema }
     ]
     ,
-    organization: {
-        _id: { type: Schema.Types.ObjectId, required: true, ref: "organizations" },
-        ID: { type: String, required: true, ref: "organizations" },
-    },
-    activation_Status: { type: Schema.Types.Boolean, required: true },
+    organization:{ type: Schema.Types.ObjectId, required: true, ref: "organizations" },
+    icon: { type: Schema.Types.String, required: false},
     color: { type: Schema.Types.String, required: true },
     creationDate: { type: Schema.Types.Date,required:true },
     isDeleted: { type: Schema.Types.Boolean, required: true, default: false },

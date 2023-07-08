@@ -1,22 +1,15 @@
 import { Document, Schema, Types, model } from "mongoose"
 
-interface Organization {
-    _id: Types.ObjectId;
-    ID: string;
-}
 export interface Status extends Document{
+    _id: Types.ObjectId;
     desc: string;
-    organization: Organization;
+    organization: Types.ObjectId;
 }
 
 const statusSchema = new Schema<Status>(
     {
         desc: { type: String, required: true },
-        organization:
-        {
-            _id: { type: Schema.Types.ObjectId, required: true, ref: "organization" },
-            ID: { type: Schema.Types.String, required: true, ref: "organization" },
-        }
+        organization:{ type: Schema.Types.ObjectId, required: true, ref: "organization" },
     }
 )
 

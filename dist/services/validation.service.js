@@ -49,7 +49,7 @@ var validationService;
     }
     validationService.validate_User_Belong_To_Organziation = validate_User_Belong_To_Organziation;
     async function is_Complainant_Active(user) {
-        const complainant = await complainant_1.default.findOne({ "user._id": user._id });
+        const complainant = await complainant_1.default.findOne({ "user": user._id });
         if (!complainant) {
             throw new errorHandler_1.clientError({
                 message: "You are not authorized to process !",

@@ -17,7 +17,6 @@ type submission = {
 export namespace reportIncidentService {
     export async function reportIncident(submission: submission, user: IUser) {
 
-        console.log(submission.formID)
         const form = await FormModel.findById(submission.formID).exec();
 
         if (!form) {
@@ -75,11 +74,14 @@ export namespace reportIncidentService {
                 latitude: reportLocation.latitude as number,
                 longitude: reportLocation.longitude as number,
             },
-            complainant: { _id: user._id, ID: user.ID },
-            organization: { _id: organization._id, ID: organization.ID },
-            form_id: form._id,
-            status: { _id: organization.system.defaultStatus._id, comment: "Report Submitted" },
-            details: { ...details },
+            complainant: user._id  ,
+            organization: organization._id,
+            form: form._id,
+            status: organization.system.defaultStatus,
+            comment:{
+                comment:"",
+            },
+            details: details,
         })
 
         await newReport.save()

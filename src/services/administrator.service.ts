@@ -8,10 +8,12 @@ import { ObjectId } from "mongodb";
 import ExcelJS from "exceljs";
 import { randomUUID } from "crypto";
 import path from "path";
+import ReportModel from "../models/report";
 
 export type newForm = {
     name: String,
     fields: Array<IField>,
+    icon:string,
     color: string,
     activation: boolean,
 }
@@ -40,12 +42,10 @@ export namespace administratorService {
             defaultFields: defaultFields,
             fields: form.fields,
             activation_Status: form.activation,
-            color:form.color,
-            organization: {
-                _id: user.organization._id,
-                ID: user.organization.ID,
-            },
-            creationDate: new Date()
+            icon:form.icon,
+            color: form.color,
+            organization: user.organization._id,
+            creationDate: new Date(),
         });
 
         return await newForm.save();
@@ -66,8 +66,10 @@ export namespace administratorService {
             $set: {
                 name: formToUpdate.name,
                 fields: formToUpdate.fields,
-                activation_Status: formToUpdate.activation_Status,
+                color: formToUpdate.color,
+                icon:formToUpdate.icon,
             }
+
         }, { returnDocument: "after", runValidators: true }
         ).where({ organization: user.organization })
 
@@ -90,11 +92,11 @@ export namespace administratorService {
             })
         }
         const complainant = await complaiantModel.findOne({
-            'user._id': id
+            'user': id
         }).populate({
-            path: "user._id",
+            path: "user",
             match: {
-                'organization._id': requester.organization._id
+                'organization': requester.organization._id
             }
 
         }).updateOne({
@@ -241,163 +243,75 @@ export namespace administratorService {
 
 
 
-    export function filterPipelineBuilder(req: Request): PipelineStage[] {
+    export function filterQueryBuilder(req: Request) {
         const user = req.user;
         const sortBy = req.query?.sortBy;
-        const groupByType = req.query?.groupByType ? true : false// group report by type, default to true
         const subDate = {
             fromDate: req.query?.subFromDate,
             toDate: req.query?.subToDate,
         };
         const status = req.query?.status?.toString().split(",");
         const type = req.query?.type?.toString().split(",");
+        console.log(user)
 
-        console.log("Grouped By Type : " + req.query.groupByType)
-        const pipeline: PipelineStage[] = [
-            {
-                $match: {
-                    "organization._id": user.organization._id,
-                },
-
-
-            },
-        ]
+        const query = ReportModel.find({
+            organization: user.organization._id,
+        })
 
         if (subDate.fromDate) {
-            console.log(subDate.fromDate)
-            pipeline.push({
-                $match: {
-                    submissionDate: { $gte: new Date(subDate.fromDate.toString()) },
-                }
+            query.find({
+                submissionDate: { $gte: new Date(subDate.fromDate.toString()) },
             })
         }
         if (subDate.toDate) {
-            pipeline.push({
-                $match: {
-                    submissionDate: { $lte: new Date(subDate.toDate.toString()) },
-                }
+            query.find({
+                submissionDate: { $lte: new Date(subDate.toDate.toString()) },
             })
         }
 
-        if (status) {
-            const statuses: FilterQuery<any>[] = []// array of status to match from the query params - mongoose filter query
-            status.forEach((type) => {
-                console.log(type)
-                statuses.push({ "status._id": new ObjectId(type) })
-            })
-            pipeline.push({
-                $match: {
-                    $or: statuses
-                }
+        if (status || type) {
+            const statuses = status?.map((id) => {
+                return { "status": new ObjectId(id) }
+            }) || []
+
+            const types = type?.map((id) => {
+                return { "form": new ObjectId(id) }
+            }) || []
+
+            const and = []
+
+            if (statuses.length > 0) {
+                and.push({ $or: statuses })
+            }
+
+            if (types.length > 0) { 
+                and.push({ $or: types })
+            }
+
+            console.log(statuses)
+            query.find({
+                $and:and
+                
             })
         }
 
-        if (type) {
-            const types: FilterQuery<any>[] = []
-            type.forEach((type) => {
-                console.log(type)
-                types.push({ "form_id": new ObjectId(type) })
-            })
-            pipeline.push({
-                $match: {
-                    $or: types
-
-                }
-            })
-        }
 
         if (sortBy == "upDate") {
-            pipeline.push({
-                $sort: { "updateDate": 1 }
+            query.sort({
+                "updateDate": 1
             })
         }
         else {
-            pipeline.push({
-                $sort: { "submissionDate": 1 }
+            query.sort({
+                "submissionDate": 1
             })
         }
 
-        if (groupByType) {
-            pipeline.push(...[
-                {
-                    $lookup: {
-                        from: "status",
-                        localField: "status._id",
-                        foreignField: "_id",
-                        as: "status"
-                    }
-                },
-                {
-                    $lookup: {
-                        from:"users",
-                        localField:"complainant._id",
-                        foreignField:"_id",
-                        as:"complainant"
-                    }
-                },
-                {
-                    $unwind:"$complainant",
-                },
-                {
-                    $unwind: "$status"
-                },
-                {
-                    $addFields: {
-                        "reports.status.desc": "$status.desc",
-                        "reports.status.comment": "$status.comment",
-                    }
-                },
-                {
-                    $group: {
-                        _id: "$form_id",
-                        reports: { $push: "$$ROOT" }
-                    }
-                }, {
-                    $lookup: {
-                        from: "forms",
-                        localField: "_id",
-                        foreignField: "_id",
-                        as: "form"
-                    }
-                },
-                {
-                    $unwind: "$form"
-                },
-                {
-                    $addFields: {
-                        name: "$form.name",
-                        color: "$form.color"
-                    }
-                },
-            ])
-        } else {
-            pipeline.push(...[{
-                $lookup: {
-                    from: "forms",
-                    localField: "form_id",
-                    foreignField: "_id",
-                    as: "form"
-                }
-            },
-            {
-                $unwind: "$form"
-            },
-            {
-                $lookup: {
-                    from: "status",
-                    localField: "status._id",
-                    foreignField: "_id",
-                    as: "currentStatus"
-                }
 
-            },
-            {
-                $unwind: "$currentStatus"
-            }
-            ]
-            )
-        }
-        return pipeline;
+        query.populate("status").populate("complainant").populate("form")
+
+        return query
+
     }
 
 }

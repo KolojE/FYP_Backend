@@ -3,6 +3,7 @@ import { reportIncidentService } from "../services/reportIncident.service";
 import ReportModel from "../models/report";
 import { PipelineStage } from "mongoose";
 import { clientError, statusCode } from "../exception/errorHandler";
+import { ObjectId } from "mongodb";
 
 
 export async function reportIncidentController(req: Request, res: Response, next: Function) {
@@ -21,7 +22,7 @@ export async function reportIncidentController(req: Request, res: Response, next
 
 }
 
-export async function reportPhotoUploadController(req: Request, res: Response, next: Function) {
+export async function reportPhotoVideoUploadController(req: Request, res: Response, next: Function) {
 try {
         const file = req.file;
         if (!file) {
@@ -32,11 +33,10 @@ try {
         }
 
         file.path = file.path.replace(/\\/g, "/");
-
         file.path = file.path.replace("public", "");
 
         res.status(200).json({
-            message: `Photo Uploaded Successfully path is ${file.path}`,
+            message: `Photo/Video Uploaded Successfully path is ${file.path}`,
             filePath: file.path
         })
 
@@ -58,14 +58,16 @@ export async function getReportController(req: Request, res: Response, next: Fun
             toDate: req.query?.subToDate
         }
         const sortBy = req.query?.sortBy;
+        const status = req.query?.status?.toString().split(",");
+        const type = req.query?.type?.toString().split(",");
 
 
         if (reportID) {
             const report = await ReportModel.findOne({
                 _id: reportID,
-                "organization._id": user.organization._id,
-                "complainant._id": user._id,
-            }).populate("status._id").populate("form_id");
+                "organization": user.organization._id,
+                "complainant": user._id,
+            }).populate("status").populate("form");
 
             if (!report) {
                 throw new clientError({
@@ -82,115 +84,73 @@ export async function getReportController(req: Request, res: Response, next: Fun
             return
         }
 
-        //default pipeline.
-        const pipeline: PipelineStage[] = [
-            {
-                $match: {
-                    "complainant._id": user._id,
-                    "organization._id": user.organization._id,
-                },
-            },
-            {
-                $lookup: {
-                    from: "forms",
-                    localField: "form_id",
-                    foreignField: "_id",
-                    as: "form",
-                },
-            },
-            {
-                $lookup:{
-                    from:"status",
-                    localField:"status._id",
-                    foreignField:"_id",
-                    as:"statusData",
-                }
-            },
-            {
-                $unwind:"$statusData",
-            },
-            {
-                $addFields:{
-                    "status.desc":"$statusData.desc",
-                }
-            },
-            {
-                $unwind: "$form"
-            },
-            {
-                $unwind:"$status"
-            },
-            {
-                $addFields: {
-                    "name": "$form.name",
-                    
-                }
-            },
-            {
-                $project: {
-                    "form": 0,
-                    "statusData":0,
-                }
-                
-            },
-        ]
-
-
+        const query = ReportModel.find({
+            organization: user.organization._id,
+            complainant: user._id,
+        })
 
         if (subDate.fromDate) {
-            console.log(subDate)
-            pipeline.push({
-                $match: {
-                    submissionDate: {
-                        $gte: new Date(subDate.fromDate as string)
-                    }
-                }
+            query.find({
+                submissionDate: { $gte: new Date(subDate.fromDate.toString()) },
             })
         }
-
         if (subDate.toDate) {
-            pipeline.push({
-                $match: {
-                    submissionDate: {
-                        $lte: new Date(subDate.toDate as string),
-                    }
-                }
+            query.find({
+                submissionDate: { $lte: new Date(subDate.toDate.toString()) },
             })
         }
 
-        if(sortBy==="subDate")
-        {
-            console.log("sort by sub Date")
-            pipeline.push({
-                $sort:{
-                    submissionDate:-1, 
-                }
-            })
-        }else if(sortBy==="upDate")
-        {
-            console.log("sort By up Date")
-            pipeline.push({
-                $sort:{
-                    updateDate:-1,
-                }
+        if (status || type) {
+            const statuses = status?.map((id) => {
+                return { "status": new ObjectId(id) }
+            }) || []
+
+            const types = type?.map((id) => {
+                return { "form": new ObjectId(id) }
+            }) || []
+
+            const and = []
+
+            if (statuses.length > 0) {
+                and.push({ $or: statuses })
+            }
+
+            if (types.length > 0) { 
+                and.push({ $or: types })
+            }
+
+            console.log(statuses)
+            query.find({
+                $and:and
+                
             })
         }
-        
+
+
+        if (sortBy == "upDate") {
+            query.sort({
+                "updateDate": 1
+            })
+        }
+        else {
+            query.sort({
+                "submissionDate": 1
+            })
+        }
+
+
+        query.populate("status").populate("complainant").populate("form")
+
         if (limit) {
-            pipeline.push({
-                $limit: Number(limit)
-            })
+            query.limit(parseInt(limit.toString()))
         }
 
+        const result = await query.exec();
 
-        const submittedReports = ReportModel.aggregate(pipeline)
-
-        
-        const reports = await submittedReports;
-        console.log(reports)
+        console.log(JSON.stringify(result,null,2))
         res.status(200).send({
             message: `successfully get the submitted reports by User ${user._id}`,
-            reports: reports
+            reports: result
         })
 
     } catch (err) {

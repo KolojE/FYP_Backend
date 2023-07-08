@@ -52,10 +52,7 @@ var OrganizationService;
         const newAdminUser = new user_1.default({
             email: newRootAdmin.email,
             name: newRootAdmin.name,
-            organization: {
-                _id: newOrganization._id,
-                ID: newOrganization.ID
-            },
+            organization: newOrganization._id,
             password: {
                 hashed: hashedPassword.hashed,
                 salt: hashedPassword.salt,
@@ -69,17 +66,11 @@ var OrganizationService;
         const doc = this;
         const pendingStatus = new status_1.default({
             desc: "Pending",
-            organization: {
-                _id: doc._id,
-                ID: doc.ID,
-            },
+            organization: doc._id,
         });
         const resolvedStatus = new status_1.default({
             desc: "Resolved",
-            organization: {
-                _id: doc._id,
-                ID: doc.ID,
-            }
+            organization: doc._id,
         });
         const systemDefaultStatus = await pendingStatus.save();
         await resolvedStatus.save();

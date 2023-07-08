@@ -3,24 +3,10 @@ import { inputType } from "./form";
 import { any } from "joi";
 
 
-interface IOrganization {
-    _id: Types.ObjectId;
-    ID: string;
-}
-
-interface IComplainant {
-
-    _id: Types.ObjectId;
-    ID: string;
-}
-
-interface IStatus {
-    _id: Types.ObjectId;
+interface IComment{
     comment:string;
-    admin?: {
-        _id: Types.ObjectId;
-        ID: string;
-    }
+    admin?: string;
+    
 }
 
 export interface IDetails 
@@ -47,10 +33,11 @@ export interface IReport extends Document {
         latitude:number;
         longitude:number;
     }
-    form_id: Types.ObjectId;
-    organization: IOrganization;
-    complainant: IComplainant;
-    status: IStatus;
+    form: Types.ObjectId;
+    status: Types.ObjectId;
+    organization: Types.ObjectId;
+    complainant: Types.ObjectId;
+    comment?:IComment;
 
 }
 
@@ -67,23 +54,15 @@ const reportSchema = new Schema<IReport>({
         latitude:{type:Schema.Types.Number,required:true},
         longitude:{type:Schema.Types.Number,required:true}
     },
-    form_id: { type: Schema.Types.ObjectId, required: true, ref: "form" },
-    organization: {
-        _id: { type: Schema.Types.ObjectId, required: true, ref: "organization" },
-        ID: { type: String, required: true }
-    },
-    complainant: {
-        _id: { type: Schema.Types.ObjectId, required: true, ref: "user" },
-        ID: { type: String, required: true }
-    },
-    status: {
-        _id: { type: Schema.Types.ObjectId, required: true, ref: "status" },
+    form: { type: Schema.Types.ObjectId, required: true, ref: "form" },
+    organization: { type: Schema.Types.ObjectId, required: true, ref: "organization" },
+    complainant: { type: Schema.Types.ObjectId, required: true, ref: "user" },
+    status: { type: Schema.Types.ObjectId, required: true, ref:"status"},
+    comment: {
         comment:{type:Schema.Types.String,required:false},
-        admin: {
-            _id: { type: Schema.Types.ObjectId,  ref: "administrator" },
-            ID: { type: String }
-        }
+        admin: {type:Schema.Types.ObjectId,required:false,ref:"admin"}
     }
+
 });
 
 const ReportModel: Model<IReport> = model<IReport>('report', reportSchema);

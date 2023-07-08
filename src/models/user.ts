@@ -6,11 +6,7 @@ export enum role {
     admin = "admin",
     complainant = "complainant"
 }
-interface IOrganization {
 
-    _id: Types.ObjectId;
-    ID: string;
-}
 interface IContact {
 
     phoneNo: String;
@@ -24,19 +20,19 @@ interface IPassword {
 }
 
 export interface IUser extends Document {
-    ID: string;
+    ID?: string;
     profilePicture?:string;
     email: string;
     name:string;
     password: IPassword;
-    organization: IOrganization;
+    organization: Types.ObjectId;
     contact?: IContact;
     role: role;
 
 }
 
 const userSchema = new Schema<IUser>({
-    ID: { type: String,unique:true },
+    ID: { type: String,required:true,unique:true },
     email: { type: Schema.Types.String, unique:true, required: true },
     profilePicture:{type:Schema.Types.String,required:false},   
     name:{type:Schema.Types.String,required:true},
@@ -44,10 +40,7 @@ const userSchema = new Schema<IUser>({
         hashed: { type: String, required: true },
         salt: { type: String, required: true },
     },
-    organization: {
-        _id: { type: Schema.Types.ObjectId, required: true, ref: "organization" },
-        ID: { type: String, required: true, ref: "organization" },
-    },
+    organization:{ type: Schema.Types.ObjectId, required: true, ref: "organization" },
     contact: {
         phoneNo: { type: String, required: false },
         address: { type: String },

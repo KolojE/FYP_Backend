@@ -18,7 +18,6 @@ const systemConfigSchema = new Schema<ISystemConfig>({
 })
 
 export interface IOrganization extends Document {
-    _id: Types.ObjectId;
     ID: string;
     name: string;
     contactNo: string;

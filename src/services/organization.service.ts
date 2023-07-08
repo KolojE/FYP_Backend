@@ -9,6 +9,7 @@ type newOrganization = Omit<IOrganization,keyof Document|"ID"|"system">
 type rootAdmin = Omit<IUser,keyof Document|"ID"> & {
     password:string|Object
 }
+type status = Omit<Status,keyof Document>
 export namespace OrganizationService {
     export async function create_New_Organization(data: newOrganization): Promise<IOrganization>{
 
@@ -32,10 +33,7 @@ return newOrganization_;
         const newAdminUser = new userModel<rootAdmin>({
             email: newRootAdmin.email,
             name:newRootAdmin.name,
-            organization: {
-                _id: newOrganization._id,
-                ID: newOrganization.ID
-            },
+            organization: newOrganization._id,
             password: {
                 hashed: hashedPassword.hashed,
                 salt: hashedPassword.salt,
@@ -49,26 +47,20 @@ return newOrganization_;
         const doc = this;
 
 
-        const pendingStatus = new statusModel({
+        const pendingStatus = new statusModel<status>({
             desc: "Pending",
-            organization: {
-                _id: doc._id,
-                ID: doc.ID,
-            },
+            organization:doc._id,
 
         })
-        const resolvedStatus = new statusModel({
+        const resolvedStatus = new statusModel<status>({
             desc: "Resolved",
-            organization: {
-                _id: doc._id,
-                ID: doc.ID,
-            }
+            organization:doc._id,
+            
 
         })
 
         const systemDefaultStatus = await pendingStatus.save();
         await resolvedStatus.save();
-
         doc.system = {
             autoActiveNewUser: false,
             defaultStatus: systemDefaultStatus._id,

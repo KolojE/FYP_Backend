@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getAllForms, getForm,   getProfilePicture,    getReportPhotoUri,    getUserInfoController, updateProfile, uploadProfilePicture } from "../controller/user.controller";
+import { getAllForms, getForm,   getProfilePicture,    getReportElement,    getReportPhotoUri,    getUserInfoController, updateProfile, uploadProfilePicture } from "../controller/user.controller";
 import { authenticationMiddleware } from "../middleware/authentication.middleware";
 import { clientErrorHandler, errorHandler } from "../exception/errorHandler";
 import { uploadPictureMulter } from "../middleware/multerMiddleware";
@@ -18,6 +18,7 @@ userRouter.post('/getReportPhotos',getReportPhotoUri);
 
 userRouter.post('/updateProfile',updateProfile)
 userRouter.post('/uploadProfilePicture',uploadPictureMulter.single("profilePicture"),uploadProfilePicture)
+userRouter.get("/getReportElement", getReportElement);
 
 userRouter.use(clientErrorHandler);
 userRouter.use(errorHandler);

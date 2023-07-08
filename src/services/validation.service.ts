@@ -14,7 +14,6 @@ export namespace validationService {
     }
 
     export async function check_Email_Availability(email: String) {
-
         //check if it exists in conplainants 
         if (await userModel.exists({ email: email }) !== null) {
             throw new clientError({
@@ -25,7 +24,6 @@ export namespace validationService {
 
         }
     }
-
 
     export function form_Validation(form: newForm | IForm) {
         form.fields.forEach((field) => {
@@ -52,7 +50,7 @@ export namespace validationService {
     }
 
     export async function is_Complainant_Active(user: IUser) {
-        const complainant = await complaiantModel.findOne({ "user._id": user._id });
+        const complainant = await complaiantModel.findOne({ "user": user._id });
         if (!complainant) {
             throw new clientError({
                 message: "You are not authorized to process !",

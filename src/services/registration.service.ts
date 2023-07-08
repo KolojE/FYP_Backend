@@ -6,6 +6,9 @@ import { hashPassword } from "../utils/hash";
 import { validationService } from "./validation.service";
 
 type newComplainant  = Omit<IUser,keyof Document|"ID"> & {
+    organization:IOrganization & {
+        ID?:string
+    },
     password:string|Object
 }
 
@@ -43,14 +46,14 @@ export namespace registrationService {
         //hash password and store salt and hashed password
         const hashedPassword = await hashPassword(newComplainant.password.toString());
 
-        const newComplainant_ = new userModel<newComplainant>({
+        const newComplainant_ = new userModel<Omit<IUser,keyof Document>>({
             email: newComplainant.email,
             name:newComplainant.name,
             password: {
                 hashed: hashedPassword.hashed,
                 salt: hashedPassword.salt,
             },
-            organization: { _id: Organization._id, ID: Organization.ID },
+            organization: Organization._id,
             role: role.complainant,
         })
 

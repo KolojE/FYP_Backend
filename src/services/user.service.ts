@@ -5,6 +5,7 @@ import { ObjectId } from "mongodb";
 import { clientError, statusCode } from "../exception/errorHandler";
 import { readFile} from "fs/promises";
 import OrganizationModel from "../models/organization";
+import { Request } from "express";
 
 export namespace userService {
 
@@ -92,7 +93,6 @@ export namespace userService {
 
         return getBased64profilePicture(user);
     }
-
 
 }
 

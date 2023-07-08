@@ -44,7 +44,11 @@ export function generateSchema(form: IForm) {
             case inputType.Photo:
                 formSchema[fieldID] = Joi.array().items(Joi.string());
         console.log(field._id+" "+field.label+" "+field.inputType)
-        break;
+                break;
+            case inputType.Video:
+                formSchema[fieldID] = Joi.array().items(Joi.string());
+        console.log(field._id+" "+field.label+" "+field.inputType)
+                break;
         }
 
 

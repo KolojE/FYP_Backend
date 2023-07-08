@@ -3,10 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getReportController = exports.reportPhotoUploadController = exports.reportIncidentController = void 0;
+exports.getReportController = exports.reportPhotoVideoUploadController = exports.reportIncidentController = void 0;
 const reportIncident_service_1 = require("../services/reportIncident.service");
 const report_1 = __importDefault(require("../models/report"));
 const errorHandler_1 = require("../exception/errorHandler");
+const mongodb_1 = require("mongodb");
 async function reportIncidentController(req, res, next) {
     try {
         await reportIncident_service_1.reportIncidentService.reportIncident(req.body, req.user);
@@ -19,7 +20,7 @@ async function reportIncidentController(req, res, next) {
     }
 }
 exports.reportIncidentController = reportIncidentController;
-async function reportPhotoUploadController(req, res, next) {
+async function reportPhotoVideoUploadController(req, res, next) {
     try {
         const file = req.file;
         if (!file) {
@@ -31,7 +32,7 @@ async function reportPhotoUploadController(req, res, next) {
         file.path = file.path.replace(/\\/g, "/");
         file.path = file.path.replace("public", "");
         res.status(200).json({
-            message: `Photo Uploaded Successfully path is ${file.path}`,
+            message: `Photo/Video Uploaded Successfully path is ${file.path}`,
             filePath: file.path
         });
     }
@@ -39,9 +40,9 @@ async function reportPhotoUploadController(req, res, next) {
         next(err);
     }
 }
-exports.reportPhotoUploadController = reportPhotoUploadController;
+exports.reportPhotoVideoUploadController = reportPhotoVideoUploadController;
 async function getReportController(req, res, next) {
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j;
     try {
         const user = req.user;
         const limit = (_a = req.query) === null || _a === void 0 ? void 0 : _a.limit;
@@ -51,12 +52,14 @@ async function getReportController(req, res, next) {
             toDate: (_d = req.query) === null || _d === void 0 ? void 0 : _d.subToDate
         };
         const sortBy = (_e = req.query) === null || _e === void 0 ? void 0 : _e.sortBy;
+        const status = (_g = (_f = req.query) === null || _f === void 0 ? void 0 : _f.status) === null || _g === void 0 ? void 0 : _g.toString().split(",");
+        const type = (_j = (_h = req.query) === null || _h === void 0 ? void 0 : _h.type) === null || _j === void 0 ? void 0 : _j.toString().split(",");
         if (reportID) {
             const report = await report_1.default.findOne({
                 _id: reportID,
-                "organization._id": user.organization._id,
-                "complainant._id": user._id,
-            }).populate("status._id").populate("form_id");
+                "organization": user.organization._id,
+                "complainant": user._id,
+            }).populate("status").populate("form");
             if (!report) {
                 throw new errorHandler_1.clientError({
                     message: `No Report Found with _id ${reportID}`,
@@ -70,101 +73,58 @@ async function getReportController(req, res, next) {
             });
             return;
         }
-        const pipeline = [
-            {
-                $match: {
-                    "complainant._id": user._id,
-                    "organization._id": user.organization._id,
-                },
-            },
-            {
-                $lookup: {
-                    from: "forms",
-                    localField: "form_id",
-                    foreignField: "_id",
-                    as: "form",
-                },
-            },
-            {
-                $lookup: {
-                    from: "status",
-                    localField: "status._id",
-                    foreignField: "_id",
-                    as: "statusData",
-                }
-            },
-            {
-                $unwind: "$statusData",
-            },
-            {
-                $addFields: {
-                    "status.desc": "$statusData.desc",
-                }
-            },
-            {
-                $unwind: "$form"
-            },
-            {
-                $unwind: "$status"
-            },
-            {
-                $addFields: {
-                    "name": "$form.name",
-                }
-            },
-            {
-                $project: {
-                    "form": 0,
-                    "statusData": 0,
-                }
-            },
-        ];
+        const query = report_1.default.find({
+            organization: user.organization._id,
+            complainant: user._id,
+        });
         if (subDate.fromDate) {
-            console.log(subDate);
-            pipeline.push({
-                $match: {
-                    submissionDate: {
-                        $gte: new Date(subDate.fromDate)
-                    }
-                }
+            query.find({
+                submissionDate: { $gte: new Date(subDate.fromDate.toString()) },
             });
         }
         if (subDate.toDate) {
-            pipeline.push({
-                $match: {
-                    submissionDate: {
-                        $lte: new Date(subDate.toDate),
-                    }
-                }
+            query.find({
+                submissionDate: { $lte: new Date(subDate.toDate.toString()) },
             });
         }
-        if (sortBy === "subDate") {
-            console.log("sort by sub Date");
-            pipeline.push({
-                $sort: {
-                    submissionDate: -1,
-                }
+        if (status || type) {
+            const statuses = (status === null || status === void 0 ? void 0 : status.map((id) => {
+                return { "status": new mongodb_1.ObjectId(id) };
+            })) || [];
+            const types = (type === null || type === void 0 ? void 0 : type.map((id) => {
+                return { "form": new mongodb_1.ObjectId(id) };
+            })) || [];
+            const and = [];
+            if (statuses.length > 0) {
+                and.push({ $or: statuses });
+            }
+            if (types.length > 0) {
+                and.push({ $or: types });
+            }
+            console.log(statuses);
+            query.find({
+                $and: and
             });
         }
-        else if (sortBy === "upDate") {
-            console.log("sort By up Date");
-            pipeline.push({
-                $sort: {
-                    updateDate: -1,
-                }
+        if (sortBy == "upDate") {
+            query.sort({
+                "updateDate": 1
             });
         }
+        else {
+            query.sort({
+                "submissionDate": 1
+            });
+        }
+        query.populate("status").populate("complainant").populate("form");
         if (limit) {
-            pipeline.push({
-                $limit: Number(limit)
-            });
+            query.limit(parseInt(limit.toString()));
         }
-        const submittedReports = report_1.default.aggregate(pipeline);
-        const reports = await submittedReports;
-        console.log(reports);
+        const result = await query.exec();
+        console.log(JSON.stringify(result, null, 2));
         res.status(200).send({
             message: `successfully get the submitted reports by User ${user._id}`,
-            reports: reports
+            reports: result
         });
     }
     catch (err) {

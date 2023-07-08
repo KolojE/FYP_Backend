@@ -10,7 +10,7 @@ var role;
     role["complainant"] = "complainant";
 })(role = exports.role || (exports.role = {}));
 const userSchema = new mongoose_1.Schema({
-    ID: { type: String, unique: true },
+    ID: { type: String, required: true, unique: true },
     email: { type: mongoose_1.Schema.Types.String, unique: true, required: true },
     profilePicture: { type: mongoose_1.Schema.Types.String, required: false },
     name: { type: mongoose_1.Schema.Types.String, required: true },
@@ -18,10 +18,7 @@ const userSchema = new mongoose_1.Schema({
         hashed: { type: String, required: true },
         salt: { type: String, required: true },
     },
-    organization: {
-        _id: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "organization" },
-        ID: { type: String, required: true, ref: "organization" },
-    },
+    organization: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "organization" },
     contact: {
         phoneNo: { type: String, required: false },
         address: { type: String },

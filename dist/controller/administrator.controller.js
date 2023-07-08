@@ -26,7 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateReportController = exports.updateOrganization = exports.getReportElement = exports.getReportExcelController = exports.getReportController = exports.deleteMemberController = exports.updateMemberActivationController = exports.viewMembersController = exports.deleteFormController = exports.updateFormController = exports.addFormController = void 0;
+exports.updateReportController = exports.updateOrganization = exports.getReportExcelController = exports.getReportController = exports.deleteMemberController = exports.updateMemberActivationController = exports.viewMembersController = exports.deleteFormController = exports.updateFormController = exports.addFormController = void 0;
 const complainant_1 = __importDefault(require("../models/complainant"));
 const administrator_service_1 = require("../services/administrator.service");
 const validation_service_1 = require("../services/validation.service");
@@ -61,6 +61,7 @@ async function updateFormController(req, res, next) {
         const updateForm = req.body;
         await validation_service_1.validationService.form_Validation(updateForm);
         const updatedForm = await administrator_service_1.administratorService.updateForm(updateForm, req.user);
+        console.log(`Form ${updateForm._id} is updated. `, updatedForm, updateForm);
         res.status(200).json({
             message: "successfully updated form",
             data: updatedForm,
@@ -75,7 +76,14 @@ async function deleteFormController(req, res, next) {
     try {
         const formToDelete = req.query._id;
         const user = req.user;
-        const deletedForm = await form_1.FormModel.deleteOne({ _id: formToDelete }).where({ organization: user.organization });
+        const deletedForm = await form_1.FormModel.findOneAndUpdate({
+            _id: formToDelete,
+            organization: user.organization
+        }, {
+            $set: {
+                isDeleted: true
+            }
+        });
         console.log(`Form ${formToDelete} is deleted. `);
         res.status(200).json({
             message: `sucessfully deleted form ${formToDelete}`,
@@ -92,13 +100,13 @@ async function viewMembersController(req, res, next) {
         const members = await complainant_1.default.aggregate([
             {
                 $lookup: {
-                    from: "users", localField: "user._id", foreignField: "_id",
+                    from: "users", localField: "user", foreignField: "_id",
                     as: "user"
                 }
             },
             {
                 $lookup: {
-                    from: "organizations", localField: "user.organization._id", foreignField: "_id",
+                    from: "organizations", localField: "user.organization", foreignField: "_id",
                     as: "organization"
                 }
             },
@@ -149,7 +157,7 @@ async function deleteMemberController(req, res, next) {
     try {
         const user = req.user;
         const deleteUserId = req.query._id;
-        const deletedMember = await user_1.default.findOne({ _id: deleteUserId, role: user_1.role.complainant, "organization._id": user.organization._id });
+        const deletedMember = await user_1.default.findOne({ _id: deleteUserId, role: user_1.role.complainant, "organization": user.organization });
         const deletedComplainant = await complainant_1.default.findOne({ user: deleteUserId });
         if (!deletedComplainant) {
             throw new errorHandler_1.clientError({
@@ -184,10 +192,11 @@ async function getReportController(req, res, next) {
         console.log(req.query);
         if (req.query.reportID) {
             const reportID = req.query.reportID;
-            const report = await report_1.default.findOne({ _id: reportID,
-                "organization._id": req.user.organization._id
-            }).populate("status._id").populate("form_id").populate({
-                path: "complainant._id",
+            const report = await report_1.default.findOne({
+                _id: reportID,
+                "organization": req.user.organization._id
+            }).populate("status").populate("form").populate({
+                path: "complainant",
                 select: "-password -organization",
                 options: { lean: true },
                 justOne: true,
@@ -201,13 +210,13 @@ async function getReportController(req, res, next) {
             }
             res.status(200).send({
                 message: `Successfully returned report`,
-                report: Object.assign(Object.assign({}, report), { complainant: report.complainant._id }),
+                report: report,
             });
             return;
         }
-        const pipeline = administrator_service_1.administratorService.filterPipelineBuilder(req);
-        const result = await report_1.default.aggregate(pipeline);
-        console.log(JSON.stringify(result, null, 2));
+        const query = administrator_service_1.administratorService.filterQueryBuilder(req);
+        const result = await query.exec();
+        console.log(result);
         res.status(200).send({
             message: `Successfully returned reports for organization`,
             reports: result,
@@ -220,8 +229,8 @@ async function getReportController(req, res, next) {
 exports.getReportController = getReportController;
 async function getReportExcelController(req, res, next) {
     try {
-        const pipeline = administrator_service_1.administratorService.filterPipelineBuilder(req);
-        const result = await report_1.default.aggregate(pipeline);
+        const pipeline = administrator_service_1.administratorService.filterQueryBuilder(req);
+        const result = await pipeline.exec();
         const transformedResult = await administrator_service_1.administratorService.reportResultTransformer(result);
         const reportExcel = await administrator_service_1.administratorService.generateReportExcel(transformedResult);
         res.status(200).send({
@@ -233,39 +242,15 @@ async function getReportExcelController(req, res, next) {
     }
 }
 exports.getReportExcelController = getReportExcelController;
-async function getReportElement(req, res, next) {
-    var _a, _b;
-    try {
-        const user = req.user;
-        const includeType = ((_a = req.query) === null || _a === void 0 ? void 0 : _a.type) ? true : false;
-        const includeStatus = ((_b = req.query) === null || _b === void 0 ? void 0 : _b.status) ? true : false;
-        const element = {
-            type: null,
-            status: null,
-        };
-        if (includeType)
-            element.type = await form_1.FormModel.find({ "organization._id": user.organization._id }).select('name');
-        if (includeStatus)
-            element.status = await status_1.default.find({ "organization._id": user.organization._id }).select('desc');
-        res.status(200).send({
-            message: "succesfully returned Report Element ",
-            element: element,
-        });
-    }
-    catch (err) {
-        next(err);
-    }
-}
-exports.getReportElement = getReportElement;
 async function updateOrganization(req, res, next) {
     const user = req.user;
     const organizationToUpdate = req.body.organization;
     const stattusesToUpdateAndCreate = req.body.statuses;
     const statusesToDelete = req.body.statusesToDelete;
+    const statusReplacementMapper = req.body.statusReplacementMapper;
     const defaultStatusID = organizationToUpdate.system.defaultStatus;
-    console.log(organizationToUpdate);
     try {
-        const organization = await organization_1.default.findOne({ _id: user.organization._id });
+        const organization = await organization_1.default.findOne({ _id: user.organization });
         if (!organization) {
             throw new errorHandler_1.clientError({
                 message: `Organization not found`,
@@ -278,6 +263,7 @@ async function updateOrganization(req, res, next) {
                 status: errorHandler_1.statusCode.unauthorized,
             });
         }
+        const newStatuesOldIDs = [];
         const newStatuses = [];
         const updatedStatuses = [];
         const deletedStatuses = [];
@@ -288,16 +274,14 @@ async function updateOrganization(req, res, next) {
                 if (!(0, mongoose_1.isObjectIdOrHexString)(status._id)) {
                     const newStatus = new status_1.default({
                         desc: status.desc,
-                        organization: {
-                            _id: user.organization._id,
-                            ID: user.organization.ID,
-                        },
+                        organization: user.organization,
                     });
                     newStatuses.push(newStatus);
-                    newID = newStatus._id;
+                    newStatuesOldIDs.push(status._id.toString());
+                    newID = newStatus._id.toHexString();
                 }
                 else {
-                    const updatedStatus = await status_1.default.findOne({ _id: status._id, "organization._id": user.organization._id });
+                    const updatedStatus = await status_1.default.findOne({ _id: status._id, "organization": user.organization });
                     if (!updatedStatus) {
                         throw new errorHandler_1.clientError({
                             message: `no status with id ${status._id} was found`,
@@ -306,13 +290,43 @@ async function updateOrganization(req, res, next) {
                     }
                     updatedStatus.desc = status.desc;
                     updatedStatuses.push(updatedStatus);
-                    newID = updatedStatus._id;
+                    newID = updatedStatus._id.toHexString();
                 }
                 if (status._id == defaultStatusID) {
                     const ID = new mongoose_1.default.Types.ObjectId(newID);
                     organizationToUpdate.system.defaultStatus = ID;
                 }
             }
+        }
+        const reportsToUpdateQueries = [];
+        if (statusReplacementMapper) {
+            Object.keys(statusReplacementMapper).forEach((key) => {
+                const reportWithStatusID = key;
+                const updateReportToStatusID = statusReplacementMapper[key];
+                if (!(0, mongoose_1.isObjectIdOrHexString)(reportWithStatusID)) {
+                    throw new errorHandler_1.clientError({
+                        message: `report id ${reportWithStatusID} is not a valid id`,
+                        status: errorHandler_1.statusCode.badRequest,
+                    });
+                }
+                if (!(0, mongoose_1.isObjectIdOrHexString)(updateReportToStatusID)) {
+                    const newStatusHexIDIndex = newStatuesOldIDs.findIndex((status) => status == updateReportToStatusID);
+                    if (newStatusHexIDIndex == -1) {
+                        throw new errorHandler_1.clientError({
+                            message: `status id ${updateReportToStatusID} is not a valid id`,
+                            status: errorHandler_1.statusCode.badRequest,
+                        });
+                    }
+                    const newStattusHexID = newStatuses[newStatusHexIDIndex]._id.toHexString();
+                    statusReplacementMapper[key] = newStattusHexID;
+                }
+                reportsToUpdateQueries.push(report_1.default.updateMany({
+                    status: key,
+                    organization: user.organization,
+                }, {
+                    status: statusReplacementMapper[key],
+                }));
+            });
         }
         if (statusesToDelete) {
             for (let i = 0; i < statusesToDelete.length; i++) {
@@ -323,7 +337,7 @@ async function updateOrganization(req, res, next) {
                         status: errorHandler_1.statusCode.notfound,
                     });
                 }
-                const deletedStatus = await status_1.default.findOne({ _id: status._id, "organization._id": user.organization._id });
+                const deletedStatus = await status_1.default.findOne({ _id: status._id, "organization": user.organization });
                 if (!deletedStatus) {
                     throw new errorHandler_1.clientError({
                         message: `no status with id ${status._id} was found`,
@@ -340,7 +354,7 @@ async function updateOrganization(req, res, next) {
             }
         }
         if (organizationToUpdate) {
-            await organization_1.default.findOneAndUpdate({ _id: new mongodb_1.ObjectId(user.organization._id) }, {
+            await organization_1.default.findOneAndUpdate({ _id: new mongodb_1.ObjectId(user.organization) }, {
                 name: organizationToUpdate.name,
                 contactNo: organizationToUpdate.contactNo,
                 address: organizationToUpdate.address,
@@ -363,8 +377,9 @@ async function updateOrganization(req, res, next) {
                 }
             })));
         }
-        const updatedNewStatuses = await status_1.default.find({ "organization._id": user.organization._id }).select({ organization: 0 });
-        const updatedOrganization = await organization_1.default.findOne({ _id: user.organization._id });
+        const updatedReport = await Promise.all(reportsToUpdateQueries);
+        const updatedNewStatuses = await status_1.default.find({ "organization": user.organization }).select({ organization: 0 });
+        const updatedOrganization = await organization_1.default.findOne({ _id: user.organization });
         res.status(200).send({
             message: "succesfully updated organization ",
             organization: updatedOrganization,
@@ -383,22 +398,26 @@ async function updateReportController(req, res, next) {
     const reportStatus = req.body.status;
     const reportComment = req.body.comment;
     try {
-        const status = await status_1.default.findOne({ _id: reportStatus, "organization._id": user.organization._id });
+        const status = await status_1.default.findOne({ _id: reportStatus, "organization": user.organization._id });
         if (!status) {
             throw new errorHandler_1.clientError({
                 message: `status not found`,
                 status: errorHandler_1.statusCode.notfound,
             });
         }
-        const adminID = await administrator_1.default.findOne({ "user._id": user._id }).select('_id');
-        const report = await report_1.default.findOneAndUpdate({ _id: reportID, "organization._id": user.organization._id }, {
-            "status._id": status._id,
-            "status.comment": reportComment,
-            "status.admin": adminID,
+        const adminID = await administrator_1.default.findOne({ "user": user._id }).select('_id');
+        const report = await report_1.default.findOneAndUpdate({ _id: reportID, "organization": user.organization._id }, {
+            $set: {
+                status: status._id,
+                comment: {
+                    comment: reportComment,
+                    admin: adminID,
+                },
+            }
         }, {
             new: true,
         }).populate({
-            path: 'status._id',
+            path: 'status',
         });
         console.log(JSON.stringify(report, null, 2));
         if (!report) {

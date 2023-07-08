@@ -4,10 +4,7 @@ const mongoose_1 = require("mongoose");
 const autoincrement_1 = require("../plugin/autoincrement");
 const complainantSchema = new mongoose_1.Schema({
     ID: { type: String, unique: true, required: true },
-    user: {
-        _id: { type: mongoose_1.Schema.Types.ObjectId, unique: true, ref: "user" },
-        ID: { type: String, unique: true, ref: "user" }
-    },
+    user: { type: mongoose_1.Schema.Types.ObjectId, unique: true, ref: "user" },
     activation: { type: Boolean },
 });
 complainantSchema.plugin(autoincrement_1.autoIncrement, { fieldName: "ID", ModelName: "complainant", prefix: "Comp_" });

@@ -4,10 +4,7 @@ import { autoIncrement } from "../plugin/autoincrement";
 
 export interface IComplainant extends Document {
     ID: string;
-    user: {
-        _id: Types.ObjectId;
-        ID: string;
-    },
+    user:Types.ObjectId;
     activation:boolean
     
 }
@@ -15,10 +12,7 @@ export interface IComplainant extends Document {
 
 const complainantSchema = new Schema<IComplainant>({
     ID: { type: String, unique: true, required: true },
-    user: {
-        _id: { type: Schema.Types.ObjectId, unique: true, ref: "user" },
-        ID: { type: String, unique: true, ref: "user" }
-    },
+    user:{ type: Schema.Types.ObjectId, unique: true, ref: "user" },
     activation:{type:Boolean},
 })
 complainantSchema.plugin(autoIncrement, { fieldName: "ID", ModelName: "complainant", prefix: "Comp_" });

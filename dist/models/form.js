@@ -10,6 +10,7 @@ var inputType;
     inputType["DropDown"] = "DropDown";
     inputType["Map"] = "Map";
     inputType["Photo"] = "Photo";
+    inputType["Video"] = "Video";
 })(inputType = exports.inputType || (exports.inputType = {}));
 const fieldSchema = new mongoose_1.Schema({
     label: { type: String, required: true },
@@ -25,11 +26,8 @@ const formSchema = new mongoose_1.Schema({
     fields: [
         { label: String, inputType: String, options: mongoose_1.Schema.Types.Array, required: Boolean, type: fieldSchema }
     ],
-    organization: {
-        _id: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "organizations" },
-        ID: { type: String, required: true, ref: "organizations" },
-    },
-    activation_Status: { type: mongoose_1.Schema.Types.Boolean, required: true },
+    organization: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "organizations" },
+    icon: { type: mongoose_1.Schema.Types.String, required: false },
     color: { type: mongoose_1.Schema.Types.String, required: true },
     creationDate: { type: mongoose_1.Schema.Types.Date, required: true },
     isDeleted: { type: mongoose_1.Schema.Types.Boolean, required: true, default: false },
