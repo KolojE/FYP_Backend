@@ -22,7 +22,8 @@ export namespace registrationService {
         console.log(newComplainant)
         newComplainant.email = newComplainant.email.toLowerCase()
         //Get organization from submitted ID
-        const Organization = await OrganizationModel.findOne({ ID: newComplainant.organization.ID })
+        const ID = newComplainant.organization.ID;
+        const Organization = await OrganizationModel.findOne({ ID:RegExp(ID,"i") })
 
         await validationService.check_Email_Availability(newComplainant.email);
 

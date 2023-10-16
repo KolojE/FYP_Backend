@@ -36,8 +36,10 @@ var registrationService;
 (function (registrationService) {
     async function register_Complainant(complainantData) {
         const newComplainant = complainantData;
+        console.log(newComplainant);
         newComplainant.email = newComplainant.email.toLowerCase();
-        const Organization = await organization_1.default.findOne({ ID: newComplainant.organization.ID });
+        const ID = newComplainant.organization.ID;
+        const Organization = await organization_1.default.findOne({ ID: RegExp(ID, "i") });
         await validation_service_1.validationService.check_Email_Availability(newComplainant.email);
         if (!Organization) {
             throw new errorHandler_1.clientError({

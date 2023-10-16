@@ -1,5 +1,5 @@
 import express, { Router } from "express";
-import { createCollectionController, registerOrganizationController } from "../controller/organization.controller";
+import { createCollectionController, getOrganizationController, registerOrganizationController } from "../controller/organization.controller";
 import { clientErrorHandler, errorHandler } from "../exception/errorHandler";
 
 
@@ -9,6 +9,8 @@ organizationRouter.use(express.json())
 
 organizationRouter.post('/addOrganization', registerOrganizationController);
 organizationRouter.post('/createCollection', createCollectionController);
+
+organizationRouter.get('/getOrganization',getOrganizationController);
 organizationRouter.use(clientErrorHandler);
 organizationRouter.use(errorHandler)
 

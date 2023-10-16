@@ -10,6 +10,7 @@ const organizationRouter = express_1.default.Router();
 organizationRouter.use(express_1.default.json());
 organizationRouter.post('/addOrganization', organization_controller_1.registerOrganizationController);
 organizationRouter.post('/createCollection', organization_controller_1.createCollectionController);
+organizationRouter.get('/getOrganization', organization_controller_1.getOrganizationController);
 organizationRouter.use(errorHandler_1.clientErrorHandler);
 organizationRouter.use(errorHandler_1.errorHandler);
 exports.default = organizationRouter;

@@ -33,9 +33,10 @@ export namespace authenticationService {
             }) 
         }
 
-
+        console.log(login.identifier)
         //find the identifier owner and verify password
-        const loginUser = await userModel.findOne({ email: login.identifier }).lean()
+        const loginUser = await userModel.findOne({ email: { $regex: new RegExp(login.identifier, 'i') } }).lean();
+        console.log(loginUser)
         if (loginUser) {
             console.log(login.password)
             if (await verify(login.password, loginUser.password.hashed))

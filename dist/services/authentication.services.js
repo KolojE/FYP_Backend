@@ -19,7 +19,9 @@ var authenticationService;
                 status: errorHandler_1.statusCode.unauthorized
             });
         }
-        const loginUser = await user_1.default.findOne({ email: login.identifier }).lean();
+        console.log(login.identifier);
+        const loginUser = await user_1.default.findOne({ email: { $regex: new RegExp(login.identifier, 'i') } }).lean();
+        console.log(loginUser);
         if (loginUser) {
             console.log(login.password);
             if (await (0, hash_1.verify)(login.password, loginUser.password.hashed))

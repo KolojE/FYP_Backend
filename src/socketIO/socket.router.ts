@@ -55,7 +55,7 @@ export function socketConnceted(socket: Socket) {
         //Check if receipient is online
         if (io.sockets.has(onlineUserIDs.get(receipientID) ?? "")) {
             console.log("send message to " + receipientID)
-            io.to(receipientID).emit("receiveMessage", sender._id, message)
+            io.to(receipientID).emit("receiveMessage", sender._id, {...message,time:new Date().toLocaleString()})
             ack({
                 status: "success",
                 message: "Message Sent Successfully"
@@ -71,7 +71,7 @@ export function socketConnceted(socket: Socket) {
                 message: "Not Online, Message Will Be Sent When Online"
             })
         }
-        pendingMessages?.get(receipientID)?.push({ message: message, senderID: sender._id.toString() })
+        pendingMessages?.get(receipientID)?.push({ message: {...message,time:new Date().toLocaleString()}, senderID: sender._id.toString() })
 
     });
 
