@@ -15,7 +15,6 @@ export async function ConnectDatabase(callback: () => void) {
     }, (rejected) => {
         console.log(rejected);
         console.log("Connection to database is rejected!");
-
     })
 
 }

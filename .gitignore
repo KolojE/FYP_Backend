@@ -1,3 +1,5 @@
 node_modules
 dist
 public
+sample-data
+src/sample-data

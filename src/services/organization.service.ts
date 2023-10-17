@@ -21,8 +21,7 @@ export namespace OrganizationService {
             contactNo: newOrganization.contactNo,
             creationDate:new Date(),
         });
-return newOrganization_;
-
+    return newOrganization_;
     }
 
     export async function create_Root_Admin(newOrganization: IOrganization, data: rootAdmin): Promise<IUser> {

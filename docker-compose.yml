@@ -1,8 +1,13 @@
 version: '3.8'
 
 services:
+  mongodb:
+    image: koloje/fyp-mongo:latest
+    ports:
+      - "27017:27017"
+
   backend:
-    image: backend-image
+    image: koloje/fyp-backend:prototype 
     ports:
       - "8080:8080"
     depends_on:
@@ -10,7 +15,4 @@ services:
     links:
       - mongodb
 
-  mongodb:
-    image: mongo
-    ports:
-      - "27017:27017"
+  
