@@ -1,11 +1,6 @@
 version: '3.8'
 
 services:
-  mongodb:
-    image: koloje/fyp-mongo:latest
-    ports:
-      - "27017:27017"
-
   backend:
     image: koloje/fyp-backend:prototype 
     ports:
@@ -15,4 +10,10 @@ services:
     links:
       - mongodb
 
-  
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+
