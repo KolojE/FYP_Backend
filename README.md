@@ -23,11 +23,11 @@ The purpose of this project is to create an automated reporting system that aims
 - Report the environmental incident.
 - Track submitted report status.
 - Update system setting.
+- Report form customization.
 - Review incident report.
 - Incident report analysis.
 - Generate summary report.
 - In-app chat.
-
 
 ## Technologies/Libraries Used
 
@@ -36,8 +36,8 @@ The purpose of this project is to create an automated reporting system that aims
 - React Native
 - Node.js
 - [JOI.js (Data Validator)](https://joi.dev/)
+- Socket.io
 
-Provide a brief explanation of why you chose these technologies and how they were used in your project.
 
 ## Getting Started
 
