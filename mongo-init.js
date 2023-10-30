@@ -1,5 +1,3 @@
-const { ObjectId } = require("mongodb");
-
 db = db.getSiblingDB('fyp');
 
 db.administrators.insertMany([
