@@ -150,3 +150,21 @@ db.users.insertMany(
     ]
 
 )
+
+db.counters.insertMany([{
+    collectionID: 'complainant',
+    seq:2
+},
+{
+    collectionID: 'administrator',
+    seq:1
+},
+{
+    collectionID: 'organization',
+    seq:1
+},
+{
+    collectionID: 'user',
+    seq:4
+},
+])
