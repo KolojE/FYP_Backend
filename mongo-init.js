@@ -1,3 +1,5 @@
+const { ObjectId } = require("mongodb");
+
 db = db.getSiblingDB('fyp');
 
 db.administrators.insertMany([
@@ -78,6 +80,29 @@ db.organizations.insertMany(
     ]
 
 )
+
+db.status.insertMany([
+    {
+        _id: ObjectId("652d0bef7d4e65e143591c34"),
+        desc: "Pending",
+        organization: ObjectId("652d0bef7d4e65e143591c30"),
+    },
+    {
+        _id:ObjectId("652d0bef7d4e65e143591c36"),
+        desc: "Resolved",
+        organization: ObjectId("652d0bef7d4e65e143591c30"),
+    },
+    {
+        _id: ObjectId("652d0c0e7d4e65e143591c48"),
+        desc: "Pending",
+        organization: ObjectId("652d0c0e7d4e65e143591c46"),
+    },
+    {
+        _id: ObjectId("652d0c0e7d4e65e143591c4a"),
+        desc: "Resolved",
+        organization: ObjectId("652d0c0e7d4e65e143591c46"),
+    }
+])
 
 
 db.users.insertMany(
